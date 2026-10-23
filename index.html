@@ -1,0 +1,3192 @@
+<!DOCTYPE html>
+<html lang="gu" data-theme="cream">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Target — Smart Study OS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- OFFICIAL FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Gujarati:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+    /* SAMSUNG ONE UI — CREAM WHITE THEME */
+    html[data-theme="cream"] {
+      --bg-main: #F4F2EE;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #EAE6DF;
+      --bg-nav: rgba(255, 255, 255, 0.96);
+      --text-main: #121417;
+      --text-muted: #606770;
+      --border-col: #DFDBD2;
+      --accent: #3B5BDB;
+    }
+
+    /* SAMSUNG ONE UI — DEEP BLACK AMOLED THEME */
+    html[data-theme="black"] {
+      --bg-main: #000000;
+      --bg-card: #121418;
+      --bg-subtle: #1C1F26;
+      --bg-nav: rgba(18, 20, 24, 0.96);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border-col: #262A34;
+      --accent: #5C7CFA;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Gujarati', sans-serif;
+      overscroll-behavior-y: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .one-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-col);
+      border-radius: 26px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    }
+    .subtle-pill {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-col);
+      border-radius: 18px;
+    }
+    .theme-input {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-col);
+      color: var(--text-main);
+      border-radius: 16px;
+    }
+    .theme-input:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    .muted-text { color: var(--text-muted); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
+</head>
+<body class="min-h-screen pb-28 selection:bg-indigo-600 selection:text-white">
+
+  <!-- DEMO STICKY BAR -->
+  <div id="demoBanner" class="hidden sticky top-0 z-50 bg-amber-500 text-white px-4 py-2 shadow-md">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+      <div class="text-xs font-extrabold truncate">
+        👁️ DEMO MODE • <button onclick="startAppTour()" class="underline">🧭 Start Tour</button> • Buy: 9033189251
+      </div>
+      <button onclick="exitDemoMode()" class="bg-white text-amber-900 font-extrabold text-[11px] px-3 py-1 rounded-full shrink-0">
+        Exit
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= INTERACTIVE STEP-BY-STEP APP TOUR MODAL ================= -->
+  <div id="appTourOverlay" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center p-4">
+    <div class="w-full max-w-sm one-card p-5 space-y-4 border-2 border-indigo-500 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <span id="tourStepBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-indigo-600 text-white">
+          Step 1 / 6
+        </span>
+        <button onclick="closeAppTour()" class="text-xs font-extrabold muted-text hover:text-rose-500 px-2 py-1">
+          ✕ Skip Tour
+        </button>
+      </div>
+
+      <div class="space-y-1.5">
+        <h3 id="tourTitle" class="text-base font-extrabold">🎯 Welcome to The Target</h3>
+        <p id="tourDesc" class="text-xs muted-text leading-relaxed"></p>
+      </div>
+
+      <div id="tourHighlightBox" class="subtle-pill p-3 text-[11px] font-semibold text-indigo-500"></div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button onclick="prevTourStep()" id="tourPrevBtn" class="subtle-pill px-4 py-2 text-xs font-extrabold">
+          ◀ Back
+        </button>
+        <div id="tourDots" class="flex gap-1.5"></div>
+        <button onclick="nextTourStep()" id="tourNextBtn" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-extrabold shadow-md">
+          Next ➔
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LOGIN & PLAN GATE SCREEN ================= -->
+  <div id="authScreen" class="fixed inset-0 z-40 overflow-y-auto flex flex-col justify-center items-center px-4 py-6" style="background-color: var(--bg-main);">
+    <div class="w-full max-w-sm one-card p-6">
+      
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md">🎯</div>
+          <div>
+            <h1 class="text-lg font-extrabold tracking-tight leading-none">THE TARGET</h1>
+            <p class="text-[11px] muted-text mt-1">5-Day Free Trial • Secure Cloud OS</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleTheme()" id="themeBtnAuth" class="text-xs font-extrabold w-9 h-9 rounded-full subtle-pill">🌙</button>
+          <span id="cloudStatusAuth" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-500">🔒 Ready</span>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginFormContainer" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-bold muted-text mb-1 ml-1">મોબાઈલ નંબર</label>
+          <input id="authMobile" type="tel" maxlength="11" placeholder="10-digit mobile number" oninput="handleMobileInput(this.value)"
+            class="w-full theme-input px-4 py-3 text-sm font-semibold" />
+        </div>
+
+        <!-- Admin Password (ONLY for 9106581326) -->
+        <div id="adminPassWrapper" class="hidden">
+          <label class="block text-[11px] font-bold text-amber-500 mb-1 ml-1">Admin Password</label>
+          <input id="authAdminPass" type="password" placeholder="Enter Admin Password"
+            class="w-full theme-input border-amber-500 px-4 py-3 text-sm" />
+        </div>
+
+        <!-- Student Fields -->
+        <div id="studentFieldsWrapper" class="space-y-3">
+          <div id="newStudentFields" class="space-y-3">
+            <div>
+              <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પૂરું નામ</label>
+              <input id="authName" type="text" placeholder="Your Full Name" class="w-full theme-input px-4 py-3 text-sm" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પરીક્ષા</label>
+                <input id="authExam" type="text" placeholder="GPSC / CCE" class="w-full theme-input px-3.5 py-2.5 text-sm" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પરીક્ષા તારીખ</label>
+                <input id="authExamDate" type="date" class="w-full theme-input px-3 py-2.5 text-sm" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પ્લેટફોર્મ PIN</label>
+            <input id="authPin" type="password" placeholder="Enter PIN (2026)" class="w-full theme-input px-4 py-3 text-sm" />
+          </div>
+        </div>
+
+        <p id="authError" class="text-xs text-rose-500 font-bold hidden"></p>
+
+        <button type="button" onclick="submitAuth()" id="btnSubmitAuth"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-extrabold py-3.5 rounded-2xl text-sm shadow-md transition">
+          🎁 Start 5-Day Free Trial / Login
+        </button>
+      </div>
+
+      <!-- POST-LOGIN EXPIRED / APPROVAL LOCK + PRICING PLANS + DEMO -->
+      <div id="pendingApprovalView" class="hidden space-y-3.5">
+        <div class="text-center">
+          <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto text-xl mb-1.5">⏳</div>
+          <h2 id="txtPendTitle" class="text-sm font-extrabold">5-Day Free Trial પૂર્ણ થયો છે</h2>
+          <p class="text-[11px] muted-text mt-0.5">તમારો ડેટા ૧૦૦% સુરક્ષિત છે. આગળ વાપરવા પ્લાન પસંદ કરો:</p>
+        </div>
+
+        <div class="subtle-pill p-3 text-xs space-y-1">
+          <div class="flex justify-between"><span class="muted-text">Student:</span><span id="pendName" class="font-bold"></span></div>
+          <div class="flex justify-between"><span class="muted-text">Mobile:</span><span id="pendMobile" class="font-mono font-bold text-indigo-500"></span></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="subtle-pill p-2.5">
+            <div class="text-[10px] font-bold muted-text">6 Months</div>
+            <div class="text-base font-extrabold text-indigo-500 mt-0.5">₹99</div>
+            <div class="text-[9px] muted-text">180 Days</div>
+          </div>
+          <div class="subtle-pill p-2.5 border-2 border-indigo-500 relative">
+            <span class="absolute -top-2 inset-x-2 bg-indigo-600 text-white text-[8px] font-extrabold rounded-full py-0.5">POPULAR</span>
+            <div class="text-[10px] font-bold muted-text mt-1">1 Year</div>
+            <div class="text-base font-extrabold text-emerald-500 mt-0.5">₹149</div>
+            <div class="text-[9px] muted-text">365 Days</div>
+          </div>
+          <div class="subtle-pill p-2.5 border border-amber-500/40">
+            <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
+            <div class="text-base font-extrabold text-amber-500 mt-0.5">₹999</div>
+            <div class="text-[9px] muted-text">Unlimited</div>
+          </div>
+        </div>
+
+        <button onclick="startReadOnlyDemo(true)"
+          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
+          🧭 એપનો ડેમો અને ટૂર જુઓ (Interactive Demo Tour)
+        </button>
+
+        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-3 text-center space-y-2">
+          <div class="text-xs font-extrabold text-emerald-500">પ્લાન એક્ટિવેટ કરવા સંપર્ક કરો:</div>
+          <div class="text-sm font-extrabold font-mono text-emerald-500">📞 9033189251</div>
+          <div class="grid grid-cols-2 gap-2">
+            <a href="tel:9033189251" class="bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs block">📞 Call</a>
+            <a href="https://wa.me/919033189251?text=Hello%20The%20Target,%20I%20want%20to%20activate%20my%20Study%20App%20Plan" target="_blank" class="subtle-pill font-bold py-2 rounded-xl text-xs block">💬 WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="checkApprovalStatus()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs">🔄 સ્ટેટસ ચેક કરો</button>
+          <button onclick="logoutUser()" class="px-3.5 subtle-pill font-bold py-2.5 rounded-xl text-xs">Logout</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= STUDENT APP (SAMSUNG ONE UI SHELL) ================= -->
+  <div id="studentApp" class="hidden max-w-md mx-auto px-3.5 pt-3.5">
+    
+    <div id="studentBroadcastBanner" class="hidden mb-3 one-card p-3 bg-indigo-600/10 border-indigo-500/40 flex items-center justify-between gap-2">
+      <div class="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
+        <span>📢</span> <span id="studentBroadcastText"></span>
+      </div>
+    </div>
+
+    <header class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">🎯</div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm font-extrabold tracking-tight">THE TARGET</h1>
+            <span id="headerPlanBadge" class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">Trial</span>
+            <span id="cloudSyncBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">🔒 Synced</span>
+          </div>
+          <p id="headerStudentName" class="text-[10px] muted-text font-medium"></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="startAppTour()" title="App Guide Tour" class="text-xs font-extrabold w-8 h-8 rounded-full one-card flex items-center justify-center text-indigo-500">🧭</button>
+        <button onclick="toggleTheme()" id="themeBtnHeader" class="text-xs font-extrabold w-8 h-8 rounded-full one-card flex items-center justify-center">🌙</button>
+        <div onclick="switchStudentTab('profile')" class="text-right one-card px-2.5 py-1 rounded-2xl cursor-pointer active:scale-95 transition">
+          <div class="text-[8px] muted-text font-bold uppercase">પરીક્ષા બાકી</div>
+          <div id="headerDaysLeft" class="text-xs font-extrabold text-indigo-500">--</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-4 gap-2 mb-3.5">
+      <button onclick="onKpiClick('completed')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-indigo-500">
+        <div class="text-[9px] font-bold muted-text truncate">પૂર્ણ ચેપ્ટર ↗</div>
+        <div id="kpiSyllabusPct" class="text-sm font-extrabold mt-0.5">0/0</div>
+        <div id="kpiSyllabusPages" class="text-[9px] text-indigo-500 font-bold truncate">0p વાંચ્યા</div>
+      </button>
+
+      <button onclick="onKpiClick('revision')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-amber-500">
+        <div class="text-[9px] font-bold muted-text truncate">રિવિઝન ↗</div>
+        <div id="kpiDueRev" class="text-sm font-extrabold text-amber-500 mt-0.5">0 બાકી</div>
+        <div id="kpiRevPagesInfo" class="text-[9px] text-emerald-500 font-bold truncate">0p Rev</div>
+      </button>
+
+      <button onclick="onKpiClick('streak')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-emerald-500">
+        <div class="text-[9px] font-bold muted-text truncate">સ્ટ્રીક ↗</div>
+        <div id="kpiStreak" class="text-sm font-extrabold text-emerald-500 mt-0.5">0 🔥</div>
+        <div id="kpiDailyPace" class="text-[9px] muted-text truncate">આજે: 0p</div>
+      </button>
+
+      <button onclick="onKpiClick('tests')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-purple-500">
+        <div class="text-[9px] font-bold muted-text truncate">ટેસ્ટ સરેરાશ ↗</div>
+        <div id="kpiTestAvgTop" class="text-sm font-extrabold text-purple-500 mt-0.5">--%</div>
+        <div id="kpiTestCountTop" class="text-[9px] muted-text truncate">0 ટેસ્ટ</div>
+      </button>
+    </div>
+
+    <!-- ================= TAB 1: TODAY ================= -->
+    <section id="tab-today" class="space-y-3.5">
+      
+      <div class="one-card p-3.5 flex items-center justify-between gap-3">
+        <div class="flex-1">
+          <div class="flex items-center justify-between text-xs font-extrabold mb-1">
+            <span>🎯 આજનો વાંચન ટાર્ગેટ (Daily Page Goal)</span>
+            <span id="dailyGoalText" class="text-indigo-500">0 / 15 Pages</span>
+          </div>
+          <div class="w-full h-2 subtle-pill overflow-hidden">
+            <div id="dailyGoalBar" class="h-full bg-indigo-600 rounded-full transition-all" style="width:0%"></div>
+          </div>
+        </div>
+        <button onclick="changeDailyPageGoal()" class="subtle-pill px-2.5 py-1.5 text-[10px] font-extrabold shrink-0">⚙️ Goal</button>
+      </div>
+
+      <div class="one-card p-4 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h2 id="txtTodayLogTitle" class="text-sm font-extrabold">આજે શું ચાલ્યું?</h2>
+            <p class="text-[10px] muted-text">આજની કે જૂની તારીખ સિલેક્ટ કરીને પેજ ઉમેરો</p>
+          </div>
+          <div class="flex items-center gap-1 subtle-pill px-2.5 py-1">
+            <span class="text-xs">📅</span>
+            <input id="dailyLogDatePicker" type="date" onchange="handleDailyDateChange()"
+              class="bg-transparent text-[11px] font-extrabold outline-none w-[98px]" />
+            <button onclick="resetDailyDateToToday()" id="btnResetTodayDate" class="hidden text-[9px] bg-indigo-600 text-white font-bold px-1.5 py-0.5 rounded">Today</button>
+          </div>
+        </div>
+
+        <div id="todayNoSubjectsNotice" class="hidden text-center py-5 subtle-pill border-dashed">
+          <p class="text-xs muted-text mb-2">શરૂઆત કરવા પહેલા તમારો વિષય ઉમેરો</p>
+          <button onclick="switchStudentTab('syllabus')" class="text-xs font-extrabold bg-indigo-600 text-white px-4 py-2 rounded-full shadow-sm">
+            + સિલેબસમાં વિષય ઉમેરો
+          </button>
+        </div>
+
+        <div id="todayLoggerControls" class="space-y-3">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-extrabold uppercase muted-text">1. વિષય પસંદ કરો (Subject)</span>
+              <button onclick="switchStudentTab('syllabus')" class="text-[10px] font-bold text-indigo-500">+ નવો વિષય</button>
+            </div>
+            <div id="todaySubjectPills" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-extrabold uppercase muted-text">2. ચેપ્ટર પસંદ કરો (Chapter)</span>
+              <button onclick="toggleTodayTopicBox()"
+                class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full subtle-pill text-indigo-500 flex items-center gap-1">
+                <span>+</span> <span>પેટા-ટોપિક (Optional)</span>
+              </button>
+            </div>
+            <div id="todayChapterPills" class="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto pr-0.5"></div>
+          </div>
+
+          <div id="todayTopicDrawer" class="hidden subtle-pill p-3 space-y-2">
+            <select id="todayTopicSelect" onchange="handleTopicSelectChange()"
+              class="w-full theme-input px-3 py-2 text-xs font-semibold">
+            </select>
+            <input id="todayNewTopicName" type="text" placeholder="નવા ટોપિકનું નામ લખો..."
+              class="w-full theme-input px-3 py-2 text-xs" />
+          </div>
+
+          <div class="subtle-pill p-3 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div id="selectedChapterTitle" class="text-xs font-extrabold truncate">ચેપ્ટર પસંદ કરો</div>
+              <div class="flex items-center gap-1.5 mt-1 text-[10px] font-bold flex-wrap">
+                <span class="px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500" id="statReadBadge">📖 વાંચેલા: 0p</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500" id="statRevBadge">✅ રિવાઈઝ્ડ: 0p</span>
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500" id="statUnrevBadge">⏳ બાકી: 0p</span>
+              </div>
+            </div>
+
+            <div id="todayStepperWrap" class="flex items-center gap-1 one-card p-1 rounded-2xl shrink-0">
+              <button onclick="adjustStepper(-1)" class="w-8 h-8 rounded-xl subtle-pill font-extrabold text-sm">−</button>
+              <input id="todayPageDeltaInput" type="number" value="5" min="0" max="500"
+                class="w-9 text-center bg-transparent text-xs font-extrabold outline-none" />
+              <button onclick="adjustStepper(1)" class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-sm">+</button>
+            </div>
+          </div>
+
+          <div id="todayChapLockedNotice" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 text-center space-y-1.5">
+            <div class="text-xs font-extrabold text-amber-500">🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે</div>
+            <p class="text-[10px] muted-text">પૂર્ણ થયેલા ચેપ્ટરમાં સુધારો કરવા પહેલા તેને સિલેબસમાંથી <b>"↺ પાછું ચાલુ કરો (Reopen)"</b> કરો.</p>
+            <button onclick="reopenSelectedChapterFromToday()" class="bg-amber-500 text-white font-extrabold text-[11px] px-3.5 py-1.5 rounded-full">
+              ↺ પાછું ચાલુ કરો (Reopen to Edit)
+            </button>
+          </div>
+
+          <div id="todayActionButtonsRow" class="grid grid-cols-2 gap-2">
+            <button onclick="saveDailyPageLog(false)"
+              class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold py-3 px-2 rounded-2xl text-xs shadow-sm transition leading-tight">
+              <div>+ પેજ ઉમેરો (ચાલુ)</div>
+              <div class="text-[9px] font-normal opacity-85 mt-0.5">Today + 7-Day Revision</div>
+            </button>
+            <button onclick="saveDailyPageLog(true)"
+              class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-3 px-2 rounded-2xl text-xs shadow-sm transition leading-tight">
+              <div>✓ ચેપ્ટર પૂર્ણ (Finish)</div>
+              <div class="text-[9px] font-normal opacity-85 mt-0.5">Full 1•7•30•60D Plan</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="dueRevisionsCardAnchor" class="one-card p-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <div>
+            <h2 class="text-sm font-extrabold">🔔 આજનું રિવિઝન (Due Revisions)</h2>
+            <p class="text-[10px] muted-text">ચાલુ ચેપ્ટર (Today/7D) અને પૂર્ણ ચેપ્ટર (1-7-30-60D)</p>
+          </div>
+          <span id="dueRevBadgeCount" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500">0</span>
+        </div>
+
+        <div id="dueRevisionList" class="space-y-2"></div>
+
+        <details class="mt-3 pt-2.5 border-t" style="border-color: var(--border-col);">
+          <summary class="text-xs font-bold muted-text cursor-pointer select-none">
+            📅 આવનારા રિવિઝન (Upcoming Schedule)
+          </summary>
+          <div id="upcomingRevisionList" class="mt-2 space-y-1.5"></div>
+        </details>
+      </div>
+
+      <div class="one-card p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-extrabold">📌 Quick Formula & Key Notes</h2>
+            <p class="text-[10px] muted-text">વારંવાર ભુલાતા સૂત્રો, અનુચ્છેદ કે શોર્ટ-નોટ્સ અહીં સેવ રાખો</p>
+          </div>
+        </div>
+        <div class="flex gap-1.5">
+          <input id="quickNoteInput" type="text" placeholder="દા.ત. અનુચ્છેદ 32 = બંધારણીય ઇલાજોનો અધિકાર..."
+            class="flex-1 theme-input px-3 py-2 text-xs" />
+          <button onclick="addQuickNote()" class="bg-indigo-600 text-white font-extrabold px-3.5 py-2 rounded-2xl text-xs shrink-0">+ Save</button>
+        </div>
+        <div id="quickNotesList" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+      </div>
+
+      <div class="one-card p-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <h2 class="text-sm font-extrabold">🕒 રોજની એન્ટ્રી (Study Logs)</h2>
+          <input type="date" id="historyFilterDate" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1" />
+        </div>
+        <div id="dailyLogsHistoryList" class="space-y-1.5"></div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 2: SYLLABUS ================= -->
+    <section id="tab-syllabus" class="hidden space-y-3.5">
+      
+      <div class="one-card p-4">
+        <div class="flex gap-2">
+          <input id="newSubjectName" type="text" placeholder="નવો વિષય ઉમેરો (દા.ત. ભારતનું બંધારણ)"
+            class="flex-1 theme-input px-3.5 py-2.5 text-xs font-semibold" />
+          <button onclick="addSubject()"
+            class="bg-indigo-600 text-white font-extrabold px-4 py-2.5 rounded-2xl text-xs shrink-0 shadow-sm">
+            + વિષય
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between px-2">
+        <span class="text-[11px] font-bold muted-text">વિષય પર ટચ કરીને ચેપ્ટર Open / Close કરો</span>
+        <div class="flex gap-2">
+          <button onclick="setAllSubjectsAccordion(true)" class="text-[11px] font-extrabold text-indigo-500">Open All</button>
+          <span class="muted-text">•</span>
+          <button onclick="setAllSubjectsAccordion(false)" class="text-[11px] font-extrabold muted-text">Close All</button>
+        </div>
+      </div>
+
+      <div id="syllabusContainer" class="space-y-2.5"></div>
+
+      <div id="completedChaptersVaultAnchor" class="one-card p-4 border-l-4 border-l-emerald-500">
+        <div class="flex items-center justify-between mb-2.5">
+          <div>
+            <h2 class="text-sm font-extrabold text-emerald-500">🏆 પૂર્ણ થયેલા ચેપ્ટર્સ (Completed Vault)</h2>
+            <p class="text-[10px] muted-text">વિષય પર ટચ કરીને પૂર્ણ ચેપ્ટર્સ Open / Close કરો</p>
+          </div>
+          <span id="completedVaultTotalBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-500">0 Done</span>
+        </div>
+        <div id="completedChaptersBySubjectBox" class="space-y-2"></div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 3: ANALYSIS, GRAPHS, TESTS & WWW.THETARGET.IN ================= -->
+    <section id="tab-tests" class="hidden space-y-3.5">
+      
+      <a href="https://www.thetarget.in" target="_blank" class="one-card p-3.5 flex items-center justify-between bg-indigo-600/10 border-indigo-500/40 block">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-base font-bold">🌐</div>
+          <div>
+            <div class="text-xs font-extrabold text-indigo-500">Live MCQ Practice & Test Series</div>
+            <div class="text-[11px] font-bold">Visit: <span class="underline">www.thetarget.in</span></div>
+          </div>
+        </div>
+        <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full">Open ↗</span>
+      </a>
+
+      <div class="grid grid-cols-3 gap-1.5 subtle-pill p-1">
+        <button onclick="switchAnalysisSubView('overview')" id="subnav-overview" class="py-2 rounded-2xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm">
+          📊 Graphs & Psych
+        </button>
+        <button onclick="switchAnalysisSubView('addtest')" id="subnav-addtest" class="py-2 rounded-2xl text-xs font-extrabold muted-text">
+          🎯 + Add Test
+        </button>
+        <button onclick="switchAnalysisSubView('chapters')" id="subnav-chapters" class="py-2 rounded-2xl text-xs font-extrabold muted-text">
+          📚 Sub & Chap
+        </button>
+      </div>
+
+      <div id="an-view-overview" class="space-y-3.5">
+        
+        <div class="one-card p-4 space-y-3 border-t-4 border-t-indigo-600">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold">🧠 Study Psychology & Readiness</h2>
+              <p class="text-[10px] muted-text">તમારી વાંચન પદ્ધતિ અને યાદશક્તિનું મનોવૈજ્ઞાનિક વિશ્લેષણ</p>
+            </div>
+            <div id="readinessScoreBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-indigo-600 text-white">
+              0 / 100
+            </div>
+          </div>
+
+          <div class="subtle-pill p-3 space-y-1.5 border-l-4 border-l-amber-500">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-extrabold uppercase text-amber-500">Study Persona (તમારી શૈલી)</span>
+              <span id="psychMemoryScore" class="text-[10px] font-extrabold text-emerald-500">Memory Index: 100%</span>
+            </div>
+            <div id="psychPersonaTitle" class="text-xs font-extrabold">Consistent Builder</div>
+            <p id="psychActionAdvice" class="text-[11px] muted-text leading-relaxed"></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="subtle-pill p-2.5">
+              <div class="text-[10px] font-bold muted-text">⚡ રોજની સરેરાશ ઝડપ</div>
+              <div id="deepVelocity" class="text-sm font-extrabold text-indigo-500 mt-0.5">0 p/day</div>
+              <div id="microActiveDays" class="text-[9px] muted-text">0/7 દિવસ સક્રિય</div>
+            </div>
+            <div class="subtle-pill p-2.5">
+              <div class="text-[10px] font-bold muted-text">🔄 રિવિઝન કવરેજ</div>
+              <div id="microRevCoverage" class="text-sm font-extrabold text-emerald-500 mt-0.5">0%</div>
+              <div id="microUnrevBacklog" class="text-[9px] text-amber-500 font-bold">0p રિવિઝન બાકી</div>
+            </div>
+            <div class="subtle-pill p-2.5">
+              <div class="text-[10px] font-bold muted-text">🏆 શ્રેષ્ઠ ટેસ્ટ વિષય</div>
+              <div id="bestTestSubjectCard" class="text-xs font-extrabold text-purple-500 mt-0.5 truncate">--</div>
+              <div id="bestTestSubjectSub" class="text-[9px] muted-text">Subject Test Avg</div>
+            </div>
+            <div class="subtle-pill p-2.5">
+              <div class="text-[10px] font-bold muted-text">📖 Chapter Test Avg</div>
+              <div id="chapTestAvgCard" class="text-sm font-extrabold text-emerald-500 mt-0.5">--%</div>
+              <div id="microUntestedChaps" class="text-[9px] text-rose-500 font-bold">0 પૂર્ણ ચેપ્ટર ટેસ્ટ બાકી</div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t space-y-1.5" style="border-color: var(--border-col);">
+            <div class="text-xs font-extrabold">📊 Subject-Wise Test Average (વિષય મુજબ ટેસ્ટ સરેરાશ)</div>
+            <div id="overviewSubjectTestAverages" class="grid grid-cols-2 gap-1.5"></div>
+          </div>
+        </div>
+
+        <div id="streakGraphCardAnchor" class="one-card p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold">📊 7-Day Study Consistency Graph</h2>
+              <p class="text-[10px] muted-text">છેલ્લા ૭ દિવસમાં રોજ કેટલા પેજ ચાલ્યા</p>
+            </div>
+            <span id="graph7DayTotalBadge" class="text-xs font-extrabold text-indigo-500">0p Total</span>
+          </div>
+          <div id="weeklyChartBars" class="grid grid-cols-7 gap-2 items-end h-28 pt-5 px-2 subtle-pill"></div>
+        </div>
+
+        <div class="one-card p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-extrabold">📈 Test Score Progression Graph</h2>
+              <p class="text-[10px] muted-text">તમારી છેલ્લી ૧૦ ટેસ્ટના ટકાવારીનો ગ્રાફ</p>
+            </div>
+            <span id="deepTestAvg" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-500">Avg: --%</span>
+          </div>
+          <div id="testTrendSvgContainer" class="subtle-pill p-3 h-32 flex items-center justify-center"></div>
+        </div>
+
+      </div>
+
+      <!-- SUBVIEW B: ADD TEST + SORTABLE HISTORY -->
+      <div id="an-view-addtest" class="hidden space-y-3.5">
+        
+        <div class="one-card p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-extrabold">🎯 ટેસ્ટના માર્ક્સ ઉમેરો (Add Test)</h2>
+            <input type="date" id="testDateInput" class="theme-input text-[11px] font-bold px-2.5 py-1" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-1.5 subtle-pill p-1">
+            <button onclick="setTestEntryMode('chapter')" id="tmode-chapter" class="py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white">
+              📖 Chapter / Multi-Ch
+            </button>
+            <button onclick="setTestEntryMode('general')" id="tmode-general" class="py-1.5 rounded-xl text-[11px] font-extrabold muted-text">
+              🌐 Full / General Test
+            </button>
+          </div>
+
+          <input id="testCustomTitleInput" type="text" placeholder="ટેસ્ટનું નામ (Optional)"
+            class="w-full theme-input px-3.5 py-2 text-xs font-semibold" />
+
+          <div class="subtle-pill p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-extrabold uppercase muted-text">1. વિષય સિલેક્ટ કરો</span>
+              <button onclick="selectAllTestSubjects()" class="text-[10px] font-bold text-indigo-500">Select All (General)</button>
+            </div>
+            <div id="multiTestSubjectChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+            <div class="text-[10px] font-extrabold uppercase muted-text pt-1">2. ચેપ્ટર સિલેક્ટ કરો</div>
+            <div id="multiTestChapterCheckboxes" class="max-h-36 overflow-y-auto space-y-1 pt-1 border-t" style="border-color: var(--border-col);"></div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-[9px] font-bold muted-text ml-1">મેળવેલ માર્ક્સ</label>
+              <input id="testScoredInput" type="number" placeholder="e.g. 74" class="w-full theme-input px-3 py-2 text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-[9px] font-bold muted-text ml-1">કુલ માર્ક્સ</label>
+              <input id="testTotalInput" type="number" placeholder="100" value="100" class="w-full theme-input px-3 py-2 text-xs font-bold" />
+            </div>
+            <div class="flex items-end">
+              <button onclick="addTestScore()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2 rounded-2xl text-xs shadow-sm">
+                + સેવ કરો
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="one-card p-4 space-y-3">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <h2 class="text-sm font-extrabold">📋 ટેસ્ટ હિસ્ટ્રી (Test Results)</h2>
+            <div class="flex gap-1.5">
+              <select id="testHistSubFilter" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1">
+                <option value="ALL">All Subjects</option>
+              </select>
+              <select id="testHistSortBy" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1">
+                <option value="latest">🕒 Latest</option>
+                <option value="high">⬆️ High %</option>
+                <option value="low">⬇️ Low %</option>
+              </select>
+            </div>
+          </div>
+          <div id="testAnalyticsList" class="space-y-2"></div>
+        </div>
+
+      </div>
+
+      <!-- SUBVIEW C: SUBJECT-WISE & CHAPTER-WISE DEEP BREAKDOWN -->
+      <div id="an-view-chapters" class="hidden space-y-3.5">
+        <div class="one-card p-4 space-y-2.5">
+          <h2 class="text-sm font-extrabold">📚 Subject-Wise Mastery & Test Average</h2>
+          <div id="deepSubjectBreakdown" class="space-y-2"></div>
+        </div>
+
+        <div class="one-card p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-extrabold">📖 Chapter-Wise Test & Revision</h2>
+            <select id="analysisSubjectFilter" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2.5 py-1">
+              <option value="ALL">All Subjects</option>
+            </select>
+          </div>
+          <div id="deepChapterBreakdown" class="space-y-2 max-h-96 overflow-y-auto pr-0.5"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 4: ACCOUNT, PLANS, WWW.THETARGET.IN & BUG/FEATURE REPORT ================= -->
+    <section id="tab-profile" class="hidden space-y-3.5">
+      
+      <div class="one-card p-4 border-l-4 border-l-indigo-600 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <span id="profPlanTypeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">5-Day Free Trial</span>
+            <h2 id="profPlanTitle" class="text-base font-extrabold mt-1">Free Trial Active</h2>
+          </div>
+          <div class="text-right">
+            <div id="subDaysRemainingBig" class="text-xl font-extrabold text-emerald-500">5 Days</div>
+            <div class="text-[10px] muted-text">Validity Left</div>
+          </div>
+        </div>
+
+        <div class="w-full h-2 subtle-pill overflow-hidden">
+          <div id="subValidityBar" class="h-full bg-emerald-500 rounded-full" style="width:100%"></div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] muted-text">
+          <span>Start: <b id="subStartDate">--</b></span>
+          <span>Valid Till: <b id="subEndDate" class="text-emerald-500">--</b></span>
+        </div>
+
+        <div class="pt-2 border-t space-y-2" style="border-color: var(--border-col);">
+          <div class="text-xs font-extrabold">💎 Upgrade Membership Plans:</div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="subtle-pill p-2">
+              <div class="text-[10px] font-bold muted-text">6 Months</div>
+              <div class="text-sm font-extrabold text-indigo-500">₹99</div>
+            </div>
+            <div class="subtle-pill p-2 border border-indigo-500">
+              <div class="text-[10px] font-bold text-indigo-500">1 Year</div>
+              <div class="text-sm font-extrabold text-emerald-500">₹149</div>
+            </div>
+            <div class="subtle-pill p-2 border border-amber-500/50">
+              <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
+              <div class="text-sm font-extrabold text-amber-500">₹999</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-1 text-xs">
+            <span class="muted-text">Activate / Buy Contact: <b class="font-mono text-indigo-500">9033189251</b></span>
+            <a href="https://wa.me/919033189251?text=Hello%20The%20Target,%20I%20want%20to%20upgrade%20my%20plan" target="_blank" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded-full text-[11px]">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://www.thetarget.in" target="_blank" class="one-card p-4 flex items-center justify-between border-l-4 border-l-purple-500 block">
+        <div>
+          <div class="text-xs font-extrabold text-purple-500">🌐 Online MCQ Practice Platform</div>
+          <div class="text-sm font-extrabold mt-0.5">www.thetarget.in</div>
+          <div class="text-[10px] muted-text">રોજ નવા MCQ અને મોક ટેસ્ટની પ્રેક્ટિસ કરવા અહીં ક્લિક કરો</div>
+        </div>
+        <span class="bg-purple-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-2xl shrink-0">Visit ↗</span>
+      </a>
+
+      <div class="one-card p-4 space-y-2.5 border-l-4 border-l-amber-500">
+        <div>
+          <h2 class="text-sm font-extrabold">🛠️ Report Bug / Request New Feature</h2>
+          <p class="text-[10px] muted-text">એપમાં કોઈ ભૂલ (Error/Bug) આવતી હોય કે નવું ફીચર જોઈતું હોય તો અહીં જણાવો:</p>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5">
+          <select id="feedbackTypeSelect" class="theme-input px-2.5 py-2 text-xs font-bold">
+            <option value="Feature Request">✨ New Feature</option>
+            <option value="Bug / Error">🐞 Bug / Error</option>
+            <option value="Suggestion">💡 Suggestion</option>
+          </select>
+          <input id="feedbackMessageInput" type="text" placeholder="તમારો મેસેજ અહીં લખો..."
+            class="col-span-2 theme-input px-3 py-2 text-xs" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="submitFeedbackReport(false)" class="bg-indigo-600 text-white font-extrabold py-2 rounded-2xl text-xs">
+            📩 Submit to Admin
+          </button>
+          <button onclick="submitFeedbackReport(true)" class="bg-emerald-600 text-white font-extrabold py-2 rounded-2xl text-xs">
+            💬 Send on WhatsApp
+          </button>
+        </div>
+      </div>
+
+      <div class="one-card p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-extrabold">⏱️ Quick Study Focus Timer</div>
+          <div class="text-[11px] muted-text">25 Min Deep Reading Session</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="pomoClock" class="text-base font-mono font-extrabold text-indigo-500">25:00</span>
+          <button onclick="togglePomodoro()" id="pomoBtn" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-full">Start</button>
+          <button onclick="resetPomodoro()" class="subtle-pill text-xs font-bold px-2.5 py-1.5">↺</button>
+        </div>
+      </div>
+
+      <div class="one-card p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-extrabold">🎨 One UI Theme & App Tour</div>
+          <div class="text-[11px] muted-text">થીમ બદલો અથવા App Guide ફરી જુઓ</div>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="startAppTour()" class="px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/15 text-indigo-500">🧭 Tour</button>
+          <button onclick="setTheme('cream')" class="px-2.5 py-1.5 rounded-full text-xs font-bold border border-amber-300 bg-[#F4F2EE] text-slate-900">☀️</button>
+          <button onclick="setTheme('black')" class="px-2.5 py-1.5 rounded-full text-xs font-bold border border-slate-700 bg-[#000000] text-white">🌙</button>
+        </div>
+      </div>
+
+      <div class="one-card p-4 space-y-2.5 border-l-4 border-l-emerald-500">
+        <h2 class="text-sm font-extrabold">🛡️ ડેટા બેકઅપ (Cloud + File Backup)</h2>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="downloadStudentBackup()" class="bg-emerald-600 text-white font-bold py-2.5 rounded-2xl text-xs">
+            ⬇ Download Backup
+          </button>
+          <label class="subtle-pill font-bold py-2.5 rounded-2xl text-xs text-center cursor-pointer">
+            ⬆ Restore File
+            <input type="file" accept=".json" class="hidden" onchange="restoreStudentBackup(event)" />
+          </label>
+        </div>
+      </div>
+
+      <div class="one-card p-4 space-y-2.5">
+        <h2 class="text-sm font-extrabold">🎯 પ્રોફાઈલ અને પરીક્ષા તારીખ</h2>
+        <input id="profName" type="text" class="w-full theme-input px-3.5 py-2.5 text-xs font-semibold" />
+        <div class="grid grid-cols-2 gap-2">
+          <input id="profExam" type="text" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
+          <input id="profExamDate" type="date" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
+        </div>
+        <button onclick="saveProfileSettings()" class="w-full bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs">
+          સેવ કરો
+        </button>
+      </div>
+
+      <div class="one-card p-4 flex items-center justify-between">
+        <div id="profMobileDisplay" class="text-xs font-mono font-bold text-indigo-500"></div>
+        <button onclick="logoutUser()" class="bg-rose-500/15 text-rose-500 font-bold px-4 py-1.5 rounded-full text-xs">
+          Logout
+        </button>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 inset-x-0 z-30 backdrop-blur-lg border-t" style="background-color: var(--bg-nav); border-color: var(--border-col);">
+      <div class="max-w-md mx-auto grid grid-cols-4 py-2 px-3">
+        <button onclick="switchStudentTab('today')" id="nav-today" class="flex flex-col items-center py-1 text-indigo-500">
+          <span class="text-base">🏠</span>
+          <span id="navLbl1" class="text-[10px] font-extrabold mt-0.5">આજે</span>
+        </button>
+        <button onclick="switchStudentTab('syllabus')" id="nav-syllabus" class="flex flex-col items-center py-1 muted-text">
+          <span class="text-base">📚</span>
+          <span id="navLbl2" class="text-[10px] font-extrabold mt-0.5">સિલેબસ</span>
+        </button>
+        <button onclick="switchStudentTab('tests')" id="nav-tests" class="flex flex-col items-center py-1 muted-text">
+          <span class="text-base">📊</span>
+          <span id="navLbl3" class="text-[10px] font-extrabold mt-0.5">એનાલિસિસ</span>
+        </button>
+        <button onclick="switchStudentTab('profile')" id="nav-profile" class="flex flex-col items-center py-1 muted-text">
+          <span class="text-base">👤</span>
+          <span id="navLbl4" class="text-[10px] font-extrabold mt-0.5">પ્લાન</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ================= PRIVATE OWNER ADMIN PANEL (9106581326) ================= -->
+  <div id="adminApp" class="hidden max-w-3xl mx-auto px-4 pt-4 pb-24">
+    <header class="flex items-center justify-between one-card p-4 mb-4 border-l-4 border-l-indigo-600">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm font-extrabold">🛡️ THE TARGET — OWNER ADMIN (91065 81326)</h1>
+          <span id="adminCloudBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">🔒 Secure Cloud</span>
+        </div>
+        <p class="text-[11px] muted-text">5D Trial • ₹99 (6M) • ₹149 (1Y) • ₹999 (Lifetime) • www.thetarget.in</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="syncFromFirebaseCloud(true)" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-indigo-600 text-white">🔄 Refresh Cloud</button>
+        <button onclick="toggleTheme()" class="text-xs font-extrabold px-3 py-1.5 rounded-full subtle-pill">☀️/🌙</button>
+        <button onclick="logoutUser()" class="subtle-pill text-xs font-bold px-3.5 py-1.5">Logout</button>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-4 gap-2 mb-4">
+      <div class="one-card p-3">
+        <div class="text-[10px] muted-text">Total Users</div>
+        <div id="admTotalUsers" class="text-base font-extrabold">0</div>
+      </div>
+      <div class="one-card p-3">
+        <div class="text-[10px] muted-text">5D Trial / Exp</div>
+        <div id="admPendingUsers" class="text-base font-extrabold text-amber-500">0</div>
+      </div>
+      <div class="one-card p-3">
+        <div class="text-[10px] muted-text">Paid Active</div>
+        <div id="admApprovedUsers" class="text-base font-extrabold text-emerald-500">0</div>
+      </div>
+      <div class="one-card p-3">
+        <div class="text-[10px] muted-text">Bug / Feedback</div>
+        <div id="admFeedbackCount" class="text-base font-extrabold text-indigo-500">0</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div class="one-card p-3.5 space-y-2">
+        <div class="text-xs font-extrabold">📢 Global Student Broadcast Notice</div>
+        <div class="flex gap-1.5">
+          <input id="adminBroadcastInput" type="text" placeholder="બધા વિદ્યાર્થીઓને એપમાં ઉપર સૂચના બતાવો..."
+            class="flex-1 theme-input px-3 py-1.5 text-xs" />
+          <button onclick="saveAdminBroadcast()" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl">Post</button>
+        </div>
+      </div>
+
+      <div class="one-card p-3.5 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-extrabold">💾 Master Database Backup</div>
+          <div class="text-[10px] muted-text">All Students JSON Export / Restore</div>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="exportAllDatabaseJSON()" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-xl font-bold">⬇ Export</button>
+          <label class="text-xs subtle-pill px-3 py-1.5 font-bold cursor-pointer">
+            ⬆ Restore
+            <input type="file" accept=".json" class="hidden" onchange="importMasterDatabaseJSON(event)" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="one-card p-4 mb-4 space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-xs font-extrabold">👥 Student Management (Locked Until '✎ Edit' Clicked)</h2>
+          <p class="text-[10px] muted-text">નામ કે મોબાઈલ નંબરથી સર્ચ કરો. Edit બટન દબાવ્યા પછી જ વેલિડિટી કે વિગત બદલી શકાશે.</p>
+        </div>
+        <div class="flex gap-1.5">
+          <input id="adminSearchInput" type="text" placeholder="🔍 Search Name or Mobile..." oninput="renderAdminPanel()"
+            class="theme-input px-3 py-1.5 text-xs font-semibold w-48" />
+          <select id="adminFilterStatus" onchange="renderAdminPanel()" class="theme-input px-2.5 py-1.5 text-xs font-bold">
+            <option value="ALL">All</option>
+            <option value="PAID">Paid Active</option>
+            <option value="TRIAL">5D Trial</option>
+            <option value="EXPIRED">Expired / Locked</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="adminStudentList" class="space-y-2.5"></div>
+    </div>
+
+    <div class="one-card p-4 mb-4">
+      <h2 class="text-xs font-extrabold mb-2">🛠️ Student Bug Reports & Feature Requests</h2>
+      <div id="adminFeedbackList" class="space-y-2"></div>
+    </div>
+
+    <div id="adminInspectBox" class="hidden one-card p-5 border-2 border-indigo-500 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-col);">
+        <h3 id="inspectStudentTitle" class="text-sm font-extrabold text-indigo-500"></h3>
+        <button onclick="document.getElementById('adminInspectBox').classList.add('hidden')" class="text-xs font-extrabold px-3 py-1 rounded-full subtle-pill">✕ Close Report</button>
+      </div>
+      <div id="inspectStudentContent" class="space-y-4 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- ================= APPLICATION & SECURE FIREBASE CONFIG LOGIC ================= -->
+  <script>
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCiHw4vS44EadG9fvw806qTDybf0Jk824o",
+      authDomain: "the-target-tracker.firebaseapp.com",
+      databaseURL: "https://the-target-tracker-default-rtdb.firebaseio.com",
+      projectId: "the-target-tracker",
+      storageBucket: "the-target-tracker.firebasestorage.app",
+      messagingSenderId: "636804262453",
+      appId: "1:636804262453:web:0d5a7b778f661c85bf9f7c",
+      measurementId: "G-FECT2V09Y6"
+    };
+
+    const FIREBASE_DB_URL = FIREBASE_CONFIG.databaseURL;
+    let firebaseIdToken = null;
+    let fbAppReady = false;
+
+    try {
+      if (typeof firebase !== "undefined") {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        fbAppReady = true;
+      }
+    } catch (e) {}
+
+    const ADMIN_MOBILE = "9106581326";
+    const ADMIN_PASS   = "Zj@123456";
+    const REQUIRED_STUDENT_PIN = "2026";
+    const DB_KEY = "THE_TARGET_CLEAN_DB_V6";
+    const DB_MIRROR_KEY = "THE_TARGET_CLEAN_DB_MIRROR_V6";
+    const SESSION_KEY = "THE_TARGET_ACTIVE_SESSION_V6";
+    const THEME_KEY = "THE_TARGET_THEME_PREF";
+
+    let theme = localStorage.getItem(THEME_KEY) || "cream";
+    let db = loadDB();
+    let currentSession = loadSession();
+    let isDemoMode = false;
+    let selectedSubjectId = null;
+    let selectedChapterId = null;
+    let expandedSubjects = {};
+    let expandedCompletedVault = {};
+    let openOldChapterForm = {};
+    let adminUnlockedUsers = {};
+
+    let currentTestEntryMode = "chapter";
+    let selectedTestSubIds = [];
+    let selectedTestChapKeys = [];
+
+    let pomoSeconds = 25 * 60;
+    let pomoTimer = null;
+
+    // Non-blocking timeout wrapper so login NEVER hangs!
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(resolve => setTimeout(() => resolve(null), ms))
+      ]);
+    }
+
+    async function ensureFirebaseAuthToken() {
+      if (firebaseIdToken) return firebaseIdToken;
+      try {
+        if (fbAppReady && firebase.auth) {
+          const cur = firebase.auth().currentUser;
+          if (cur) {
+            firebaseIdToken = await cur.getIdToken();
+            return firebaseIdToken;
+          }
+          const cred = await withTimeout(firebase.auth().signInAnonymously(), 2500);
+          if (cred && cred.user) {
+            firebaseIdToken = await cred.user.getIdToken();
+            return firebaseIdToken;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const res = await withTimeout(
+          fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + FIREBASE_CONFIG.apiKey, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ returnSecureToken: true })
+          }),
+          2500
+        );
+        if (res && res.ok) {
+          const data = await res.json();
+          firebaseIdToken = data.idToken;
+          return firebaseIdToken;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function buildFirebaseUrl(path) {
+      return firebaseIdToken
+        ? FIREBASE_DB_URL + path + "?auth=" + encodeURIComponent(firebaseIdToken)
+        : FIREBASE_DB_URL + path;
+    }
+
+    function setCloudBadgeStatus(text, isOk) {
+      const b1 = document.getElementById("cloudSyncBadge");
+      const b2 = document.getElementById("adminCloudBadge");
+      const b3 = document.getElementById("cloudStatusAuth");
+      [b1, b2, b3].forEach(el => {
+        if (!el) return;
+        el.textContent = text;
+        el.className = isOk
+          ? "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500"
+          : "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500";
+      });
+    }
+
+    function normalizeUserObject(u) {
+      if (!u) return u;
+      if (!Array.isArray(u.subjects)) u.subjects = [];
+      u.subjects.forEach(s => {
+        if (!Array.isArray(s.chapters)) s.chapters = [];
+        s.chapters.forEach(c => {
+          if (!Array.isArray(c.topics)) c.topics = [];
+        });
+      });
+      if (!Array.isArray(u.logs)) u.logs = [];
+      if (!Array.isArray(u.revisions)) u.revisions = [];
+      if (!Array.isArray(u.tests)) u.tests = [];
+      if (!Array.isArray(u.quickNotes)) u.quickNotes = [];
+      return u;
+    }
+
+    async function syncFromFirebaseCloud(manualRefresh) {
+      try {
+        setCloudBadgeStatus("🔒 Syncing...", true);
+        await ensureFirebaseAuthToken();
+        let res = await withTimeout(fetch(buildFirebaseUrl("/targetApp.json")), 3000);
+        if ((!res || !res.ok) && firebaseIdToken) {
+          res = await withTimeout(fetch(FIREBASE_DB_URL + "/targetApp.json"), 2500);
+        }
+        if (!res || !res.ok) throw new Error("Sync skipped");
+        const cloudData = await res.json();
+
+        if (cloudData) {
+          if (cloudData.users) {
+            Object.keys(cloudData.users).forEach(mob => {
+              db.users[mob] = normalizeUserObject(cloudData.users[mob]);
+            });
+          }
+          if (Array.isArray(cloudData.feedbacks)) db.feedbacks = cloudData.feedbacks;
+          if (typeof cloudData.broadcast === "string") db.broadcast = cloudData.broadcast;
+
+          const str = JSON.stringify(db);
+          localStorage.setItem(DB_KEY, str);
+          localStorage.setItem(DB_MIRROR_KEY, str);
+        } else if (Object.keys(db.users).length > 0) {
+          await pushToFirebaseCloud();
+        }
+
+        setCloudBadgeStatus("🔒 Secure Live", true);
+        if (currentSession) {
+          if (currentSession.role === "admin") renderAdminPanel();
+          else if (currentSession.role === "student" && !isDemoMode) renderStudentAll();
+        }
+        if (manualRefresh) alert("✅ Secure Firebase Cloud માંથી તાજો ડેટા લોડ થઈ ગયો છે!");
+      } catch (err) {
+        setCloudBadgeStatus("⚡ Local Ready", false);
+      }
+    }
+
+    async function pushToFirebaseCloud() {
+      try {
+        if (isDemoMode) return;
+        setCloudBadgeStatus("🔒 Saving...", true);
+        await ensureFirebaseAuthToken();
+
+        if (currentSession && currentSession.role === "student" && currentSession.mobile) {
+          const m = currentSession.mobile;
+          if (db.users[m]) {
+            await withTimeout(fetch(buildFirebaseUrl("/targetApp/users/" + m + ".json"), {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(db.users[m])
+            }), 3000);
+          }
+          await withTimeout(fetch(buildFirebaseUrl("/targetApp/feedbacks.json"), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(db.feedbacks || [])
+          }), 3000);
+        } else {
+          await withTimeout(fetch(buildFirebaseUrl("/targetApp.json"), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(db)
+          }), 3000);
+        }
+        setCloudBadgeStatus("🔒 Secure Live", true);
+      } catch (err) {
+        setCloudBadgeStatus("⚡ Saved Locally", false);
+      }
+    }
+
+    let currentTourStep = 0;
+    const TOUR_STEPS = [
+      {
+        tab: "today",
+        title: "1/6 • 🏠 Today's Study & Daily Goal",
+        desc: "અહીં તમે રોજ જે વિષય અને ચેપ્ટર વાંચો તેના પેજ (+ / -) ઉમેરી શકો છો. ઉપરનું કેલેન્ડર વાપરીને અગાઉના દિવસોની જૂની એન્ટ્રી પણ કરી શકાય છે.",
+        highlight: "💡 ચાલુ ચેપ્ટરના પેજ ઉમેરતા Today + 7-Day રિવિઝન બનશે, અને '✓ ચેપ્ટર પૂર્ણ' કરતા 1-7-30-60 દિવસનો માસ્ટર રિવિઝન પ્લાન બનશે!"
+      },
+      {
+        tab: "today",
+        title: "2/6 • 🔔 Smart Spaced Revision Queue",
+        desc: "તમે વાંચેલા પેજ અને પૂર્ણ કરેલા ચેપ્ટરનું રિવિઝન ક્યારે કરવાનું છે તે અહીં ઓટોમેટિક બતાવશે. બાજુમાં '✓ Done' દબાવતા જ તે પેજ 'રિવાઈઝ્ડ' ગણાઈ જશે.",
+        highlight: "📌 નીચે Quick Formula & Key Notes માં તમે અગત્યના સૂત્રો અને અનુચ્છેદ પણ સાચવી શકો છો."
+      },
+      {
+        tab: "syllabus",
+        title: "3/6 • 📚 Collapsible Syllabus & Edit Lock",
+        desc: "અહીં તમારા બધા વિષય અને ચેપ્ટર ઉમેરો. '📅 જૂનું પૂર્ણ?' બટન દબાવીને અગાઉ ચાલેલા ચેપ્ટર જૂની તારીખ સાથે ઉમેરી શકાય છે.",
+        highlight: "🔒 જે ચેપ્ટર '✓ પૂર્ણ' થઈ જાય તે લોક થઈ જશે — તેને ફરી '↺ પાછું ચાલુ કરો' કર્યા પછી જ એડિટ કરી શકાશે."
+      },
+      {
+        tab: "syllabus",
+        title: "4/6 • 🏆 Subject-Wise Completed Vault",
+        desc: "સિલેબસની નીચે પૂર્ણ થયેલા બધા ચેપ્ટર્સ વિષય પ્રમાણે Open / Close લિસ્ટમાં જોવા મળશે.",
+        highlight: "✅ કયા વિષયમાં કેટલા ચેપ્ટર પૂરા થયા અને તેના કેટલા માસ્ટર રિવિઝન થયા તે એક જ નજરમાં દેખાશે."
+      },
+      {
+        tab: "tests",
+        title: "5/6 • 📊 Graphs, Psychology & Multi-Chapter Tests",
+        desc: "અહીં તમારી તૈયારીનો 7-Day Graph, Test Progression Graph અને Study Psychology જોવા મળશે. તમે એકસાથે 2 કે વધુ ચેપ્ટર સિલેક્ટ કરીને ટેસ્ટ માર્ક્સ ઉમેરી શકો છો.",
+        highlight: "🌐 લાઈવ MCQ પ્રેક્ટિસ માટે www.thetarget.in ની લિંક પણ અહીં આપેલી છે."
+      },
+      {
+        tab: "profile",
+        title: "6/6 • 👤 Membership Plans, Backup & Bug Report",
+        desc: "અહીં તમારી 5-Day Free Trial અથવા Paid Plan (₹99 / ₹149 / ₹999) ની વેલિડિટી, ડેટા બેકઅપ અને કોઈ નવું ફીચર કે ભૂલ (Bug) રિપોર્ટ કરવાનું ફોર્મ મળશે.",
+        highlight: "🎉 હવે તમે 'Finish' દબાવીને એપ વાપરવાનું શરૂ કરી શકો છો!"
+      }
+    ];
+
+    function startAppTour() {
+      currentTourStep = 0;
+      document.getElementById("appTourOverlay").classList.remove("hidden");
+      renderTourStep();
+    }
+    function closeAppTour() {
+      document.getElementById("appTourOverlay").classList.add("hidden");
+    }
+    function nextTourStep() {
+      if (currentTourStep < TOUR_STEPS.length - 1) {
+        currentTourStep++;
+        renderTourStep();
+      } else {
+        closeAppTour();
+      }
+    }
+    function prevTourStep() {
+      if (currentTourStep > 0) {
+        currentTourStep--;
+        renderTourStep();
+      }
+    }
+    function renderTourStep() {
+      const st = TOUR_STEPS[currentTourStep];
+      switchStudentTab(st.tab);
+      document.getElementById("tourStepBadge").textContent = "Step " + (currentTourStep + 1) + " / " + TOUR_STEPS.length;
+      document.getElementById("tourTitle").textContent = st.title;
+      document.getElementById("tourDesc").textContent = st.desc;
+      document.getElementById("tourHighlightBox").textContent = st.highlight;
+      document.getElementById("tourPrevBtn").style.visibility = currentTourStep === 0 ? "hidden" : "visible";
+      document.getElementById("tourNextBtn").textContent = currentTourStep === TOUR_STEPS.length - 1 ? "Finish ✓" : "Next ➔";
+      document.getElementById("tourDots").innerHTML = TOUR_STEPS.map((_, i) =>
+        '<span class="w-2 h-2 rounded-full ' + (i === currentTourStep ? 'bg-indigo-600' : 'bg-slate-400/40') + '"></span>'
+      ).join("");
+    }
+
+    function todayISO() { return new Date().toISOString().split("T")[0]; }
+    function addDaysISO(dateStr, days) {
+      const d = new Date(dateStr + "T00:00:00");
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split("T")[0];
+    }
+    function daysBetween(d1, d2) {
+      return Math.ceil((new Date(d2 + "T00:00:00") - new Date(d1 + "T00:00:00")) / 86400000);
+    }
+
+    function applyTheme() {
+      document.documentElement.setAttribute("data-theme", theme);
+      const icon = theme === "cream" ? "🌙" : "☀️";
+      const b1 = document.getElementById("themeBtnAuth");
+      const b2 = document.getElementById("themeBtnHeader");
+      if (b1) b1.textContent = icon;
+      if (b2) b2.textContent = icon;
+    }
+    function toggleTheme() {
+      theme = theme === "cream" ? "black" : "cream";
+      localStorage.setItem(THEME_KEY, theme);
+      applyTheme();
+    }
+    function setTheme(newTheme) {
+      theme = newTheme;
+      localStorage.setItem(THEME_KEY, theme);
+      applyTheme();
+    }
+
+    function getDemoStudentObject() {
+      const td = todayISO();
+      return {
+        mobile: "DEMO",
+        name: "Demo Aspirant",
+        exam: "GPSC / CCE",
+        examDate: addDaysISO(td, 65),
+        status: "approved",
+        planName: "5-Day Free Trial",
+        planStartDate: td,
+        planExpiryDate: addDaysISO(td, 5),
+        dailyGoal: 15,
+        quickNotes: [
+          { id: "qn1", text: "અનુચ્છેદ 32 — બંધારણીય ઇલાજોનો અધિકાર (આત્મા)" },
+          { id: "qn2", text: "ચક્રવૃદ્ધિ વ્યાજ 2 વર્ષનો તફાવત = P(R/100)²" }
+        ],
+        subjects: [
+          {
+            id: "ds1",
+            name: "ભારતનું બંધારણ",
+            chapters: [
+              { id: "dc1", name: "આમુખ અને મૂળભૂત અધિકારો", donePages: 22, revisedPages: 22, completed: true, completedDate: addDaysISO(td, -7), topics: [] },
+              { id: "dc2", name: "રાષ્ટ્રપતિ અને સંસદ", donePages: 14, revisedPages: 6, completed: false, topics: [] }
+            ]
+          },
+          {
+            id: "ds2",
+            name: "ગણિત અને રીઝનિંગ",
+            chapters: [
+              { id: "dc3", name: "ટકાવારી (Percentage)", donePages: 18, revisedPages: 18, completed: true, completedDate: addDaysISO(td, -3), topics: [] },
+              { id: "dc4", name: "નફો અને ખોટ", donePages: 10, revisedPages: 5, completed: false, topics: [] }
+            ]
+          }
+        ],
+        logs: [
+          { id: "dl1", date: addDaysISO(td, -2), subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc1", chapterName: "આમુખ અને મૂળભૂત અધિકારો", pages: 12, isChapterFinish: true, revised: true },
+          { id: "dl2", date: addDaysISO(td, -1), subjectId: "ds2", subjectName: "ગણિત અને રીઝનિંગ", chapterId: "dc3", chapterName: "ટકાવારી (Percentage)", pages: 10, isChapterFinish: true, revised: true },
+          { id: "dl3", date: td, subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc2", chapterName: "રાષ્ટ્રપતિ અને સંસદ", pages: 8, isChapterFinish: false, revised: false }
+        ],
+        revisions: [
+          { id: "dr1", logId: "dl3", subjectId: "ds1", chapterId: "dc2", subjectName: "ભારતનું બંધારણ", chapterName: "રાષ્ટ્રપતિ અને સંસદ", topicName: "Daily Study (+8p)", pagesCount: 8, revType: "daily", stageLabel: "Today Rev (Daily)", studiedDate: td, dueDate: td, done: false },
+          { id: "dr2", logId: "dl1", subjectId: "ds1", chapterId: "dc1", subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", topicName: "✓ Full Chapter (22p)", pagesCount: 22, revType: "master", stageLabel: "7-Day Master", studiedDate: addDaysISO(td, -7), dueDate: td, done: false }
+        ],
+        tests: [
+          { id: "dt1", date: addDaysISO(td, -4), testType: "chapter", title: "Polity Ch-1 Test", subjects: ["ભારતનું બંધારણ"], chapters: ["આમુખ અને મૂળભૂત અધિકારો"], subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", scored: 38, total: 50 },
+          { id: "dt2", date: addDaysISO(td, -2), testType: "chapter", title: "Maths + Polity Combined", subjects: ["ભારતનું બંધારણ", "ગણિત અને રીઝનિંગ"], chapters: ["રાષ્ટ્રપતિ અને સંસદ", "ટકાવારી (Percentage)"], subjectName: "ભારતનું બંધારણ, ગણિત અને રીઝનિંગ", chapterName: "રાષ્ટ્રપતિ અને સંસદ + ટકાવારી (Percentage)", scored: 41, total: 50 }
+        ]
+      };
+    }
+
+    function guardDemoAction() {
+      if (isDemoMode) {
+        alert("🔒 Read-Only Demo Mode! પ્લાન ખરીદવા સંપર્ક કરો: 9033189251\n• ₹99 (6 Months)\n• ₹149 (1 Year)\n• ₹999 (Lifetime)");
+        return true;
+      }
+      return false;
+    }
+
+    function loadDB() {
+      const keys = [DB_KEY, DB_MIRROR_KEY, "THE_TARGET_CLEAN_DB_V5", "THE_TARGET_CLEAN_DB_V4"];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (!parsed.feedbacks) parsed.feedbacks = [];
+            if (typeof parsed.broadcast !== "string") parsed.broadcast = "";
+            return parsed;
+          } catch (e) {}
+        }
+      }
+      return { users: {}, feedbacks: [], broadcast: "" };
+    }
+
+    function saveDB() {
+      const str = JSON.stringify(db);
+      localStorage.setItem(DB_KEY, str);
+      localStorage.setItem(DB_MIRROR_KEY, str);
+      pushToFirebaseCloud();
+    }
+
+    function loadSession() {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch (e) { return null; }
+    }
+
+    function saveSession(sess) {
+      currentSession = sess;
+      if (!sess) localStorage.removeItem(SESSION_KEY);
+      else localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
+    }
+
+    function normalizeMobile(val) { return (val || "").replace(/\D/g, ""); }
+
+    function handleMobileInput(val) {
+      const clean = normalizeMobile(val);
+      const adminWrap = document.getElementById("adminPassWrapper");
+      const studentWrap = document.getElementById("studentFieldsWrapper");
+      const newStudFields = document.getElementById("newStudentFields");
+      document.getElementById("authError").classList.add("hidden");
+
+      if (clean === ADMIN_MOBILE) {
+        adminWrap.classList.remove("hidden");
+        studentWrap.classList.add("hidden");
+      } else {
+        adminWrap.classList.add("hidden");
+        studentWrap.classList.remove("hidden");
+        if (clean.length === 10 && db.users[clean]) {
+          newStudFields.classList.add("hidden");
+        } else {
+          newStudFields.classList.remove("hidden");
+        }
+      }
+    }
+
+    function showAuthError(msg) {
+      const errEl = document.getElementById("authError");
+      errEl.textContent = msg;
+      errEl.classList.remove("hidden");
+    }
+
+    // INSTANT NON-BLOCKING LOGIN (Works for Admin & Student even if Cloud is slow)
+    async function submitAuth() {
+      const mobile = normalizeMobile(document.getElementById("authMobile").value);
+      if (mobile.length !== 10) return showAuthError("10 આંકડાનો મોબાઈલ નંબર નાખો.");
+
+      if (mobile === ADMIN_MOBILE) {
+        const pass = document.getElementById("authAdminPass").value;
+        if (pass !== ADMIN_PASS) {
+          return showAuthError("Invalid Admin Password.");
+        }
+        isDemoMode = false;
+        saveSession({ role: "admin", mobile: ADMIN_MOBILE });
+        bootApp();
+        syncFromFirebaseCloud(false);
+        return;
+      }
+
+      const pin = document.getElementById("authPin").value.trim();
+      if (pin !== REQUIRED_STUDENT_PIN) {
+        return showAuthError("સાચો PIN (2026) નાખો.");
+      }
+
+      const btn = document.getElementById("btnSubmitAuth");
+      btn.textContent = "⏳ Opening Dashboard...";
+
+      // Quick background sync (max 2 seconds, never blocks login)
+      await syncFromFirebaseCloud(false);
+      btn.textContent = "🎁 Start 5-Day Free Trial / Login";
+
+      let isFirstTimeUser = false;
+      let user = db.users[mobile];
+      if (!user) {
+        const name = document.getElementById("authName").value.trim() || ("Student " + mobile.slice(-4));
+        const exam = document.getElementById("authExam").value.trim() || "GPSC / CCE";
+        const examDate = document.getElementById("authExamDate").value || addDaysISO(todayISO(), 90);
+
+        user = {
+          mobile, name, exam, examDate,
+          status: "approved",
+          planName: "5-Day Free Trial",
+          createdAt: todayISO(),
+          planStartDate: todayISO(),
+          planExpiryDate: addDaysISO(todayISO(), 5),
+          dailyGoal: 15,
+          quickNotes: [],
+          subjects: [], logs: [], revisions: [], tests: []
+        };
+        db.users[mobile] = user;
+        saveDB();
+        isFirstTimeUser = true;
+      }
+
+      isDemoMode = false;
+      saveSession({ role: "student", mobile });
+      bootApp();
+      if (isFirstTimeUser) {
+        setTimeout(() => startAppTour(), 300);
+      }
+    }
+
+    function startReadOnlyDemo(withTour) {
+      isDemoMode = true;
+      bootApp();
+      if (withTour) {
+        setTimeout(() => startAppTour(), 250);
+      }
+    }
+    function exitDemoMode() { isDemoMode = false; closeAppTour(); bootApp(); }
+    async function checkApprovalStatus() {
+      await syncFromFirebaseCloud(false);
+      isDemoMode = false;
+      bootApp();
+    }
+    function logoutUser() {
+      isDemoMode = false;
+      closeAppTour();
+      saveSession(null);
+      document.getElementById("authMobile").value = "";
+      document.getElementById("authAdminPass").value = "";
+      document.getElementById("authPin").value = "";
+      handleMobileInput("");
+      bootApp();
+    }
+
+    function getCurrentStudent() {
+      if (isDemoMode) return getDemoStudentObject();
+      if (!currentSession || currentSession.role !== "student") return null;
+      return db.users[currentSession.mobile] || null;
+    }
+
+    function getValidityRemainingDays(user) {
+      if (!user.planExpiryDate) user.planExpiryDate = addDaysISO(user.createdAt || todayISO(), 5);
+      return Math.max(0, daysBetween(todayISO(), user.planExpiryDate));
+    }
+
+    function bootApp() {
+      applyTheme();
+      const authScreen = document.getElementById("authScreen");
+      const loginForm = document.getElementById("loginFormContainer");
+      const pendingView = document.getElementById("pendingApprovalView");
+      const studentApp = document.getElementById("studentApp");
+      const adminApp = document.getElementById("adminApp");
+      const demoBanner = document.getElementById("demoBanner");
+
+      authScreen.classList.add("hidden");
+      studentApp.classList.add("hidden");
+      adminApp.classList.add("hidden");
+      demoBanner.classList.add("hidden");
+
+      if (!currentSession) {
+        authScreen.classList.remove("hidden");
+        loginForm.classList.remove("hidden");
+        pendingView.classList.add("hidden");
+        return;
+      }
+
+      if (currentSession.role === "admin" && currentSession.mobile === ADMIN_MOBILE) {
+        adminApp.classList.remove("hidden");
+        renderAdminPanel();
+        return;
+      }
+
+      if (currentSession.role === "student") {
+        const realUser = db.users[currentSession.mobile];
+        if (!realUser) return logoutUser();
+
+        if (isDemoMode) {
+          demoBanner.classList.remove("hidden");
+          studentApp.classList.remove("hidden");
+          initDatePickers();
+          renderStudentAll();
+          return;
+        }
+
+        const remValDays = getValidityRemainingDays(realUser);
+        if (realUser.status !== "approved" || remValDays <= 0) {
+          authScreen.classList.remove("hidden");
+          loginForm.classList.add("hidden");
+          pendingView.classList.remove("hidden");
+          document.getElementById("pendName").textContent = realUser.name;
+          document.getElementById("pendMobile").textContent = realUser.mobile;
+          document.getElementById("txtPendTitle").textContent = remValDays <= 0
+            ? "⏳ 5-Day Free Trial / Plan પૂર્ણ થયો છે"
+            : "🔒 એકાઉન્ટ હોલ્ડ પર છે";
+          return;
+        }
+
+        studentApp.classList.remove("hidden");
+        initDatePickers();
+        renderStudentAll();
+      }
+    }
+
+    function initDatePickers() {
+      const dp = document.getElementById("dailyLogDatePicker");
+      if (dp && !dp.value) dp.value = todayISO();
+      const td = document.getElementById("testDateInput");
+      if (td && !td.value) td.value = todayISO();
+    }
+
+    function handleDailyDateChange() {
+      const dp = document.getElementById("dailyLogDatePicker");
+      const btn = document.getElementById("btnResetTodayDate");
+      const title = document.getElementById("txtTodayLogTitle");
+      if (dp.value && dp.value !== todayISO()) {
+        btn.classList.remove("hidden");
+        title.textContent = "📅 " + dp.value + " ના રોજ શું ચાલ્યું?";
+      } else {
+        btn.classList.add("hidden");
+        title.textContent = "આજે શું ચાલ્યું?";
+      }
+    }
+
+    function resetDailyDateToToday() {
+      document.getElementById("dailyLogDatePicker").value = todayISO();
+      handleDailyDateChange();
+    }
+
+    function onKpiClick(target) {
+      if (target === "completed") {
+        switchStudentTab("syllabus");
+        setTimeout(() => {
+          document.getElementById("completedChaptersVaultAnchor")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+      } else if (target === "revision") {
+        switchStudentTab("today");
+        setTimeout(() => {
+          document.getElementById("dueRevisionsCardAnchor")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+      } else if (target === "streak") {
+        switchStudentTab("tests");
+        switchAnalysisSubView("overview");
+        setTimeout(() => {
+          document.getElementById("streakGraphCardAnchor")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+      } else if (target === "tests") {
+        switchStudentTab("tests");
+        switchAnalysisSubView("addtest");
+      }
+    }
+
+    function switchAnalysisSubView(view) {
+      ["overview", "addtest", "chapters"].forEach(v => {
+        document.getElementById("an-view-" + v).classList.toggle("hidden", v !== view);
+        const btn = document.getElementById("subnav-" + v);
+        btn.className = v === view
+          ? "py-2 rounded-2xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm"
+          : "py-2 rounded-2xl text-xs font-extrabold muted-text";
+      });
+    }
+
+    // ================= STUDENT RENDERING =================
+    function renderStudentAll() {
+      const user = getCurrentStudent();
+      if (!user) return;
+
+      const bBanner = document.getElementById("studentBroadcastBanner");
+      if (db.broadcast && db.broadcast.trim()) {
+        bBanner.classList.remove("hidden");
+        document.getElementById("studentBroadcastText").textContent = db.broadcast;
+      } else {
+        bBanner.classList.add("hidden");
+      }
+
+      const valLeft = getValidityRemainingDays(user);
+      const isLifetime = valLeft > 2000;
+      const planLabel = isLifetime ? "Lifetime Pro" : (user.planName || (valLeft <= 5 ? "5D Free Trial" : "Pro Plan"));
+
+      document.getElementById("headerStudentName").textContent = user.name + " • " + user.exam;
+      document.getElementById("headerPlanBadge").textContent = isLifetime ? "♾️ Lifetime" : (valLeft + "d left");
+
+      const examDaysLeft = Math.max(0, daysBetween(todayISO(), user.examDate));
+      document.getElementById("headerDaysLeft").textContent = examDaysLeft + "d";
+
+      let totalChaps = 0, doneChaps = 0, totalPagesRead = 0, totalPagesRevised = 0;
+      user.subjects.forEach(s => {
+        s.chapters.forEach(c => {
+          totalChaps++;
+          if (c.completed) doneChaps++;
+          const dp = Number(c.donePages || 0);
+          const rp = Math.min(dp, Number(c.revisedPages || 0));
+          c.revisedPages = rp;
+          totalPagesRead += dp;
+          totalPagesRevised += rp;
+        });
+      });
+
+      document.getElementById("kpiSyllabusPct").textContent = doneChaps + "/" + totalChaps;
+      document.getElementById("kpiSyllabusPages").textContent = totalPagesRead + "p વાંચ્યા";
+      document.getElementById("kpiRevPagesInfo").textContent = totalPagesRevised + "/" + totalPagesRead + "p Rev";
+
+      let totSc = 0, totMx = 0;
+      (user.tests || []).forEach(t => { totSc += Number(t.scored); totMx += Number(t.total); });
+      const topTestAvg = totMx > 0 ? Math.round((totSc / totMx) * 100) : null;
+      document.getElementById("kpiTestAvgTop").textContent = topTestAvg !== null ? (topTestAvg + "%") : "--%";
+      document.getElementById("kpiTestCountTop").textContent = (user.tests || []).length + " ટેસ્ટ";
+
+      document.getElementById("profPlanTypeBadge").textContent = planLabel;
+      document.getElementById("profPlanTitle").textContent = isLifetime ? "₹999 Lifetime Access" : (planLabel + " Active");
+      document.getElementById("subDaysRemainingBig").textContent = isLifetime ? "♾️ Lifetime" : (valLeft + " Days");
+      document.getElementById("subStartDate").textContent = user.planStartDate || user.createdAt || todayISO();
+      document.getElementById("subEndDate").textContent = isLifetime ? "Never Expires" : (user.planExpiryDate || "--");
+      const maxBarDays = valLeft <= 5 ? 5 : (valLeft <= 185 ? 180 : 365);
+      document.getElementById("subValidityBar").style.width = isLifetime ? "100%" : (Math.min(100, Math.round((valLeft / maxBarDays) * 100)) + "%");
+
+      document.getElementById("profName").value = user.name;
+      document.getElementById("profExam").value = user.exam;
+      document.getElementById("profExamDate").value = user.examDate;
+      document.getElementById("profMobileDisplay").textContent = user.mobile;
+
+      renderTodayTab(user);
+      renderSyllabusTab(user);
+      renderTestsAndDeepAnalysis(user, doneChaps, totalChaps, totalPagesRead, totalPagesRevised, topTestAvg);
+    }
+
+    function changeDailyPageGoal() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const val = prompt("તમારો રોજનો કેટલા પેજ વાંચવાનો ટાર્ગેટ (Daily Page Goal) રાખવો છે?", user.dailyGoal || 15);
+      if (val === null) return;
+      user.dailyGoal = Math.max(1, parseInt(val, 10) || 15);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function addQuickNote() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user.quickNotes) user.quickNotes = [];
+      const inp = document.getElementById("quickNoteInput");
+      const txt = inp.value.trim();
+      if (!txt) return;
+      user.quickNotes.unshift({ id: "qn_" + Date.now(), text: txt });
+      inp.value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function deleteQuickNote(id) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      user.quickNotes = (user.quickNotes || []).filter(n => n.id !== id);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function toggleTodayTopicBox() {
+      document.getElementById("todayTopicDrawer").classList.toggle("hidden");
+    }
+
+    function reopenSelectedChapterFromToday() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === selectedSubjectId);
+      const chap = sub ? sub.chapters.find(c => c.id === selectedChapterId) : null;
+      if (!chap) return;
+      chap.completed = false;
+      user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
+      saveDB();
+      renderStudentAll();
+    }
+
+    function renderTodayTab(user) {
+      const today = todayISO();
+      const todayPages = (user.logs || []).filter(l => l.date === today).reduce((a, l) => a + Number(l.pages || 0), 0);
+      const goal = Number(user.dailyGoal || 15);
+      const goalPct = Math.min(100, Math.round((todayPages / goal) * 100));
+      document.getElementById("dailyGoalText").textContent = todayPages + " / " + goal + " Pages (" + goalPct + "%)";
+      document.getElementById("dailyGoalBar").style.width = goalPct + "%";
+
+      const qnList = document.getElementById("quickNotesList");
+      const notes = user.quickNotes || [];
+      qnList.innerHTML = notes.length === 0
+        ? '<div class="text-[11px] muted-text">હજુ કોઈ શોર્ટ-નોટ કે સૂત્ર સેવ કર્યું નથી.</div>'
+        : notes.map(n => `
+            <div class="subtle-pill px-3 py-2 flex items-center justify-between gap-2 text-xs">
+              <span class="font-semibold">📌 ${n.text}</span>
+              <button onclick="deleteQuickNote('${n.id}')" class="text-rose-500 font-bold text-xs">✕</button>
+            </div>
+          `).join("");
+
+      const noSubNotice = document.getElementById("todayNoSubjectsNotice");
+      const controls = document.getElementById("todayLoggerControls");
+
+      if (user.subjects.length === 0) {
+        noSubNotice.classList.remove("hidden");
+        controls.classList.add("hidden");
+      } else {
+        noSubNotice.classList.add("hidden");
+        controls.classList.remove("hidden");
+
+        if (!selectedSubjectId || !user.subjects.find(s => s.id === selectedSubjectId)) {
+          selectedSubjectId = user.subjects[0].id;
+        }
+        const activeSub = user.subjects.find(s => s.id === selectedSubjectId);
+
+        document.getElementById("todaySubjectPills").innerHTML = user.subjects.map(s => {
+          const active = s.id === selectedSubjectId;
+          const doneC = s.chapters.filter(c => c.completed).length;
+          return `<button onclick="selectTodaySubject('${s.id}')"
+            class="px-3.5 py-2 rounded-2xl text-left shrink-0 transition border ${
+              active
+                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                : 'subtle-pill hover:border-indigo-400'
+            }">
+            <div class="text-xs font-extrabold whitespace-nowrap">${s.name}</div>
+            <div class="text-[9px] ${active ? 'text-indigo-100' : 'muted-text'}">${doneC}/${s.chapters.length} પૂર્ણ</div>
+          </button>`;
+        }).join("");
+
+        const chapPills = document.getElementById("todayChapterPills");
+        if (!activeSub || activeSub.chapters.length === 0) {
+          selectedChapterId = null;
+          chapPills.innerHTML = `<button onclick="switchStudentTab('syllabus')" class="text-xs font-bold text-indigo-500 py-2 text-left underline">+ આ વિષયમાં પહેલા ચેપ્ટર ઉમેરો</button>`;
+          document.getElementById("selectedChapterTitle").textContent = "--";
+        } else {
+          if (!selectedChapterId || !activeSub.chapters.find(c => c.id === selectedChapterId)) {
+            selectedChapterId = activeSub.chapters[0].id;
+          }
+          const activeChap = activeSub.chapters.find(c => c.id === selectedChapterId);
+
+          chapPills.innerHTML = activeSub.chapters.map((c, idx) => {
+            const active = c.id === selectedChapterId;
+            const rp = Math.min(c.donePages || 0, c.revisedPages || 0);
+            return `<button onclick="selectTodayChapter('${c.id}')"
+              class="w-full px-3 py-2 rounded-2xl text-left flex items-center justify-between transition border ${
+                active
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  : 'subtle-pill'
+              }">
+              <div class="min-w-0 flex-1 flex items-center gap-2">
+                <span class="text-[10px] font-mono font-bold opacity-75">#${idx + 1}</span>
+                <span class="text-xs font-extrabold truncate">${c.name}</span>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-indigo-500/15 text-indigo-500'}">
+                  ${c.donePages}p (Rev:${rp}p)
+                </span>
+                ${c.completed ? '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">🔒 ✓</span>' : ''}
+              </div>
+            </button>`;
+          }).join("");
+
+          if (activeChap) {
+            if (!Array.isArray(activeChap.topics)) activeChap.topics = [];
+            const dp = Number(activeChap.donePages || 0);
+            const rp = Math.min(dp, Number(activeChap.revisedPages || 0));
+            const unrev = Math.max(0, dp - rp);
+
+            document.getElementById("selectedChapterTitle").textContent =
+              activeChap.name + " (" + (activeChap.completed ? "🔒 ✓ પૂર્ણ" : "ચાલુ") + ")";
+            document.getElementById("statReadBadge").textContent = "📖 વાંચેલા: " + dp + "p";
+            document.getElementById("statRevBadge").textContent = "✅ રિવાઈઝ્ડ: " + rp + "p";
+            document.getElementById("statUnrevBadge").textContent = "⏳ બાકી: " + unrev + "p";
+
+            const stepperWrap = document.getElementById("todayStepperWrap");
+            const actionRow = document.getElementById("todayActionButtonsRow");
+            const lockedNotice = document.getElementById("todayChapLockedNotice");
+            if (activeChap.completed) {
+              stepperWrap.classList.add("hidden");
+              actionRow.classList.add("hidden");
+              lockedNotice.classList.remove("hidden");
+            } else {
+              stepperWrap.classList.remove("hidden");
+              actionRow.classList.remove("hidden");
+              lockedNotice.classList.add("hidden");
+            }
+
+            const topSel = document.getElementById("todayTopicSelect");
+            let opts = '<option value="NONE">-- No Sub-Topic --</option><option value="NEW">+ New Sub-Topic</option>';
+            activeChap.topics.forEach(tp => {
+              opts += `<option value="${tp.id}">🔄 ${tp.name} (${tp.readPages}p)</option>`;
+            });
+            topSel.innerHTML = opts;
+            handleTopicSelectChange();
+          }
+        }
+      }
+
+      const dueList = user.revisions.filter(r => !r.done && r.dueDate <= today);
+      const upcomingList = user.revisions.filter(r => !r.done && r.dueDate > today).sort((a,b) => a.dueDate.localeCompare(b.dueDate));
+
+      document.getElementById("kpiDueRev").textContent = dueList.length + " બાકી";
+      document.getElementById("dueRevBadgeCount").textContent = dueList.length;
+
+      const dueEl = document.getElementById("dueRevisionList");
+      if (dueList.length === 0) {
+        dueEl.innerHTML = '<div class="text-xs muted-text text-center py-3 subtle-pill">આજે કોઈ રિવિઝન બાકી નથી! 🎉</div>';
+      } else {
+        dueEl.innerHTML = dueList.map(r => {
+          const isMaster = r.revType === "master";
+          return `
+            <div class="flex items-center justify-between ${isMaster ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-amber-500/10 border border-amber-500/30'} rounded-2xl p-3 gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isMaster ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}">${r.stageLabel}</span>
+                  <span class="text-xs font-extrabold truncate">${r.subjectName} ➔ ${r.chapterName}</span>
+                </div>
+                <div class="text-[10px] muted-text mt-0.5 font-medium">
+                  ${r.topicName} • તારીખ: ${r.studiedDate}
+                </div>
+              </div>
+              <button onclick="markRevisionDone('${r.id}')"
+                class="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shrink-0 shadow-sm">
+                ✓ Done
+              </button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const upEl = document.getElementById("upcomingRevisionList");
+      upEl.innerHTML = upcomingList.length === 0
+        ? '<div class="text-[11px] muted-text">--</div>'
+        : upcomingList.slice(0, 12).map(r => `
+          <div class="flex items-center justify-between text-[11px] subtle-pill px-3 py-1.5">
+            <span class="font-semibold"><b>[${r.stageLabel}]</b> ${r.subjectName}: ${r.chapterName}</span>
+            <span class="font-mono muted-text">${r.dueDate}</span>
+          </div>
+        `).join("");
+
+      const filterDate = document.getElementById("historyFilterDate").value;
+      const histEl = document.getElementById("dailyLogsHistoryList");
+      let logsToShow = (user.logs || []).slice().reverse();
+      if (filterDate) logsToShow = logsToShow.filter(l => l.date === filterDate);
+
+      if (logsToShow.length === 0) {
+        histEl.innerHTML = '<div class="text-xs muted-text text-center py-2">કોઈ એન્ટ્રી મળી નથી.</div>';
+      } else {
+        histEl.innerHTML = logsToShow.slice(0, 12).map(l => `
+          <div class="subtle-pill p-2.5 flex items-center justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${l.date}</span>
+                <span class="text-xs font-extrabold truncate">${l.subjectName} ➔ ${l.chapterName}</span>
+                ${l.isChapterFinish
+                  ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500">✓ પૂર્ણ</span>'
+                  : `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${l.revised ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">${l.revised ? '✓ Rev' : '⏳ બાકી'}</span>`
+                }
+              </div>
+              <div class="text-[10px] muted-text mt-0.5">
+                વાંચેલા: <b class="text-indigo-500">+${l.pages}p</b> ${l.topicName ? '• 📌 ' + l.topicName : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="editDailyLog('${l.id}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
+              <button onclick="deleteDailyLog('${l.id}')" class="px-2 py-1 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    function handleTopicSelectChange() {
+      const sel = document.getElementById("todayTopicSelect");
+      const newInp = document.getElementById("todayNewTopicName");
+      if (!sel || !newInp) return;
+      if (sel.value === "NEW") newInp.classList.remove("hidden");
+      else newInp.classList.add("hidden");
+    }
+
+    function selectTodaySubject(subId) { selectedSubjectId = subId; selectedChapterId = null; renderStudentAll(); }
+    function selectTodayChapter(chapId) { selectedChapterId = chapId; renderStudentAll(); }
+
+    function adjustStepper(delta) {
+      const inp = document.getElementById("todayPageDeltaInput");
+      inp.value = Math.max(0, parseInt(inp.value || "0", 10) + delta);
+    }
+
+    function saveDailyPageLog(markFinished) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user || !selectedSubjectId || !selectedChapterId) return;
+
+      const sub = user.subjects.find(s => s.id === selectedSubjectId);
+      const chap = sub ? sub.chapters.find(c => c.id === selectedChapterId) : null;
+      if (!chap) return;
+      if (chap.completed) {
+        return alert("🔒 આ ચેપ્ટર પૂર્ણ થઈ ગયું છે. સુધારો કરવા પહેલા તેને Reopen કરો.");
+      }
+      if (!Array.isArray(chap.topics)) chap.topics = [];
+
+      const rawDelta = Math.max(0, parseInt(document.getElementById("todayPageDeltaInput").value || "0", 10));
+      const delta = markFinished ? rawDelta : Math.max(1, rawDelta);
+      const chosenDate = document.getElementById("dailyLogDatePicker").value || todayISO();
+
+      let topicLabel = "";
+      let targetTopicId = null;
+      const topicDrawerOpen = !document.getElementById("todayTopicDrawer").classList.contains("hidden");
+      if (topicDrawerOpen) {
+        const selVal = document.getElementById("todayTopicSelect").value;
+        if (selVal === "NEW") {
+          const tName = document.getElementById("todayNewTopicName").value.trim();
+          if (tName) {
+            let tp = chap.topics.find(x => x.name.toLowerCase() === tName.toLowerCase());
+            if (tp) tp.readPages = Number(tp.readPages || 0) + delta;
+            else {
+              tp = { id: "tp_" + Date.now(), name: tName, readPages: delta, revisedPages: 0 };
+              chap.topics.push(tp);
+            }
+            topicLabel = tp.name;
+            targetTopicId = tp.id;
+          }
+        } else if (selVal !== "NONE") {
+          const tp = chap.topics.find(x => x.id === selVal);
+          if (tp) {
+            tp.readPages = Number(tp.readPages || 0) + delta;
+            topicLabel = tp.name;
+            targetTopicId = tp.id;
+          }
+        }
+      }
+
+      chap.donePages = Number(chap.donePages || 0) + delta;
+      const logId = "log_" + Date.now();
+
+      user.logs.push({
+        id: logId,
+        date: chosenDate,
+        subjectId: sub.id,
+        subjectName: sub.name,
+        chapterId: chap.id,
+        chapterName: chap.name,
+        topicId: targetTopicId,
+        topicName: topicLabel,
+        pages: delta,
+        isChapterFinish: !!markFinished,
+        revised: false
+      });
+
+      if (!markFinished) {
+        const desc = topicLabel ? (topicLabel + " (+" + delta + "p)") : ("Study (+" + delta + "p)");
+        [
+          { days: 0, label: "Day-1 Rev (Daily)" },
+          { days: 7, label: "7-Day Rev (Daily)" }
+        ].forEach(st => {
+          user.revisions.push({
+            id: "rev_" + logId + "_" + st.days,
+            logId,
+            subjectId: sub.id,
+            chapterId: chap.id,
+            topicId: targetTopicId,
+            pagesCount: delta,
+            revType: "daily",
+            subjectName: sub.name,
+            chapterName: chap.name,
+            topicName: desc,
+            stageLabel: st.label,
+            studiedDate: chosenDate,
+            dueDate: addDaysISO(chosenDate, st.days),
+            done: false
+          });
+        });
+      } else {
+        chap.completed = true;
+        chap.completedDate = chosenDate;
+        scheduleMasterChapterRevisions(user, sub, chap, logId, chosenDate);
+      }
+
+      document.getElementById("todayNewTopicName").value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function scheduleMasterChapterRevisions(user, sub, chap, sourceLogId, baseDate) {
+      const finishDate = baseDate || chap.completedDate || todayISO();
+      user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
+
+      [
+        { days: 0,  label: "Day-1 Master" },
+        { days: 7,  label: "7-Day Master" },
+        { days: 30, label: "30-Day Master" },
+        { days: 60, label: "60-Day Master" }
+      ].forEach(st => {
+        user.revisions.push({
+          id: "mrev_" + chap.id + "_" + st.days + "_" + Date.now(),
+          logId: sourceLogId || ("fin_" + chap.id),
+          subjectId: sub.id,
+          chapterId: chap.id,
+          pagesCount: Number(chap.donePages || 0),
+          revType: "master",
+          subjectName: sub.name,
+          chapterName: chap.name,
+          topicName: "✓ Full Chapter (" + chap.donePages + "p)",
+          stageLabel: st.label,
+          studiedDate: finishDate,
+          dueDate: addDaysISO(finishDate, st.days),
+          done: false
+        });
+      });
+    }
+
+    function markRevisionDone(revId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const rev = user.revisions.find(r => r.id === revId);
+      if (!rev || rev.done) return;
+      rev.done = true;
+
+      const sub = user.subjects.find(s => s.id === rev.subjectId || s.name === rev.subjectName);
+      const chap = sub ? sub.chapters.find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
+      const linkedLog = user.logs.find(l => l.id === rev.logId);
+
+      if (rev.revType === "master" && chap) {
+        chap.revisedPages = chap.donePages;
+        (chap.topics || []).forEach(tp => { tp.revisedPages = tp.readPages; });
+      } else if (chap) {
+        if (!linkedLog || !linkedLog.revised) {
+          const credit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
+          chap.revisedPages = Math.min(Number(chap.donePages || 0), Number(chap.revisedPages || 0) + credit);
+          if (linkedLog) linkedLog.revised = true;
+        }
+      }
+
+      saveDB();
+      renderStudentAll();
+    }
+
+    function editDailyLog(logId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const log = user.logs.find(l => l.id === logId);
+      if (!log) return;
+
+      const sub = user.subjects.find(s => s.id === log.subjectId);
+      const chap = sub ? sub.chapters.find(c => c.id === log.chapterId) : null;
+      if (chap && chap.completed) {
+        return alert("🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે. પહેલા સિલેબસમાંથી ચેપ્ટરને Reopen કરો.");
+      }
+
+      const newP = prompt("Edit Pages:", log.pages);
+      if (newP === null) return;
+      const newDate = prompt("Edit Date (YYYY-MM-DD):", log.date);
+      const parsed = Math.max(0, parseInt(newP, 10) || 0);
+      const diff = parsed - Number(log.pages || 0);
+      log.pages = parsed;
+      if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())) log.date = newDate.trim();
+
+      if (chap) chap.donePages = Math.max(0, Number(chap.donePages || 0) + diff);
+
+      saveDB();
+      renderStudentAll();
+    }
+
+    function deleteDailyLog(logId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const idx = user.logs.findIndex(l => l.id === logId);
+      if (idx === -1) return;
+      const log = user.logs[idx];
+
+      const sub = user.subjects.find(s => s.id === log.subjectId);
+      const chap = sub ? sub.chapters.find(c => c.id === log.chapterId) : null;
+      if (chap && chap.completed) {
+        return alert("🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે. પહેલા સિલેબસમાંથી ચેપ્ટરને Reopen કરો.");
+      }
+
+      if (!confirm("Delete this entry?")) return;
+      if (chap) {
+        chap.donePages = Math.max(0, Number(chap.donePages || 0) - Number(log.pages || 0));
+        if (log.revised) chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - Number(log.pages || 0));
+      }
+
+      user.logs.splice(idx, 1);
+      user.revisions = user.revisions.filter(r => r.logId !== logId);
+      saveDB();
+      renderStudentAll();
+    }
+
+    // ================= SYLLABUS =================
+    function toggleSubjectAccordion(subId) {
+      expandedSubjects[subId] = !expandedSubjects[subId];
+      renderStudentAll();
+    }
+    function setAllSubjectsAccordion(openState) {
+      const user = getCurrentStudent();
+      if (!user) return;
+      user.subjects.forEach(s => { expandedSubjects[s.id] = openState; });
+      renderStudentAll();
+    }
+    function toggleCompletedVaultSubject(subId) {
+      expandedCompletedVault[subId] = !expandedCompletedVault[subId];
+      renderStudentAll();
+    }
+    function toggleOldChapterDrawer(subId) {
+      openOldChapterForm[subId] = !openOldChapterForm[subId];
+      renderStudentAll();
+    }
+
+    function addSubject() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const inp = document.getElementById("newSubjectName");
+      const name = inp.value.trim();
+      if (!name) return;
+      const newId = "sub_" + Date.now();
+      user.subjects.push({ id: newId, name, chapters: [] });
+      expandedSubjects[newId] = true;
+      inp.value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function editSubject(subId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      if (!sub) return;
+      const val = prompt("Subject Name:", sub.name);
+      if (val && val.trim()) { sub.name = val.trim(); saveDB(); renderStudentAll(); }
+    }
+
+    function deleteSubject(subId) {
+      if (guardDemoAction()) return;
+      if (!confirm("Delete Subject?")) return;
+      const user = getCurrentStudent();
+      user.subjects = user.subjects.filter(s => s.id !== subId);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function addChapter(subId, isOldCompleted) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      if (!sub) return;
+      const inp = document.getElementById("chapName_" + subId);
+      const name = inp.value.trim();
+      if (!name) return;
+
+      let chosenDate = todayISO();
+      let oldPages = 0;
+
+      if (isOldCompleted) {
+        const dateInp = document.getElementById("chapDate_" + subId);
+        const pagesInp = document.getElementById("chapOldPages_" + subId);
+        if (dateInp && dateInp.value) chosenDate = dateInp.value;
+        if (pagesInp) oldPages = Math.max(0, parseInt(pagesInp.value || "0", 10));
+      }
+
+      const newChap = {
+        id: "ch_" + Date.now(),
+        name,
+        donePages: oldPages,
+        revisedPages: isOldCompleted ? oldPages : 0,
+        completed: !!isOldCompleted,
+        completedDate: isOldCompleted ? chosenDate : null,
+        topics: []
+      };
+      sub.chapters.push(newChap);
+
+      if (isOldCompleted) {
+        scheduleMasterChapterRevisions(user, sub, newChap, null, chosenDate);
+        openOldChapterForm[subId] = false;
+      }
+
+      inp.value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function editChapter(subId, chapId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
+      if (!chap) return;
+      if (chap.completed) {
+        return alert("🔒 પૂર્ણ થયેલા ચેપ્ટરમાં સુધારો કરવા પહેલા '↺ પાછું ચાલુ કરો' પર ક્લિક કરો.");
+      }
+      const val = prompt("Chapter Name:", chap.name);
+      if (val && val.trim()) chap.name = val.trim();
+      saveDB();
+      renderStudentAll();
+    }
+
+    function deleteChapter(subId, chapId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
+      if (!chap) return;
+      if (chap.completed) {
+        return alert("🔒 પૂર્ણ થયેલા ચેપ્ટરને ડિલીટ કરવા પહેલા '↺ પાછું ચાલુ કરો' પર ક્લિક કરો.");
+      }
+      if (!confirm("Delete Chapter?")) return;
+      sub.chapters = sub.chapters.filter(c => c.id !== chapId);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function stepChapterPage(subId, chapId, delta) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
+      if (!chap) return;
+      if (chap.completed) {
+        return alert("🔒 આ ચેપ્ટર પૂર્ણ થઈ ગયું છે. પેજ બદલવા પહેલા '↺ પાછું ચાલુ કરો' દબાવો.");
+      }
+      chap.donePages = Math.max(0, Number(chap.donePages || 0) + delta);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function toggleChapterFinished(subId, chapId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
+      if (!chap) return;
+
+      chap.completed = !chap.completed;
+      if (chap.completed) {
+        chap.completedDate = todayISO();
+        scheduleMasterChapterRevisions(user, sub, chap, null, todayISO());
+      } else {
+        user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
+      }
+      saveDB();
+      renderStudentAll();
+    }
+
+    function renderSyllabusTab(user) {
+      const container = document.getElementById("syllabusContainer");
+      const completedShowcase = document.getElementById("completedChaptersBySubjectBox");
+
+      if (user.subjects.length === 0) {
+        container.innerHTML = '<div class="one-card p-6 text-center text-xs muted-text">ઉપરના બોક્સમાંથી પહેલો વિષય ઉમેરો.</div>';
+        completedShowcase.innerHTML = '<div class="text-xs muted-text">--</div>';
+        document.getElementById("completedVaultTotalBadge").textContent = "0 Done";
+        return;
+      }
+
+      if (Object.keys(expandedSubjects).length === 0 && user.subjects.length > 0) {
+        expandedSubjects[user.subjects[0].id] = true;
+      }
+
+      let globalDoneChaps = 0;
+
+      container.innerHTML = user.subjects.map(sub => {
+        const totalC = sub.chapters.length;
+        const doneC = sub.chapters.filter(c => c.completed).length;
+        globalDoneChaps += doneC;
+        const totalP = sub.chapters.reduce((a, c) => a + Number(c.donePages || 0), 0);
+        const revP = sub.chapters.reduce((a, c) => a + Number(c.revisedPages || 0), 0);
+        const isOpen = !!expandedSubjects[sub.id];
+        const showOldDrawer = !!openOldChapterForm[sub.id];
+        const pct = totalC > 0 ? Math.round((doneC / totalC) * 100) : 0;
+
+        return `
+          <div class="one-card overflow-hidden">
+            <div onclick="toggleSubjectAccordion('${sub.id}')" class="p-4 flex items-center justify-between cursor-pointer select-none">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold text-indigo-500">${isOpen ? '▼' : '▶'}</span>
+                  <h3 class="text-sm font-extrabold truncate">${sub.name}</h3>
+                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${doneC}/${totalC} પૂર્ણ (${pct}%)</span>
+                </div>
+                <p class="text-[10px] muted-text mt-1 pl-4">📖 વાંચેલા: <b>${totalP}p</b> • ✅ રિવાઈઝ્ડ: <b class="text-emerald-500">${revP}p</b></p>
+              </div>
+              <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+                <button onclick="editSubject('${sub.id}')" class="w-7 h-7 rounded-full subtle-pill text-xs">✎</button>
+                <button onclick="deleteSubject('${sub.id}')" class="w-7 h-7 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
+              </div>
+            </div>
+
+            ${isOpen ? `
+              <div class="px-4 pb-4 pt-1 space-y-2 border-t" style="border-color: var(--border-col);">
+                ${sub.chapters.map(c => {
+                  const rp = Math.min(c.donePages || 0, Number(c.revisedPages || 0));
+                  return `
+                    <div class="subtle-pill p-3 space-y-2 ${c.completed ? 'border-emerald-500/50 opacity-95' : ''}">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-xs font-extrabold truncate">${c.name}</span>
+                            ${c.completed
+                              ? `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-600 text-white">🔒 ✓ પૂર્ણ (${c.completedDate || 'Done'})</span>`
+                              : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500">ચાલુ</span>'
+                            }
+                          </div>
+                          <div class="text-[10px] muted-text mt-0.5">
+                            📖 Read: <b>${c.donePages}p</b> • ✅ Rev: <b class="text-emerald-500">${rp}p</b>
+                          </div>
+                        </div>
+
+                        <div class="flex items-center gap-1 shrink-0">
+                          ${!c.completed ? `
+                            <div class="flex items-center one-card px-1 py-0.5 rounded-xl">
+                              <button onclick="stepChapterPage('${sub.id}','${c.id}',-1)" class="w-5 h-5 text-xs font-extrabold">−</button>
+                              <span class="text-[11px] font-mono font-extrabold px-1">${c.donePages}</span>
+                              <button onclick="stepChapterPage('${sub.id}','${c.id}',1)" class="w-5 h-5 text-xs font-extrabold text-indigo-500">+</button>
+                            </div>
+                            <button onclick="editChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-full one-card text-[10px]" title="Edit">✎</button>
+                            <button onclick="deleteChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-full bg-rose-500/15 text-rose-500 text-[10px]" title="Delete">🗑</button>
+                            <button onclick="toggleChapterFinished('${sub.id}','${c.id}')"
+                              class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm">
+                              ✓ પૂર્ણ કરો
+                            </button>
+                          ` : `
+                            <button onclick="toggleChapterFinished('${sub.id}','${c.id}')"
+                              class="px-3 py-1 rounded-full text-[10px] font-extrabold one-card text-amber-500 border border-amber-500/40">
+                              ↺ પાછું ચાલુ કરો (Reopen)
+                            </button>
+                          `}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+
+                <div class="subtle-pill p-3 space-y-2 mt-2">
+                  <div class="flex gap-1.5">
+                    <input id="chapName_${sub.id}" type="text" placeholder="નવું ચેપ્ટર ઉમેરો..."
+                      class="flex-1 theme-input px-3 py-2 text-xs font-semibold" />
+                    <button onclick="addChapter('${sub.id}', false)"
+                      class="bg-indigo-600 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs shrink-0">
+                      + ઉમેરો
+                    </button>
+                    <button onclick="toggleOldChapterDrawer('${sub.id}')"
+                      class="one-card px-2.5 py-2 rounded-xl text-[10px] font-extrabold text-emerald-500 shrink-0">
+                      📅 જૂનું પૂર્ણ?
+                    </button>
+                  </div>
+
+                  ${showOldDrawer ? `
+                    <div class="pt-2 border-t flex items-center justify-between gap-2 flex-wrap" style="border-color: var(--border-col);">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-bold muted-text">પૂર્ણ તારીખ:</span>
+                        <input type="date" id="chapDate_${sub.id}" value="${todayISO()}" class="theme-input px-2 py-1 text-[11px] font-bold" />
+                      </div>
+                      <input id="chapOldPages_${sub.id}" type="number" placeholder="કુલ પેજ" class="w-20 theme-input px-2.5 py-1 text-xs font-bold" />
+                      <button onclick="addChapter('${sub.id}', true)"
+                        class="bg-emerald-600 text-white font-extrabold px-3 py-1.5 rounded-xl text-[11px]">
+                        ✓ જૂની તારીખે પૂર્ણ ઉમેરો
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("completedVaultTotalBadge").textContent = globalDoneChaps + " પૂર્ણ";
+      const compHtml = user.subjects.map(s => {
+        const compChaps = s.chapters.filter(c => c.completed);
+        if (compChaps.length === 0) return "";
+        const isVaultOpen = !!expandedCompletedVault[s.id];
+        const pct = Math.round((compChaps.length / s.chapters.length) * 100);
+
+        return `
+          <div class="subtle-pill overflow-hidden">
+            <div onclick="toggleCompletedVaultSubject('${s.id}')" class="p-3 flex items-center justify-between cursor-pointer select-none">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-emerald-500">${isVaultOpen ? '▼' : '▶'}</span>
+                <span class="text-xs font-extrabold">${s.name}</span>
+              </div>
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">
+                🏆 ${compChaps.length}/${s.chapters.length} પૂર્ણ (${pct}%)
+              </span>
+            </div>
+
+            ${isVaultOpen ? `
+              <div class="px-3 pb-3 pt-1 space-y-1.5 border-t" style="border-color: var(--border-col);">
+                ${compChaps.map(c => {
+                  const mDone = user.revisions.filter(r => r.chapterId === c.id && r.revType === "master" && r.done).length;
+                  return `
+                    <div class="one-card px-3 py-2 rounded-2xl flex items-center justify-between text-xs">
+                      <div class="min-w-0 flex-1">
+                        <div class="font-extrabold text-emerald-500 truncate">✓ ${c.name}</div>
+                        <div class="text-[10px] muted-text">પૂર્ણ તારીખ: <b>${c.completedDate || '--'}</b> • ${c.donePages}p</div>
+                      </div>
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500 shrink-0">
+                        Master Rev: ${mDone}/4
+                      </span>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).filter(Boolean).join("");
+
+      completedShowcase.innerHTML = compHtml || '<div class="text-xs muted-text text-center py-2">હજુ કોઈ ચેપ્ટર પૂર્ણ થયું નથી.</div>';
+    }
+
+    // ================= TEST ENTRY & ANALYSIS =================
+    function setTestEntryMode(mode) {
+      currentTestEntryMode = mode;
+      document.getElementById("tmode-chapter").className = mode === "chapter"
+        ? "py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white"
+        : "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
+      document.getElementById("tmode-general").className = mode === "general"
+        ? "py-1.5 rounded-xl text-[11px] font-extrabold bg-purple-600 text-white"
+        : "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
+    }
+
+    function toggleTestSubSelection(subId) {
+      if (selectedTestSubIds.includes(subId)) {
+        selectedTestSubIds = selectedTestSubIds.filter(x => x !== subId);
+      } else {
+        selectedTestSubIds.push(subId);
+      }
+      renderMultiTestSelectors(getCurrentStudent());
+    }
+
+    function selectAllTestSubjects() {
+      const user = getCurrentStudent();
+      if (!user) return;
+      selectedTestSubIds = user.subjects.map(s => s.id);
+      selectedTestChapKeys = ["ALL::General Full Syllabus"];
+      renderMultiTestSelectors(user);
+    }
+
+    function toggleTestChapSelection(key) {
+      if (selectedTestChapKeys.includes(key)) {
+        selectedTestChapKeys = selectedTestChapKeys.filter(x => x !== key);
+      } else {
+        selectedTestChapKeys.push(key);
+      }
+    }
+
+    function renderMultiTestSelectors(user) {
+      const chipsEl = document.getElementById("multiTestSubjectChips");
+      const chapsEl = document.getElementById("multiTestChapterCheckboxes");
+      if (!user || user.subjects.length === 0) {
+        chipsEl.innerHTML = '<span class="text-xs muted-text">No subjects added</span>';
+        chapsEl.innerHTML = "";
+        return;
+      }
+
+      if (selectedTestSubIds.length === 0) {
+        selectedTestSubIds = [user.subjects[0].id];
+      }
+
+      chipsEl.innerHTML = user.subjects.map(s => {
+        const active = selectedTestSubIds.includes(s.id);
+        return `<button onclick="toggleTestSubSelection('${s.id}')"
+          class="px-3 py-1 rounded-full text-[11px] font-extrabold whitespace-nowrap transition ${
+            active ? 'bg-indigo-600 text-white' : 'one-card muted-text'
+          }">
+          ${active ? '✓ ' : ''}${s.name}
+        </button>`;
+      }).join("");
+
+      const activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id));
+      let html = `
+        <label class="flex items-center gap-2 text-xs font-bold p-1 cursor-pointer">
+          <input type="checkbox" ${selectedTestChapKeys.includes("ALL::General Full Syllabus") ? "checked" : ""}
+            onchange="toggleTestChapSelection('ALL::General Full Syllabus')" class="accent-indigo-600" />
+          <span class="text-indigo-500">🌐 Full Subject / General Combined Test</span>
+        </label>
+      `;
+
+      activeSubs.forEach(s => {
+        s.chapters.forEach(c => {
+          const key = s.name + "::" + c.name;
+          const checked = selectedTestChapKeys.includes(key);
+          html += `
+            <label class="flex items-center gap-2 text-xs p-1 cursor-pointer">
+              <input type="checkbox" ${checked ? "checked" : ""}
+                onchange="toggleTestChapSelection('${key.replace(/'/g, "\\'")}')" class="accent-indigo-600" />
+              <span class="truncate font-semibold">${c.name}</span>
+            </label>
+          `;
+        });
+      });
+      chapsEl.innerHTML = html;
+    }
+
+    function addTestScore() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user) return;
+
+      const scored = parseFloat(document.getElementById("testScoredInput").value);
+      const total = parseFloat(document.getElementById("testTotalInput").value);
+      if (isNaN(scored) || isNaN(total) || total <= 0) return alert("સાચા માર્ક્સ નાખો.");
+
+      const tDate = document.getElementById("testDateInput").value || todayISO();
+      const customTitle = document.getElementById("testCustomTitleInput").value.trim();
+
+      const activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id)).map(s => s.name);
+      const subDisplay = activeSubs.length > 0 ? activeSubs.join(", ") : "General";
+
+      const chapNames = selectedTestChapKeys.map(k => k.split("::")[1]).filter(Boolean);
+      const chapDisplay = chapNames.length > 0
+        ? chapNames.join(" + ")
+        : (currentTestEntryMode === "general" ? "Full Syllabus Test" : "General Combined");
+
+      user.tests.push({
+        id: "tst_" + Date.now(),
+        date: tDate,
+        testType: currentTestEntryMode,
+        title: customTitle || chapDisplay,
+        subjects: activeSubs.length > 0 ? activeSubs : ["General"],
+        chapters: chapNames.length > 0 ? chapNames : [chapDisplay],
+        subjectName: subDisplay,
+        chapterName: chapDisplay,
+        scored,
+        total
+      });
+
+      document.getElementById("testScoredInput").value = "";
+      document.getElementById("testCustomTitleInput").value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function renderTestsAndDeepAnalysis(user, doneChaps, totalChaps, totalPagesRead, totalPagesRevised, overallTestPct) {
+      const today = todayISO();
+      const map = {};
+      user.logs.forEach(l => { map[l.date] = (map[l.date] || 0) + Number(l.pages || 0); });
+
+      document.getElementById("kpiDailyPace").textContent = "આજે: " + (map[today] || 0) + "p";
+
+      let streak = 0;
+      for (let i = 0; i < 365; i++) {
+        const d = addDaysISO(today, -i);
+        if ((map[d] || 0) > 0) streak++;
+        else if (i > 0) break;
+      }
+      document.getElementById("kpiStreak").textContent = streak + " 🔥";
+
+      let last7Pages = 0, activeDays7 = 0, maxP = 10;
+      const daysArr = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = addDaysISO(today, -i);
+        const p = map[d] || 0;
+        last7Pages += p;
+        if (p > 0) activeDays7++;
+        if (p > maxP) maxP = p;
+        const shortDay = new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short" });
+        daysArr.push({ p, shortDay, isToday: d === today });
+      }
+      const avgVel = (last7Pages / 7).toFixed(1);
+      document.getElementById("deepVelocity").textContent = avgVel + " p/day";
+      document.getElementById("microActiveDays").textContent = activeDays7 + "/7 દિવસ સક્રિય";
+      document.getElementById("graph7DayTotalBadge").textContent = last7Pages + "p (7D)";
+
+      const revCovPct = totalPagesRead > 0 ? Math.round((totalPagesRevised / totalPagesRead) * 100) : 100;
+      const unrevPages = Math.max(0, totalPagesRead - totalPagesRevised);
+      document.getElementById("microRevCoverage").textContent = revCovPct + "%";
+      document.getElementById("microUnrevBacklog").textContent = unrevPages + "p રિવિઝન બાકી";
+
+      const dueToDate = user.revisions.filter(r => r.dueDate <= today).length;
+      const doneRev = user.revisions.filter(r => r.done).length;
+      const revRate = dueToDate > 0 ? Math.min(100, Math.round((doneRev / dueToDate) * 100)) : 100;
+
+      const calcPct = arr => {
+        let s = 0, m = 0;
+        arr.forEach(x => { s += Number(x.scored); m += Number(x.total); });
+        return m > 0 ? Math.round((s / m) * 100) : null;
+      };
+
+      const subMetrics = user.subjects.map(s => {
+        const cTot = s.chapters.length;
+        const cDone = s.chapters.filter(c => c.completed).length;
+        const pRead = s.chapters.reduce((a, c) => a + Number(c.donePages || 0), 0);
+        const pRev = s.chapters.reduce((a, c) => a + Number(c.revisedPages || 0), 0);
+        const sTests = (user.tests || []).filter(t => (t.subjects || []).includes(s.name) || (t.subjectName || "").includes(s.name));
+        const tAvg = calcPct(sTests);
+        const chapPct = cTot > 0 ? Math.round((cDone / cTot) * 100) : 0;
+        return { id: s.id, name: s.name, cTot, cDone, pRead, pRev, tAvg, testCount: sTests.length, chapPct };
+      });
+
+      const testedSubs = subMetrics.filter(sm => sm.tAvg !== null).sort((a, b) => b.tAvg - a.tAvg);
+      if (testedSubs.length > 0) {
+        document.getElementById("bestTestSubjectCard").textContent = testedSubs[0].name + " (" + testedSubs[0].tAvg + "%)";
+        document.getElementById("bestTestSubjectSub").textContent = testedSubs[0].testCount + " Tests Given";
+      } else {
+        document.getElementById("bestTestSubjectCard").textContent = "--";
+        document.getElementById("bestTestSubjectSub").textContent = "No Subject Tests";
+      }
+
+      document.getElementById("chapTestAvgCard").textContent = overallTestPct !== null ? (overallTestPct + "%") : "--%";
+
+      const subAvgGrid = document.getElementById("overviewSubjectTestAverages");
+      subAvgGrid.innerHTML = subMetrics.length === 0
+        ? '<div class="text-xs muted-text col-span-2">હજુ કોઈ વિષય ઉમેર્યો નથી.</div>'
+        : subMetrics.map(sm => `
+            <div class="subtle-pill px-3 py-2 flex items-center justify-between text-xs">
+              <span class="font-bold truncate pr-1">${sm.name}</span>
+              <span class="font-extrabold shrink-0 ${sm.tAvg !== null ? (sm.tAvg >= 75 ? 'text-emerald-500' : (sm.tAvg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
+                ${sm.tAvg !== null ? sm.tAvg + '%' : '--%'}
+              </span>
+            </div>
+          `).join("");
+
+      let untestedCompChaps = 0;
+      user.subjects.forEach(s => {
+        s.chapters.filter(c => c.completed).forEach(c => {
+          const tested = (user.tests || []).some(t =>
+            (t.chapters || []).includes(c.name) || (t.chapterName || "").includes(c.name)
+          );
+          if (!tested) untestedCompChaps++;
+        });
+      });
+      document.getElementById("microUntestedChaps").textContent = untestedCompChaps + " પૂર્ણ ચેપ્ટર ટેસ્ટ બાકી";
+
+      const chapCompRatio = totalChaps > 0 ? (doneChaps / totalChaps) * 100 : 0;
+      const readiness = Math.round((chapCompRatio * 0.35) + (revCovPct * 0.25) + (revRate * 0.20) + ((overallTestPct || 50) * 0.20));
+      document.getElementById("readinessScoreBadge").textContent = "Readiness: " + readiness + "/100";
+
+      const memIndex = Math.round((revCovPct * 0.6) + (revRate * 0.4));
+      document.getElementById("psychMemoryScore").textContent = "🧠 Memory Retention: " + memIndex + "%";
+
+      let persona = "🌱 Steady Starter (શરૂઆતનો તબક્કો)";
+      let advice = "રોજ નિયમિત પેજ ઉમેરવાનું ચાલુ રાખો અને જે ચેપ્ટર પૂરું થાય તેને તરત જ Finish માર્ક કરો.";
+
+      if (unrevPages > 25 && revCovPct < 50) {
+        persona = "⚡ Fast Reader, Low Revision (વાંચન ઝડપી પણ રિવિઝન ઓછું)";
+        advice = "તમે " + totalPagesRead + " પેજ વાંચ્યા છે પણ " + unrevPages + " પેજનું રિવિઝન બાકી છે! નવું વાંચતા પહેલા આજે જ જૂનું રિવિઝન પૂરું કરો.";
+      } else if (activeDays7 >= 5 && revCovPct >= 75 && (overallTestPct || 0) >= 70) {
+        persona = "🏆 Topper Mindset (સંતુલિત વાંચન + રિવિઝન + ટેસ્ટ)";
+        advice = "જબરદસ્ત! તમારી વાંચવાની ઝડપ, રિવિઝન અને ટેસ્ટ માર્ક્સ ત્રણેય સંતુલિત છે.";
+      } else if (doneChaps >= 2 && untestedCompChaps >= 2) {
+        persona = "📚 Theory Master, Test Shy (વાંચન સારું પણ ટેસ્ટ ઓછી)";
+        advice = "તમે " + untestedCompChaps + " ચેપ્ટર પૂર્ણ કર્યા છે પણ તેની ટેસ્ટ આપી નથી. www.thetarget.in પર જઈને MCQ પ્રેક્ટિસ કરો.";
+      }
+
+      document.getElementById("psychPersonaTitle").textContent = persona;
+      document.getElementById("psychActionAdvice").textContent = advice;
+
+      document.getElementById("weeklyChartBars").innerHTML = daysArr.map(item => {
+        const hPct = item.p > 0 ? Math.max(18, Math.round((item.p / maxP) * 100)) : 8;
+        return `
+          <div class="flex flex-col items-center justify-end h-full">
+            <span class="text-[9px] font-extrabold muted-text mb-1">${item.p > 0 ? item.p + 'p' : ''}</span>
+            <div style="height:${hPct}%" class="w-full rounded-t-xl transition-all ${item.p > 0 ? (item.isToday ? 'bg-indigo-600' : 'bg-emerald-500') : 'bg-slate-400/20'}"></div>
+            <span class="text-[9px] mt-1 ${item.isToday ? 'text-indigo-500 font-extrabold' : 'muted-text'}">${item.shortDay}</span>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("deepTestAvg").textContent = overallTestPct !== null ? ("Avg: " + overallTestPct + "%") : "Avg: --%";
+      const svgBox = document.getElementById("testTrendSvgContainer");
+      const lastTests = (user.tests || []).slice(-10);
+      if (lastTests.length === 0) {
+        svgBox.innerHTML = '<span class="text-xs muted-text">ટેસ્ટ માર્ક્સ ઉમેરશો એટલે અહીં ગ્રાફ દેખાશે 📈</span>';
+      } else {
+        const pts = lastTests.map((t, idx) => {
+          const pct = Math.min(100, Math.max(0, Math.round((t.scored / t.total) * 100)));
+          const x = lastTests.length === 1 ? 150 : Math.round((idx / (lastTests.length - 1)) * 260) + 20;
+          const y = Math.round(90 - (pct * 0.75)) + 10;
+          return { x, y, pct };
+        });
+        const polyPoints = pts.map(p => p.x + "," + p.y).join(" ");
+        svgBox.innerHTML = `
+          <svg viewBox="0 0 300 110" class="w-full h-full overflow-visible">
+            <line x1="15" y1="22" x2="285" y2="22" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3" />
+            <line x1="15" y1="55" x2="285" y2="55" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3" />
+            <line x1="15" y1="90" x2="285" y2="90" stroke="currentColor" stroke-opacity="0.15" />
+            <polyline fill="none" stroke="#4F46E5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}" />
+            ${pts.map(p => `
+              <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#10B981" stroke="#fff" stroke-width="1.5" />
+              <text x="${p.x}" y="${p.y - 8}" text-anchor="middle" font-size="9" font-weight="bold" fill="currentColor">${p.pct}%</text>
+            `).join("")}
+          </svg>
+        `;
+      }
+
+      renderMultiTestSelectors(user);
+
+      const histFilterSel = document.getElementById("testHistSubFilter");
+      const curHFilter = histFilterSel.value || "ALL";
+      histFilterSel.innerHTML = '<option value="ALL">All Subjects</option>' +
+        user.subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join("");
+      if (curHFilter) histFilterSel.value = curHFilter;
+
+      const sortMode = document.getElementById("testHistSortBy").value || "latest";
+      let filteredTests = (user.tests || []).slice();
+
+      if (histFilterSel.value !== "ALL") {
+        filteredTests = filteredTests.filter(t =>
+          (t.subjects || []).includes(histFilterSel.value) || (t.subjectName || "").includes(histFilterSel.value)
+        );
+      }
+
+      if (sortMode === "latest") filteredTests.reverse();
+      else if (sortMode === "high") filteredTests.sort((a, b) => (b.scored / b.total) - (a.scored / a.total));
+      else if (sortMode === "low") filteredTests.sort((a, b) => (a.scored / a.total) - (b.scored / b.total));
+
+      const listEl = document.getElementById("testAnalyticsList");
+      listEl.innerHTML = filteredTests.length === 0
+        ? '<div class="text-xs muted-text text-center py-3">કોઈ ટેસ્ટ રિઝલ્ટ નથી.</div>'
+        : filteredTests.map(x => {
+            const pct = Math.round((x.scored / x.total) * 100);
+            const col = pct >= 75 ? "bg-emerald-500/20 text-emerald-500" : (pct >= 50 ? "bg-amber-500/20 text-amber-500" : "bg-rose-500/20 text-rose-500");
+            return `
+              <div class="subtle-pill p-3 flex items-center justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-extrabold truncate">${x.title || x.chapterName}</div>
+                  <div class="text-[10px] muted-text mt-0.5 truncate">
+                    ${x.subjectName} • <b>${x.scored}/${x.total}</b> • ${x.date}
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <span class="text-xs font-extrabold px-2.5 py-1 rounded-full ${col}">${pct}%</span>
+                  <button onclick="deleteTestScore('${x.id}')" class="text-rose-500 text-xs px-1.5">🗑</button>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+      document.getElementById("deepSubjectBreakdown").innerHTML = subMetrics.map(sm => `
+        <div class="subtle-pill p-3 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold">${sm.name}</span>
+            <span class="text-[11px] font-extrabold ${sm.tAvg !== null ? (sm.tAvg >= 75 ? 'text-emerald-500' : (sm.tAvg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
+              Test Avg: ${sm.tAvg !== null ? sm.tAvg + '%' : 'N/A'} (${sm.testCount})
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-[10px] muted-text">
+            <span>પૂર્ણ ચેપ્ટર: <b>${sm.cDone}/${sm.cTot} (${sm.chapPct}%)</b></span>
+            <span>Read: <b>${sm.pRead}p</b> • Rev: <b class="text-emerald-500">${sm.pRev}p</b></span>
+          </div>
+          <div class="w-full h-1.5 bg-slate-400/20 rounded-full overflow-hidden">
+            <div class="h-full bg-indigo-600 rounded-full" style="width:${sm.chapPct}%"></div>
+          </div>
+        </div>
+      `).join("") || '<div class="text-xs muted-text">--</div>';
+
+      const filterSel = document.getElementById("analysisSubjectFilter");
+      const curF = filterSel.value || "ALL";
+      filterSel.innerHTML = '<option value="ALL">All Subjects</option>' + user.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+      if (curF) filterSel.value = curF;
+
+      const chapRows = [];
+      user.subjects.forEach(s => {
+        if (filterSel.value !== "ALL" && s.id !== filterSel.value) return;
+        s.chapters.forEach(c => {
+          const cTests = (user.tests || []).filter(t => (t.chapters || []).includes(c.name) || (t.chapterName || "").includes(c.name));
+          const cTestAvg = calcPct(cTests);
+          chapRows.push({
+            subName: s.name, chapName: c.name, completed: c.completed,
+            donePages: c.donePages || 0, revPages: Math.min(c.donePages || 0, c.revisedPages || 0),
+            testAvg: cTestAvg, testAttempts: cTests.length
+          });
+        });
+      });
+
+      document.getElementById("deepChapterBreakdown").innerHTML = chapRows.map(cr => `
+        <div class="subtle-pill p-2.5 flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-extrabold truncate">${cr.chapName} ${cr.completed ? '✅' : ''}</div>
+            <div class="text-[10px] muted-text">${cr.subName} • Read: <b>${cr.donePages}p</b> | Rev: <b class="text-emerald-500">${cr.revPages}p</b></div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-xs font-extrabold ${cr.testAvg !== null ? (cr.testAvg >= 75 ? 'text-emerald-500' : (cr.testAvg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
+              ${cr.testAvg !== null ? cr.testAvg + '%' : 'No Test'}
+            </div>
+            <div class="text-[9px] muted-text">${cr.testAttempts} Tests</div>
+          </div>
+        </div>
+      `).join("") || '<div class="text-xs muted-text text-center py-2">--</div>';
+    }
+
+    function deleteTestScore(id) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      user.tests = user.tests.filter(x => x.id !== id);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function submitFeedbackReport(sendWhatsApp) {
+      const user = getCurrentStudent();
+      if (!user) return;
+      const type = document.getElementById("feedbackTypeSelect").value;
+      const msg = document.getElementById("feedbackMessageInput").value.trim();
+      if (!msg) return alert("કૃપા કરીને તમારો મેસેજ કે સૂચન લખો.");
+
+      if (!db.feedbacks) db.feedbacks = [];
+      db.feedbacks.unshift({
+        id: "fb_" + Date.now(),
+        date: todayISO(),
+        studentName: user.name,
+        mobile: user.mobile,
+        type,
+        message: msg
+      });
+      saveDB();
+      document.getElementById("feedbackMessageInput").value = "";
+
+      if (sendWhatsApp) {
+        const waText = encodeURIComponent("*The Target App — " + type + "*\nStudent: " + user.name + " (" + user.mobile + ")\nMessage: " + msg);
+        window.open("https://wa.me/919033189251?text=" + waText, "_blank");
+      } else {
+        alert("✅ તમારો રિપોર્ટ Admin ને મોકલી દેવામાં આવ્યો છે! આભાર.");
+      }
+    }
+
+    function togglePomodoro() {
+      const btn = document.getElementById("pomoBtn");
+      if (pomoTimer) {
+        clearInterval(pomoTimer);
+        pomoTimer = null;
+        btn.textContent = "Resume";
+      } else {
+        btn.textContent = "Pause";
+        pomoTimer = setInterval(() => {
+          if (pomoSeconds > 0) {
+            pomoSeconds--;
+            const m = String(Math.floor(pomoSeconds / 60)).padStart(2, "0");
+            const s = String(pomoSeconds % 60).padStart(2, "0");
+            document.getElementById("pomoClock").textContent = m + ":" + s;
+          } else {
+            clearInterval(pomoTimer);
+            pomoTimer = null;
+            btn.textContent = "Start";
+            alert("🎉 25 Min Focus Session પૂર્ણ!");
+            resetPomodoro();
+          }
+        }, 1000);
+      }
+    }
+    function resetPomodoro() {
+      if (pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
+      pomoSeconds = 25 * 60;
+      document.getElementById("pomoClock").textContent = "25:00";
+      document.getElementById("pomoBtn").textContent = "Start";
+    }
+
+    function downloadStudentBackup() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const a = document.createElement("a");
+      a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(user, null, 2));
+      a.download = "target_backup_" + user.mobile + ".json";
+      a.click();
+    }
+    function restoreStudentBackup(event) {
+      if (guardDemoAction()) return;
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imp = JSON.parse(e.target.result);
+          const user = getCurrentStudent();
+          user.subjects = imp.subjects || [];
+          user.logs = imp.logs || [];
+          user.revisions = imp.revisions || [];
+          user.tests = imp.tests || [];
+          saveDB();
+          renderStudentAll();
+          alert("✅ Backup Restored!");
+        } catch (err) { alert("Invalid file"); }
+      };
+      reader.readAsText(file);
+    }
+    function saveProfileSettings() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      user.name = document.getElementById("profName").value.trim() || user.name;
+      user.exam = document.getElementById("profExam").value.trim() || user.exam;
+      user.examDate = document.getElementById("profExamDate").value || user.examDate;
+      saveDB();
+      renderStudentAll();
+      alert("✅ પ્રોફાઈલ સેવ થઈ ગઈ!");
+    }
+
+    function switchStudentTab(tab) {
+      ["today", "syllabus", "tests", "profile"].forEach(t => {
+        document.getElementById("tab-" + t).classList.toggle("hidden", t !== tab);
+        const btn = document.getElementById("nav-" + t);
+        btn.className = t === tab ? "flex flex-col items-center py-1 text-indigo-500" : "flex flex-col items-center py-1 muted-text";
+      });
+    }
+
+    // ================= OWNER ADMIN PANEL FUNCTIONS =================
+    function toggleAdminUserEditLock(mobile) {
+      adminUnlockedUsers[mobile] = !adminUnlockedUsers[mobile];
+      renderAdminPanel();
+    }
+
+    function saveAdminBroadcast() {
+      db.broadcast = document.getElementById("adminBroadcastInput").value.trim();
+      saveDB();
+      alert("📢 Broadcast Notice Updated on Secure Cloud!");
+    }
+
+    function saveAdminEditedUserDetails(mobile) {
+      const u = db.users[mobile];
+      if (!u) return;
+      const newName = document.getElementById("admEditName_" + mobile).value.trim();
+      const newExam = document.getElementById("admEditExam_" + mobile).value.trim();
+      const newExp = document.getElementById("admEditExp_" + mobile).value;
+      if (newName) u.name = newName;
+      if (newExam) u.exam = newExam;
+      if (newExp) u.planExpiryDate = newExp;
+      saveDB();
+      renderAdminPanel();
+      alert("✅ User details updated on Secure Cloud!");
+    }
+
+    function renderAdminPanel() {
+      const usersArr = Object.values(db.users);
+      document.getElementById("admTotalUsers").textContent = usersArr.length;
+      document.getElementById("admPendingUsers").textContent = usersArr.filter(u => getValidityRemainingDays(u) <= 5 || u.status !== "approved").length;
+      document.getElementById("admApprovedUsers").textContent = usersArr.filter(u => u.status === "approved" && getValidityRemainingDays(u) > 5).length;
+      document.getElementById("admFeedbackCount").textContent = (db.feedbacks || []).length;
+      document.getElementById("adminBroadcastInput").value = db.broadcast || "";
+
+      const q = (document.getElementById("adminSearchInput")?.value || "").toLowerCase().trim();
+      const statusFilter = document.getElementById("adminFilterStatus")?.value || "ALL";
+
+      const filteredUsers = usersArr.filter(u => {
+        const matchQ = !q || (u.name || "").toLowerCase().includes(q) || (u.mobile || "").includes(q);
+        if (!matchQ) return false;
+        const rem = getValidityRemainingDays(u);
+        if (statusFilter === "PAID") return u.status === "approved" && rem > 5;
+        if (statusFilter === "TRIAL") return u.status === "approved" && rem > 0 && rem <= 5;
+        if (statusFilter === "EXPIRED") return u.status !== "approved" || rem <= 0;
+        return true;
+      });
+
+      const listEl = document.getElementById("adminStudentList");
+      listEl.innerHTML = filteredUsers.length === 0
+        ? '<div class="text-xs muted-text text-center py-4">No matching students found.</div>'
+        : filteredUsers.map(u => {
+            const isApp = u.status === "approved";
+            const remDays = getValidityRemainingDays(u);
+            const isLife = remDays > 2000;
+            const isUnlocked = !!adminUnlockedUsers[u.mobile];
+
+            let totC = 0, doneC = 0, totP = 0;
+            (u.subjects || []).forEach(s => s.chapters.forEach(c => {
+              totC++;
+              if (c.completed) doneC++;
+              totP += Number(c.donePages || 0);
+            }));
+
+            return `
+              <div class="subtle-pill p-3.5 space-y-2.5 ${isUnlocked ? 'border-2 border-indigo-500' : ''}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-xs font-extrabold">${u.name}</span>
+                      <span class="text-xs font-mono font-bold text-indigo-500">${u.mobile}</span>
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isApp && remDays > 0 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}">
+                        ${isApp ? (isLife ? '♾️ LIFETIME' : `${remDays}d Left (${u.planName || 'Plan'})`) : 'LOCKED'}
+                      </span>
+                    </div>
+                    <div class="text-[11px] muted-text mt-1">
+                      Exam: <b>${u.exam}</b> • Chapters: <b>${doneC}/${totC}</b> (${totP}p) • Valid Till: <b>${u.planExpiryDate || '--'}</b>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="toggleAdminUserEditLock('${u.mobile}')"
+                      class="px-3 py-1.5 rounded-xl text-xs font-extrabold ${isUnlocked ? 'bg-amber-500 text-white' : 'one-card text-indigo-500'}">
+                      ${isUnlocked ? '🔒 Done Editing' : '✎ Edit User'}
+                    </button>
+                    <button onclick="inspectStudent('${u.mobile}')"
+                      class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl">
+                      📊 In-Detail Report
+                    </button>
+                  </div>
+                </div>
+
+                ${isUnlocked ? `
+                  <div class="pt-2.5 border-t space-y-2.5" style="border-color: var(--border-col);">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                      <input id="admEditName_${u.mobile}" type="text" value="${u.name}" placeholder="Name" class="theme-input px-2.5 py-1.5 text-xs font-bold" />
+                      <input id="admEditExam_${u.mobile}" type="text" value="${u.exam}" placeholder="Exam" class="theme-input px-2.5 py-1.5 text-xs font-bold" />
+                      <input id="admEditExp_${u.mobile}" type="date" value="${u.planExpiryDate || todayISO()}" class="theme-input px-2.5 py-1.5 text-xs font-bold" />
+                      <button onclick="saveAdminEditedUserDetails('${u.mobile}')" class="bg-emerald-600 text-white text-xs font-extrabold py-1.5 rounded-xl">
+                        💾 Save Details
+                      </button>
+                    </div>
+
+                    <div class="flex items-center justify-between flex-wrap gap-1.5">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-[10px] font-extrabold muted-text uppercase">Assign Plan:</span>
+                        <button onclick="assignStudentPlan('${u.mobile}', 5, '5-Day Free Trial')" class="one-card text-xs font-bold px-2.5 py-1 rounded-lg">5D Trial</button>
+                        <button onclick="assignStudentPlan('${u.mobile}', 180, '₹99 (6 Months)')" class="bg-indigo-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">+6M (₹99)</button>
+                        <button onclick="assignStudentPlan('${u.mobile}', 365, '₹149 (1 Year)')" class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">+1Y (₹149)</button>
+                        <button onclick="assignStudentPlan('${u.mobile}', 36500, '₹999 Lifetime')" class="bg-amber-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">♾️ ₹999 Life</button>
+                        <button onclick="adjustStudentValidity('${u.mobile}', -15)" class="one-card text-rose-500 text-xs font-extrabold px-2 py-1 rounded-lg">−15d</button>
+                        <button onclick="adjustStudentValidity('${u.mobile}', 15)" class="one-card text-emerald-500 text-xs font-extrabold px-2 py-1 rounded-lg">+15d</button>
+                      </div>
+                      <div class="flex gap-1.5">
+                        <button onclick="toggleStudentLockStatus('${u.mobile}')" class="bg-rose-500/15 text-rose-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                          ${u.status === 'approved' ? '🚫 Block/Hold' : '✓ Unblock'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join("");
+
+      const fbEl = document.getElementById("adminFeedbackList");
+      const fbs = db.feedbacks || [];
+      fbEl.innerHTML = fbs.length === 0
+        ? '<div class="text-xs muted-text">No bug reports or feature requests yet.</div>'
+        : fbs.map(f => `
+            <div class="subtle-pill p-2.5 flex items-center justify-between gap-2 text-xs">
+              <div>
+                <span class="font-extrabold text-indigo-500">[${f.type}]</span>
+                <b>${f.studentName} (${f.mobile})</b> • <span class="muted-text">${f.date}</span>
+                <div class="mt-0.5">${f.message}</div>
+              </div>
+              <button onclick="deleteFeedbackItem('${f.id}')" class="text-rose-500 font-bold px-2">✕</button>
+            </div>
+          `).join("");
+    }
+
+    function deleteFeedbackItem(id) {
+      db.feedbacks = (db.feedbacks || []).filter(f => f.id !== id);
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function toggleStudentLockStatus(m) {
+      const u = db.users[m];
+      if (!u) return;
+      u.status = u.status === "approved" ? "blocked" : "approved";
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function assignStudentPlan(m, days, planLabel) {
+      const u = db.users[m];
+      if (!u) return;
+      u.status = "approved";
+      u.planName = planLabel;
+      u.planStartDate = todayISO();
+      u.planExpiryDate = addDaysISO(todayISO(), days);
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function adjustStudentValidity(m, deltaDays) {
+      const u = db.users[m];
+      if (!u) return;
+      const base = (u.planExpiryDate && u.planExpiryDate > todayISO()) ? u.planExpiryDate : todayISO();
+      u.planExpiryDate = addDaysISO(base, deltaDays);
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function inspectStudent(m) {
+      const u = db.users[m];
+      if (!u) return;
+      const box = document.getElementById("adminInspectBox");
+      box.classList.remove("hidden");
+      document.getElementById("inspectStudentTitle").textContent = "📊 " + u.name + " (" + u.mobile + ") — Complete In-Detail Student Report";
+
+      let totC = 0, doneC = 0, totRead = 0, totRev = 0;
+      (u.subjects || []).forEach(s => s.chapters.forEach(c => {
+        totC++;
+        if (c.completed) doneC++;
+        totRead += Number(c.donePages || 0);
+        totRev += Math.min(Number(c.donePages || 0), Number(c.revisedPages || 0));
+      }));
+
+      let tSc = 0, tMx = 0;
+      (u.tests || []).forEach(t => { tSc += Number(t.scored); tMx += Number(t.total); });
+      const tAvg = tMx > 0 ? Math.round((tSc / tMx) * 100) + "%" : "N/A";
+
+      const subDetailsHtml = (u.subjects || []).map(s => {
+        const sDone = s.chapters.filter(c => c.completed).length;
+        const sTests = (u.tests || []).filter(t => (t.subjects || []).includes(s.name) || (t.subjectName || "").includes(s.name));
+        let sc = 0, mx = 0;
+        sTests.forEach(t => { sc += Number(t.scored); mx += Number(t.total); });
+        const sAvg = mx > 0 ? Math.round((sc / mx) * 100) + "%" : "No Test";
+
+        const chRows = s.chapters.map(c => `
+          <div class="flex items-center justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
+            <span>${c.completed ? '✅' : '⏳'} <b>${c.name}</b> ${c.completedDate ? `(${c.completedDate})` : ''}</span>
+            <span>Read: <b>${c.donePages}p</b> • Rev: <b class="text-emerald-500">${c.revisedPages || 0}p</b></span>
+          </div>
+        `).join("");
+
+        return `
+          <div class="subtle-pill p-3 space-y-1.5">
+            <div class="flex items-center justify-between font-extrabold text-indigo-500">
+              <span>📚 ${s.name} (${sDone}/${s.chapters.length} પૂર્ણ)</span>
+              <span>Subject Test Avg: ${sAvg}</span>
+            </div>
+            <div>${chRows || '<div class="muted-text">No chapters added</div>'}</div>
+          </div>
+        `;
+      }).join("");
+
+      const pendRevs = (u.revisions || []).filter(r => !r.done);
+      const revHtml = pendRevs.slice(0, 10).map(r => `
+        <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
+          <span><b>[${r.stageLabel}]</b> ${r.subjectName} ➔ ${r.chapterName}</span>
+          <span class="font-mono text-amber-500">Due: ${r.dueDate}</span>
+        </div>
+      `).join("");
+
+      const testHtml = (u.tests || []).slice().reverse().slice(0, 10).map(t => {
+        const p = Math.round((t.scored / t.total) * 100);
+        return `
+          <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
+            <span><b>${t.date}</b> — ${t.subjectName}: ${t.title || t.chapterName}</span>
+            <span class="font-extrabold text-purple-500">${t.scored}/${t.total} (${p}%)</span>
+          </div>
+        `;
+      }).join("");
+
+      const logsHtml = (u.logs || []).slice().reverse().slice(0, 12).map(l => `
+        <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
+          <span><b>${l.date}</b> — ${l.subjectName} ➔ ${l.chapterName} ${l.topicName ? '('+l.topicName+')' : ''}</span>
+          <span class="font-extrabold text-emerald-500">+${l.pages}p ${l.isChapterFinish ? '✓ Finish' : ''}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("inspectStudentContent").innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Plan & Validity</div><div class="text-xs font-extrabold text-emerald-500">${u.planName || 'Trial'} (${getValidityRemainingDays(u)}d)</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Chapters Done</div><div class="text-xs font-extrabold">${doneC} / ${totC}</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Read vs Revised</div><div class="text-xs font-extrabold text-indigo-500">${totRead}p / ${totRev}p</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Overall Test Avg</div><div class="text-xs font-extrabold text-purple-500">${tAvg} (${(u.tests||[]).length} Tests)</div></div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="font-extrabold text-sm">1. Subject & Chapter-Wise Progress:</div>
+          ${subDetailsHtml || '<div class="muted-text">No subjects added yet.</div>'}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="subtle-pill p-3 space-y-1">
+            <div class="font-extrabold text-amber-500 mb-1">2. Pending Revisions (${pendRevs.length}):</div>
+            ${revHtml || '<div class="muted-text">No pending revisions.</div>'}
+          </div>
+          <div class="subtle-pill p-3 space-y-1">
+            <div class="font-extrabold text-purple-500 mb-1">3. Recent Test Results (${(u.tests||[]).length}):</div>
+            ${testHtml || '<div class="muted-text">No tests logged yet.</div>'}
+          </div>
+        </div>
+
+        <div class="subtle-pill p-3 space-y-1">
+          <div class="font-extrabold text-emerald-500 mb-1">4. Recent Daily Study Logs (${(u.logs||[]).length}):</div>
+          ${logsHtml || '<div class="muted-text">No daily study logs yet.</div>'}
+        </div>
+      `;
+      box.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function exportAllDatabaseJSON() {
+      const a = document.createElement("a");
+      a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      a.download = "target_master_" + todayISO() + ".json";
+      a.click();
+    }
+
+    function importMasterDatabaseJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try { db = JSON.parse(e.target.result); saveDB(); renderAdminPanel(); alert("Master DB Restored & Synced to Secure Cloud!"); }
+        catch (err) { alert("Error"); }
+      };
+      reader.readAsText(file);
+    }
+
+    // Boot App Immediately
+    bootApp();
+    syncFromFirebaseCloud(false);
+    setInterval(() => syncFromFirebaseCloud(false), 20000);
+  </script>
+</body>
+</html>
