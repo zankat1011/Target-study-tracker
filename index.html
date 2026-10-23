@@ -13,28 +13,28 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
-    /* SAMSUNG ONE UI — CREAM WHITE THEME */
+    /* SAMSUNG ONE UI 6.1 — MINIMAL CREAM THEME */
     html[data-theme="cream"] {
-      --bg-main: #F4F2EE;
+      --bg-main: #F6F5F2;
       --bg-card: #FFFFFF;
-      --bg-subtle: #EAE6DF;
+      --bg-subtle: #EFECE6;
       --bg-nav: rgba(255, 255, 255, 0.96);
-      --text-main: #121417;
-      --text-muted: #606770;
-      --border-col: #DFDBD2;
-      --accent: #3B5BDB;
+      --text-main: #141619;
+      --text-muted: #68707A;
+      --border-col: #E5E1D8;
+      --accent: #2B50EC;
     }
 
-    /* SAMSUNG ONE UI — DEEP BLACK AMOLED THEME */
+    /* SAMSUNG ONE UI 6.1 — DEEP BLACK AMOLED THEME */
     html[data-theme="black"] {
       --bg-main: #000000;
-      --bg-card: #121418;
-      --bg-subtle: #1C1F26;
-      --bg-nav: rgba(18, 20, 24, 0.96);
+      --bg-card: #111317;
+      --bg-subtle: #1A1D24;
+      --bg-nav: rgba(17, 19, 23, 0.96);
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
-      --border-col: #262A34;
-      --accent: #5C7CFA;
+      --border-col: #242933;
+      --accent: #4C6EF5;
     }
 
     body {
@@ -42,25 +42,28 @@
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', 'Noto Sans Gujarati', sans-serif;
       overscroll-behavior-y: none;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     .one-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-col);
-      border-radius: 26px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+      border-radius: 24px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .subtle-pill {
       background-color: var(--bg-subtle);
       border: 1px solid var(--border-col);
-      border-radius: 18px;
+      border-radius: 16px;
+      transition: all 0.2s ease;
     }
     .theme-input {
       background-color: var(--bg-subtle);
       border: 1px solid var(--border-col);
       color: var(--text-main);
-      border-radius: 16px;
+      border-radius: 14px;
+      transition: border-color 0.2s ease;
     }
     .theme-input:focus {
       border-color: var(--accent);
@@ -71,63 +74,218 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+    /* Smooth UI Animations */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-fade { animation: fadeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Spotlight Highlight for Active Tour Target (No Blur!) */
+    .tour-spotlight {
+      position: relative;
+      z-index: 45 !important;
+      border: 2.5px solid #2B50EC !important;
+      box-shadow: 0 0 0 6px rgba(43, 80, 236, 0.22), 0 12px 32px rgba(43, 80, 236, 0.25) !important;
+      transform: scale(1.01);
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(520deg); opacity: 0; }
+    }
+    .confetti-piece {
+      position: fixed;
+      top: 0;
+      width: 9px;
+      height: 14px;
+      border-radius: 3px;
+      z-index: 9999;
+      pointer-events: none;
+      animation: confettiFall 2.2s ease-out forwards;
+    }
   </style>
 </head>
 <body class="min-h-screen pb-28 selection:bg-indigo-600 selection:text-white">
 
-  <!-- DEMO STICKY BAR -->
-  <div id="demoBanner" class="hidden sticky top-0 z-50 bg-amber-500 text-white px-4 py-2 shadow-md">
+  <!-- CELEBRATION CONFETTI CONTAINER & TOAST -->
+  <div id="confettiContainer"></div>
+  <div id="motivationToast" class="hidden fixed top-4 inset-x-4 max-w-sm mx-auto z-50 one-card p-3.5 bg-emerald-600 text-white border-none shadow-2xl flex items-center gap-3 anim-fade">
+    <div class="text-2xl">🎉</div>
+    <div class="min-w-0 flex-1">
+      <div id="motToastTitle" class="text-xs font-extrabold">વાહ! ખૂબ સરસ!</div>
+      <div id="motToastDesc" class="text-[11px] opacity-90 truncate">તમારું કાર્ય પૂર્ણ થયું!</div>
+    </div>
+  </div>
+
+  <!-- DEMO STICKY BAR (No raw phone number displayed) -->
+  <div id="demoBanner" class="hidden sticky top-0 z-40 bg-amber-500 text-white px-4 py-2 shadow-md">
     <div class="max-w-md mx-auto flex items-center justify-between gap-2">
       <div class="text-xs font-extrabold truncate">
-        👁️ DEMO MODE • <button onclick="startAppTour()" class="underline">🧭 Start Tour</button> • Buy: 9033189251
+        👁️ DEMO MODE • <button onclick="startAppTour()" class="underline">🧭 Guide Tour</button>
       </div>
-      <button onclick="exitDemoMode()" class="bg-white text-amber-900 font-extrabold text-[11px] px-3 py-1 rounded-full shrink-0">
-        Exit
-      </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="openAdminWhatsApp('Hello The Target, I want to buy full access plan.')" class="bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">💬 Buy Plan</button>
+        <button onclick="exitDemoMode()" class="bg-white text-amber-900 font-extrabold text-[10px] px-2.5 py-1 rounded-full">Exit</button>
+      </div>
     </div>
   </div>
 
-  <!-- ================= INTERACTIVE STEP-BY-STEP APP TOUR MODAL ================= -->
-  <div id="appTourOverlay" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center p-4">
-    <div class="w-full max-w-sm one-card p-5 space-y-4 border-2 border-indigo-500 shadow-2xl">
+  <!-- ================= 14) NON-BLUR SPOTLIGHT APP TOUR FLOATING SHEET ================= -->
+  <div id="appTourOverlay" class="hidden fixed inset-x-0 bottom-16 z-50 px-3.5 pointer-events-none">
+    <div class="w-full max-w-md mx-auto one-card p-4 space-y-2.5 border-2 border-indigo-600 shadow-2xl pointer-events-auto anim-fade">
       <div class="flex items-center justify-between">
-        <span id="tourStepBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-indigo-600 text-white">
-          Step 1 / 6
-        </span>
-        <button onclick="closeAppTour()" class="text-xs font-extrabold muted-text hover:text-rose-500 px-2 py-1">
-          ✕ Skip Tour
-        </button>
+        <div class="flex items-center gap-2">
+          <span id="tourStepBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-600 text-white">Step 1/6</span>
+          <span class="text-[10px] font-bold text-indigo-500">👆 ઉપર હાઈલાઈટ કરેલો ભાગ જુઓ</span>
+        </div>
+        <button onclick="closeAppTour()" class="text-xs font-extrabold muted-text hover:text-rose-500 px-2 py-0.5">✕ Skip</button>
       </div>
 
-      <div class="space-y-1.5">
-        <h3 id="tourTitle" class="text-base font-extrabold">🎯 Welcome to The Target</h3>
-        <p id="tourDesc" class="text-xs muted-text leading-relaxed"></p>
+      <div>
+        <h3 id="tourTitle" class="text-sm font-extrabold">🎯 Welcome to The Target</h3>
+        <p id="tourDesc" class="text-xs muted-text leading-relaxed mt-0.5"></p>
       </div>
 
-      <div id="tourHighlightBox" class="subtle-pill p-3 text-[11px] font-semibold text-indigo-500"></div>
+      <div id="tourHighlightBox" class="subtle-pill px-3 py-2 text-[11px] font-semibold text-indigo-500"></div>
 
-      <div class="flex items-center justify-between pt-2">
-        <button onclick="prevTourStep()" id="tourPrevBtn" class="subtle-pill px-4 py-2 text-xs font-extrabold">
-          ◀ Back
-        </button>
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="prevTourStep()" id="tourPrevBtn" class="subtle-pill px-3.5 py-1.5 text-xs font-extrabold">◀ Back</button>
         <div id="tourDots" class="flex gap-1.5"></div>
-        <button onclick="nextTourStep()" id="tourNextBtn" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-extrabold shadow-md">
-          Next ➔
+        <button onclick="nextTourStep()" id="tourNextBtn" class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl text-xs font-extrabold shadow-sm">Next ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 19) POPUP MODAL FOR LOCKED / COMPLETED CHAPTER ================= -->
+  <div id="chapLockModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-xs one-card p-5 text-center space-y-3 anim-fade">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto text-2xl">🔒</div>
+      <h3 id="lockModalChapName" class="text-sm font-extrabold">આ ચેપ્ટર પૂર્ણ થઈ ગયું છે</h3>
+      <p class="text-xs muted-text leading-relaxed">પૂર્ણ થયેલા ચેપ્ટરમાં પેજ ઉમેરવા કે ફેરફાર કરવા માટે તેને પહેલા <b>Reopen (પાછું ચાલુ)</b> કરવું પડશે.</p>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="closeChapLockModal()" class="subtle-pill py-2.5 text-xs font-extrabold">Cancel</button>
+        <button onclick="confirmReopenChapterPopup()" class="bg-amber-500 text-white py-2.5 rounded-2xl text-xs font-extrabold shadow-sm">↺ પાછું ચાલુ કરો</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 17) EXTRA REVISION MODAL ================= -->
+  <div id="extraRevModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm one-card p-5 space-y-3 anim-fade">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-extrabold">⚡ Extra Revision ઉમેરો</h3>
+        <button onclick="document.getElementById('extraRevModal').classList.add('hidden')" class="text-xs font-extrabold muted-text">✕</button>
+      </div>
+      <p class="text-[11px] muted-text">શેડ્યૂલ સિવાય તમે આજે જે વિષય/ચેપ્ટરનું વધારાનું રિવિઝન કર્યું હોય તે અહીં નોંધો:</p>
+      <div class="space-y-2">
+        <select id="extraRevSubSelect" onchange="populateExtraRevChaps()" class="w-full theme-input px-3 py-2 text-xs font-bold"></select>
+        <select id="extraRevChapSelect" class="w-full theme-input px-3 py-2 text-xs font-bold"></select>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="extraRevPagesInput" type="number" placeholder="રિવિઝન પેજ (e.g. 10)" value="10" class="theme-input px-3 py-2 text-xs font-bold" />
+          <input id="extraRevNoteInput" type="text" placeholder="નોંધ (Optional)" class="theme-input px-3 py-2 text-xs" />
+        </div>
+      </div>
+      <button onclick="saveExtraRevision()" class="w-full bg-emerald-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">✓ Save Extra Revision</button>
+    </div>
+  </div>
+
+  <!-- ================= 24 & 25) 3-LINE SIDE MENU DRAWER & BULK IMPORT MODAL ================= -->
+  <div id="sideMenuDrawer" class="hidden fixed inset-0 z-50 bg-black/60 flex justify-end">
+    <div class="w-72 max-w-[82vw] h-full one-card rounded-none rounded-l-3xl p-5 flex flex-col justify-between anim-fade">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-col);">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm">🎯</div>
+            <div>
+              <div class="text-xs font-extrabold">THE TARGET OS</div>
+              <div class="text-[10px] muted-text">Quick Actions Menu</div>
+            </div>
+          </div>
+          <button onclick="toggleSideDrawer()" class="w-7 h-7 rounded-full subtle-pill text-xs font-bold">✕</button>
+        </div>
+
+        <div class="space-y-1.5 text-xs font-bold">
+          <button onclick="toggleSideDrawer(); openExtraRevisionModal();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>⚡</span> <span>+ Add Extra Revision</span>
+          </button>
+          <button onclick="toggleSideDrawer(); openBulkImportModal();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>📥</span> <span>Excel / Word Bulk Import</span>
+          </button>
+          <button onclick="toggleSideDrawer(); startAppTour();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>🧭</span> <span>Interactive App Guide Tour</span>
+          </button>
+          <button onclick="toggleSideDrawer(); toggleTheme();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>🎨</span> <span>Switch Theme (Cream / Black)</span>
+          </button>
+          <button onclick="toggleSideDrawer(); downloadStudentBackup();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>💾</span> <span>Download Data Backup</span>
+          </button>
+          <a href="https://www.thetarget.in" target="_blank" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5 text-indigo-500 block">
+            <span>🌐</span> <span>MCQ Practice (thetarget.in)</span>
+          </a>
+          <button onclick="openAdminWhatsApp('Hello The Target Team, I need help with my account.')" class="w-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 rounded-2xl p-3 text-left flex items-center gap-2.5">
+            <span>💬</span> <span>WhatsApp Admin Support</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t flex items-center justify-between" style="border-color: var(--border-col);">
+        <span id="drawerMobileText" class="text-[11px] font-mono muted-text"></span>
+        <button onclick="logoutUser()" class="text-xs font-extrabold text-rose-500 px-3 py-1.5 rounded-xl bg-rose-500/10">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24) EXCEL / CSV / WORD BULK IMPORT MODAL -->
+  <div id="bulkImportModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-md one-card p-5 space-y-3.5 anim-fade">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-extrabold">📥 Excel / CSV / Word Bulk Import</h3>
+          <p class="text-[10px] muted-text">એકસાથે વિષય-ચેપ્ટર અથવા ટેસ્ટ માર્ક્સ કોપી-પેસ્ટ કે ફાઈલથી ઉમેરો</p>
+        </div>
+        <button onclick="document.getElementById('bulkImportModal').classList.add('hidden')" class="text-xs font-extrabold muted-text">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1.5 subtle-pill p-1">
+        <button onclick="setBulkImportMode('syllabus')" id="bmode-syllabus" class="py-1.5 rounded-xl text-xs font-extrabold bg-indigo-600 text-white">📚 Subjects & Chapters</button>
+        <button onclick="setBulkImportMode('tests')" id="bmode-tests" class="py-1.5 rounded-xl text-xs font-extrabold muted-text">🎯 Test Marks</button>
+      </div>
+
+      <div id="bulkImportFormatHint" class="subtle-pill p-2.5 text-[10px] muted-text leading-relaxed font-mono">
+        Format (દરેક લાઈનમાં):<br/>
+        <b>Subject Name, Chapter Name, Pages(Optional)</b><br/>
+        દા.ત.<br/>
+        ભારતનું બંધારણ, આમુખ, 12<br/>
+        ભારતનું બંધારણ, મૂળભૂત અધિકારો, 20
+      </div>
+
+      <textarea id="bulkImportTextarea" rows="5" placeholder="Excel કે Word માંથી કોપી કરીને અહીં પેસ્ટ કરો..." class="w-full theme-input p-3 text-xs font-mono"></textarea>
+
+      <div class="flex items-center justify-between gap-2">
+        <label class="subtle-pill px-3 py-2 text-xs font-extrabold cursor-pointer">
+          📂 Upload .CSV / .TXT
+          <input type="file" accept=".csv,.txt" class="hidden" onchange="handleBulkFileUpload(event)" />
+        </label>
+        <button onclick="processBulkImport()" class="flex-1 bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
+          ✓ Import All Data Now
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ================= LOGIN & PLAN GATE SCREEN ================= -->
+  <!-- ================= LOGIN & PLAN GATE SCREEN (CLEAN & MINIMAL) ================= -->
   <div id="authScreen" class="fixed inset-0 z-40 overflow-y-auto flex flex-col justify-center items-center px-4 py-6" style="background-color: var(--bg-main);">
-    <div class="w-full max-w-sm one-card p-6">
+    <div class="w-full max-w-sm one-card p-6 anim-fade">
       
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md">🎯</div>
           <div>
             <h1 class="text-lg font-extrabold tracking-tight leading-none">THE TARGET</h1>
-            <p class="text-[11px] muted-text mt-1">5-Day Free Trial • Secure Cloud OS</p>
+            <p class="text-[11px] muted-text mt-1">Smart Study & Revision OS</p>
           </div>
         </div>
         <div class="flex items-center gap-1.5">
@@ -136,7 +294,7 @@
         </div>
       </div>
 
-      <!-- Login Form -->
+      <!-- 13 & 22) Clean Login Form (No 2026 hint in placeholder & No Exam Date on Login) -->
       <div id="loginFormContainer" class="space-y-3.5">
         <div>
           <label class="block text-[11px] font-bold muted-text mb-1 ml-1">મોબાઈલ નંબર</label>
@@ -144,35 +302,30 @@
             class="w-full theme-input px-4 py-3 text-sm font-semibold" />
         </div>
 
-        <!-- Admin Password (ONLY for 9106581326) -->
+        <!-- Admin Password -->
         <div id="adminPassWrapper" class="hidden">
           <label class="block text-[11px] font-bold text-amber-500 mb-1 ml-1">Admin Password</label>
           <input id="authAdminPass" type="password" placeholder="Enter Admin Password"
             class="w-full theme-input border-amber-500 px-4 py-3 text-sm" />
         </div>
 
-        <!-- Student Fields -->
+        <!-- Student Fields (Clean: Name + Target Exam / General Prep) -->
         <div id="studentFieldsWrapper" class="space-y-3">
           <div id="newStudentFields" class="space-y-3">
             <div>
               <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પૂરું નામ</label>
-              <input id="authName" type="text" placeholder="Your Full Name" class="w-full theme-input px-4 py-3 text-sm" />
+              <input id="authName" type="text" placeholder="તમારું પૂરું નામ" class="w-full theme-input px-4 py-3 text-sm" />
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પરીક્ષા</label>
-                <input id="authExam" type="text" placeholder="GPSC / CCE" class="w-full theme-input px-3.5 py-2.5 text-sm" />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પરીક્ષા તારીખ</label>
-                <input id="authExamDate" type="date" class="w-full theme-input px-3 py-2.5 text-sm" />
-              </div>
+            <div>
+              <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પરીક્ષા / તૈયારીનું નામ</label>
+              <input id="authExam" type="text" placeholder="e.g. GPSC / CCE / General Prep" class="w-full theme-input px-4 py-3 text-sm" />
             </div>
           </div>
 
           <div>
             <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પ્લેટફોર્મ PIN</label>
-            <input id="authPin" type="password" placeholder="Enter PIN (2026)" class="w-full theme-input px-4 py-3 text-sm" />
+            <!-- 13) No 2026 mentioned in placeholder -->
+            <input id="authPin" type="password" placeholder="Enter Platform Access PIN" class="w-full theme-input px-4 py-3 text-sm" />
           </div>
         </div>
 
@@ -184,7 +337,7 @@
         </button>
       </div>
 
-      <!-- POST-LOGIN EXPIRED / APPROVAL LOCK + PRICING PLANS + DEMO -->
+      <!-- POST-LOGIN EXPIRED / APPROVAL LOCK + PRICING PLANS (No raw number shown) -->
       <div id="pendingApprovalView" class="hidden space-y-3.5">
         <div class="text-center">
           <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto text-xl mb-1.5">⏳</div>
@@ -221,14 +374,11 @@
           🧭 એપનો ડેમો અને ટૂર જુઓ (Interactive Demo Tour)
         </button>
 
-        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-3 text-center space-y-2">
-          <div class="text-xs font-extrabold text-emerald-500">પ્લાન એક્ટિવેટ કરવા સંપર્ક કરો:</div>
-          <div class="text-sm font-extrabold font-mono text-emerald-500">📞 9033189251</div>
-          <div class="grid grid-cols-2 gap-2">
-            <a href="tel:9033189251" class="bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs block">📞 Call</a>
-            <a href="https://wa.me/919033189251?text=Hello%20The%20Target,%20I%20want%20to%20activate%20my%20Study%20App%20Plan" target="_blank" class="subtle-pill font-bold py-2 rounded-xl text-xs block">💬 WhatsApp</a>
-          </div>
-        </div>
+        <!-- 12) Direct WhatsApp Button without showing Admin Phone Number -->
+        <button onclick="openAdminWhatsApp('Hello The Target, I want to activate my Study App Plan.')"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
+          <span>💬</span> <span>પ્લાન એક્ટિવેટ કરવા WhatsApp પર મેસેજ કરો</span>
+        </button>
 
         <div class="flex gap-2">
           <button onclick="checkApprovalStatus()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs">🔄 સ્ટેટસ ચેક કરો</button>
@@ -239,7 +389,7 @@
     </div>
   </div>
 
-  <!-- ================= STUDENT APP (SAMSUNG ONE UI SHELL) ================= -->
+  <!-- ================= STUDENT APP (SAMSUNG ONE UI 6.1 SHELL) ================= -->
   <div id="studentApp" class="hidden max-w-md mx-auto px-3.5 pt-3.5">
     
     <div id="studentBroadcastBanner" class="hidden mb-3 one-card p-3 bg-indigo-600/10 border-indigo-500/40 flex items-center justify-between gap-2">
@@ -248,81 +398,88 @@
       </div>
     </div>
 
-    <header class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">🎯</div>
-        <div>
+    <!-- 16, 22, 25) Clean Minimal Header (Validity removed from header; Optional Exam Countdown; 3-Line Menu) -->
+    <header class="flex items-center justify-between mb-3 gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm shrink-0">🎯</div>
+        <div class="min-w-0">
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-extrabold tracking-tight">THE TARGET</h1>
-            <span id="headerPlanBadge" class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">Trial</span>
-            <span id="cloudSyncBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">🔒 Synced</span>
+            <h1 class="text-sm font-extrabold tracking-tight truncate">THE TARGET</h1>
+            <span id="cloudSyncBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 shrink-0">🔒 Live</span>
           </div>
-          <p id="headerStudentName" class="text-[10px] muted-text font-medium"></p>
+          <p id="headerStudentName" class="text-[10px] muted-text font-medium truncate"></p>
         </div>
       </div>
 
-      <div class="flex items-center gap-1.5">
-        <button onclick="startAppTour()" title="App Guide Tour" class="text-xs font-extrabold w-8 h-8 rounded-full one-card flex items-center justify-center text-indigo-500">🧭</button>
-        <button onclick="toggleTheme()" id="themeBtnHeader" class="text-xs font-extrabold w-8 h-8 rounded-full one-card flex items-center justify-center">🌙</button>
-        <div onclick="switchStudentTab('profile')" class="text-right one-card px-2.5 py-1 rounded-2xl cursor-pointer active:scale-95 transition">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <!-- 22) Exam Countdown shown ONLY if student sets an Exam Date in Account tab -->
+        <div id="headerExamCountdownBox" onclick="switchStudentTab('profile')" class="hidden text-right one-card px-2.5 py-1 rounded-2xl cursor-pointer active:scale-95 transition">
           <div class="text-[8px] muted-text font-bold uppercase">પરીક્ષા બાકી</div>
           <div id="headerDaysLeft" class="text-xs font-extrabold text-indigo-500">--</div>
         </div>
+        <button onclick="startAppTour()" title="App Guide Tour" class="text-xs font-extrabold w-8 h-8 rounded-2xl one-card flex items-center justify-center text-indigo-500">🧭</button>
+        <button onclick="toggleSideDrawer()" title="More Options" class="text-sm font-extrabold w-9 h-9 rounded-2xl one-card flex items-center justify-center">☰</button>
       </div>
     </header>
 
-    <div class="grid grid-cols-4 gap-2 mb-3.5">
-      <button onclick="onKpiClick('completed')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-indigo-500">
-        <div class="text-[9px] font-bold muted-text truncate">પૂર્ણ ચેપ્ટર ↗</div>
-        <div id="kpiSyllabusPct" class="text-sm font-extrabold mt-0.5">0/0</div>
+    <!-- CLICKABLE TOP 4 KPI CARDS (Clean Typography, No Overflow) -->
+    <div id="tourTargetKpi" class="grid grid-cols-4 gap-2 mb-3.5">
+      <button onclick="onKpiClick('completed')" class="one-card p-2.5 text-left active:scale-95 transition">
+        <div class="text-[9px] font-bold muted-text truncate">પૂર્ણ ચેપ્ટર</div>
+        <div id="kpiSyllabusPct" class="text-sm font-extrabold mt-0.5 truncate">0/0</div>
         <div id="kpiSyllabusPages" class="text-[9px] text-indigo-500 font-bold truncate">0p વાંચ્યા</div>
       </button>
 
-      <button onclick="onKpiClick('revision')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-amber-500">
-        <div class="text-[9px] font-bold muted-text truncate">રિવિઝન ↗</div>
-        <div id="kpiDueRev" class="text-sm font-extrabold text-amber-500 mt-0.5">0 બાકી</div>
+      <button onclick="onKpiClick('revision')" class="one-card p-2.5 text-left active:scale-95 transition">
+        <div class="text-[9px] font-bold muted-text truncate">આજનું રિવિઝન</div>
+        <div id="kpiDueRev" class="text-sm font-extrabold text-amber-500 mt-0.5 truncate">0 બાકી</div>
         <div id="kpiRevPagesInfo" class="text-[9px] text-emerald-500 font-bold truncate">0p Rev</div>
       </button>
 
-      <button onclick="onKpiClick('streak')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-emerald-500">
-        <div class="text-[9px] font-bold muted-text truncate">સ્ટ્રીક ↗</div>
-        <div id="kpiStreak" class="text-sm font-extrabold text-emerald-500 mt-0.5">0 🔥</div>
+      <button onclick="onKpiClick('streak')" class="one-card p-2.5 text-left active:scale-95 transition">
+        <div class="text-[9px] font-bold muted-text truncate">સ્ટ્રીક</div>
+        <div id="kpiStreak" class="text-sm font-extrabold text-emerald-500 mt-0.5 truncate">0 🔥</div>
         <div id="kpiDailyPace" class="text-[9px] muted-text truncate">આજે: 0p</div>
       </button>
 
-      <button onclick="onKpiClick('tests')" class="one-card p-2.5 text-left active:scale-95 transition hover:border-purple-500">
-        <div class="text-[9px] font-bold muted-text truncate">ટેસ્ટ સરેરાશ ↗</div>
-        <div id="kpiTestAvgTop" class="text-sm font-extrabold text-purple-500 mt-0.5">--%</div>
+      <button onclick="onKpiClick('tests')" class="one-card p-2.5 text-left active:scale-95 transition">
+        <div class="text-[9px] font-bold muted-text truncate">ટેસ્ટ સરેરાશ</div>
+        <div id="kpiTestAvgTop" class="text-sm font-extrabold text-purple-500 mt-0.5 truncate">--%</div>
         <div id="kpiTestCountTop" class="text-[9px] muted-text truncate">0 ટેસ્ટ</div>
       </button>
     </div>
 
     <!-- ================= TAB 1: TODAY ================= -->
-    <section id="tab-today" class="space-y-3.5">
+    <section id="tab-today" class="space-y-3.5 anim-fade">
       
-      <div class="one-card p-3.5 flex items-center justify-between gap-3">
-        <div class="flex-1">
-          <div class="flex items-center justify-between text-xs font-extrabold mb-1">
-            <span>🎯 આજનો વાંચન ટાર્ગેટ (Daily Page Goal)</span>
-            <span id="dailyGoalText" class="text-indigo-500">0 / 15 Pages</span>
+      <!-- 4) Daily Goal Automatic Connection (New Pages Read + Today's Revised Pages) -->
+      <div id="tourTargetGoal" class="one-card p-3.5 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <div class="text-xs font-extrabold">🎯 આજનો ટાર્ગેટ (વાંચન + રિવિઝન પેજ)</div>
+            <div id="dailyGoalBreakdownText" class="text-[10px] muted-text">વાંચન: 0p + રિવિઝન: 0p = કુલ 0p</div>
           </div>
-          <div class="w-full h-2 subtle-pill overflow-hidden">
-            <div id="dailyGoalBar" class="h-full bg-indigo-600 rounded-full transition-all" style="width:0%"></div>
+          <div class="flex items-center gap-1.5">
+            <span id="dailyGoalText" class="text-xs font-extrabold text-indigo-500">0 / 20p</span>
+            <button onclick="changeDailyPageGoal()" class="subtle-pill px-2 py-1 text-[10px] font-extrabold">✎</button>
           </div>
         </div>
-        <button onclick="changeDailyPageGoal()" class="subtle-pill px-2.5 py-1.5 text-[10px] font-extrabold shrink-0">⚙️ Goal</button>
+        <div class="w-full h-2 subtle-pill overflow-hidden">
+          <div id="dailyGoalBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width:0%"></div>
+        </div>
       </div>
 
-      <div class="one-card p-4 space-y-3">
+      <!-- Daily Study Logger Card -->
+      <div id="tourTargetLogger" class="one-card p-4 space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
             <h2 id="txtTodayLogTitle" class="text-sm font-extrabold">આજે શું ચાલ્યું?</h2>
-            <p class="text-[10px] muted-text">આજની કે જૂની તારીખ સિલેક્ટ કરીને પેજ ઉમેરો</p>
+            <p class="text-[10px] muted-text">વિષય અને ચેપ્ટર સિલેક્ટ કરીને પેજ ઉમેરો</p>
           </div>
           <div class="flex items-center gap-1 subtle-pill px-2.5 py-1">
             <span class="text-xs">📅</span>
             <input id="dailyLogDatePicker" type="date" onchange="handleDailyDateChange()"
-              class="bg-transparent text-[11px] font-extrabold outline-none w-[98px]" />
+              class="bg-transparent text-[11px] font-extrabold outline-none w-[96px]" />
             <button onclick="resetDailyDateToToday()" id="btnResetTodayDate" class="hidden text-[9px] bg-indigo-600 text-white font-bold px-1.5 py-0.5 rounded">Today</button>
           </div>
         </div>
@@ -337,7 +494,7 @@
         <div id="todayLoggerControls" class="space-y-3">
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[10px] font-extrabold uppercase muted-text">1. વિષય પસંદ કરો (Subject)</span>
+              <span class="text-[10px] font-extrabold uppercase muted-text">1. વિષય (Subject)</span>
               <button onclick="switchStudentTab('syllabus')" class="text-[10px] font-bold text-indigo-500">+ નવો વિષય</button>
             </div>
             <div id="todaySubjectPills" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
@@ -345,10 +502,10 @@
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[10px] font-extrabold uppercase muted-text">2. ચેપ્ટર પસંદ કરો (Chapter)</span>
+              <span class="text-[10px] font-extrabold uppercase muted-text">2. ચેપ્ટર (Chapter)</span>
               <button onclick="toggleTodayTopicBox()"
                 class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full subtle-pill text-indigo-500 flex items-center gap-1">
-                <span>+</span> <span>પેટા-ટોપિક (Optional)</span>
+                <span>+</span> <span>પેટા-ટોપિક</span>
               </button>
             </div>
             <div id="todayChapterPills" class="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto pr-0.5"></div>
@@ -363,7 +520,7 @@
           </div>
 
           <div class="subtle-pill p-3 flex items-center justify-between gap-2">
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <div id="selectedChapterTitle" class="text-xs font-extrabold truncate">ચેપ્ટર પસંદ કરો</div>
               <div class="flex items-center gap-1.5 mt-1 text-[10px] font-bold flex-wrap">
                 <span class="px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500" id="statReadBadge">📖 વાંચેલા: 0p</span>
@@ -378,14 +535,6 @@
                 class="w-9 text-center bg-transparent text-xs font-extrabold outline-none" />
               <button onclick="adjustStepper(1)" class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-sm">+</button>
             </div>
-          </div>
-
-          <div id="todayChapLockedNotice" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 text-center space-y-1.5">
-            <div class="text-xs font-extrabold text-amber-500">🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે</div>
-            <p class="text-[10px] muted-text">પૂર્ણ થયેલા ચેપ્ટરમાં સુધારો કરવા પહેલા તેને સિલેબસમાંથી <b>"↺ પાછું ચાલુ કરો (Reopen)"</b> કરો.</p>
-            <button onclick="reopenSelectedChapterFromToday()" class="bg-amber-500 text-white font-extrabold text-[11px] px-3.5 py-1.5 rounded-full">
-              ↺ પાછું ચાલુ કરો (Reopen to Edit)
-            </button>
           </div>
 
           <div id="todayActionButtonsRow" class="grid grid-cols-2 gap-2">
@@ -403,56 +552,83 @@
         </div>
       </div>
 
+      <!-- 2, 3, 7, 17) Due Revisions Card + Overdue Auto-Forward + Extra Revision + Undo/Reverse -->
       <div id="dueRevisionsCardAnchor" class="one-card p-4">
-        <div class="flex items-center justify-between mb-2.5">
+        <div class="flex items-center justify-between mb-2.5 gap-2">
           <div>
             <h2 class="text-sm font-extrabold">🔔 આજનું રિવિઝન (Due Revisions)</h2>
-            <p class="text-[10px] muted-text">ચાલુ ચેપ્ટર (Today/7D) અને પૂર્ણ ચેપ્ટર (1-7-30-60D)</p>
+            <p class="text-[10px] muted-text">બાકી રહેલું રિવિઝન 1-7-30-60 સાયકલ બગાડ્યા વગર આગળના દિવસે ફોરવર્ડ થશે</p>
           </div>
-          <span id="dueRevBadgeCount" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500">0</span>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="openExtraRevisionModal()" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-indigo-500/15 text-indigo-500">+ Extra Rev</button>
+            <span id="dueRevBadgeCount" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500">0</span>
+          </div>
         </div>
 
         <div id="dueRevisionList" class="space-y-2"></div>
 
+        <!-- 3) Completed Revisions Today (With Reverse/Undo Option!) -->
         <details class="mt-3 pt-2.5 border-t" style="border-color: var(--border-col);">
+          <summary class="text-xs font-bold text-emerald-500 cursor-pointer select-none">
+            ✅ પૂર્ણ કરેલા રિવિઝન ( ભૂલથી Done થયું હોય તો ↩️ Reverse કરો )
+          </summary>
+          <div id="completedRevisionList" class="mt-2 space-y-1.5"></div>
+        </details>
+
+        <details class="mt-2.5 pt-2.5 border-t" style="border-color: var(--border-col);">
           <summary class="text-xs font-bold muted-text cursor-pointer select-none">
-            📅 આવનારા રિવિઝન (Upcoming Schedule)
+            📅 આવનારા રિવિઝન (Upcoming 1-7-30-60 Schedule)
           </summary>
           <div id="upcomingRevisionList" class="mt-2 space-y-1.5"></div>
         </details>
       </div>
 
+      <!-- 5) Subject-Tagged & General Quick Formula & Key Notes -->
       <div class="one-card p-4 space-y-2.5">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           <div>
             <h2 class="text-sm font-extrabold">📌 Quick Formula & Key Notes</h2>
-            <p class="text-[10px] muted-text">વારંવાર ભુલાતા સૂત્રો, અનુચ્છેદ કે શોર્ટ-નોટ્સ અહીં સેવ રાખો</p>
+            <p class="text-[10px] muted-text">વિષય મુજબ અથવા General શોર્ટ-નોટ્સ સેવ અને એડિટ કરો</p>
           </div>
+          <select id="quickNoteFilterSub" onchange="renderStudentAll()" class="theme-input px-2 py-1 text-[10px] font-bold">
+            <option value="ALL">All Notes</option>
+          </select>
         </div>
-        <div class="flex gap-1.5">
-          <input id="quickNoteInput" type="text" placeholder="દા.ત. અનુચ્છેદ 32 = બંધારણીય ઇલાજોનો અધિકાર..."
-            class="flex-1 theme-input px-3 py-2 text-xs" />
-          <button onclick="addQuickNote()" class="bg-indigo-600 text-white font-extrabold px-3.5 py-2 rounded-2xl text-xs shrink-0">+ Save</button>
+        <div class="grid grid-cols-3 gap-1.5">
+          <select id="quickNoteSubSelect" class="theme-input px-2.5 py-2 text-xs font-bold">
+            <option value="General">🌐 General</option>
+          </select>
+          <input id="quickNoteInput" type="text" placeholder="સૂત્ર કે નોંધ લખો..."
+            class="col-span-2 theme-input px-3 py-2 text-xs" />
         </div>
-        <div id="quickNotesList" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+        <button onclick="addQuickNote()" class="w-full bg-indigo-600 text-white font-extrabold py-2 rounded-2xl text-xs">+ Save Note</button>
+        <div id="quickNotesList" class="space-y-1.5 max-h-44 overflow-y-auto pt-1"></div>
       </div>
 
+      <!-- 1 & 2) Daily Logs History (Shows Revision Timestamp & ↩️ Reverse to Due Revision Button!) -->
       <div class="one-card p-4">
         <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-sm font-extrabold">🕒 રોજની એન્ટ્રી (Study Logs)</h2>
+          <div>
+            <h2 class="text-sm font-extrabold">🕒 રોજની એન્ટ્રી (Study & Revision Logs)</h2>
+            <p class="text-[10px] muted-text">રિવિઝનનો સમય અને ↩️ Reverse કરી ફરી Due માં મોકલવાનો ઓપ્શન</p>
+          </div>
           <input type="date" id="historyFilterDate" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1" />
         </div>
-        <div id="dailyLogsHistoryList" class="space-y-1.5"></div>
+        <div id="dailyLogsHistoryList" class="space-y-2"></div>
       </div>
 
     </section>
 
     <!-- ================= TAB 2: SYLLABUS ================= -->
-    <section id="tab-syllabus" class="hidden space-y-3.5">
+    <section id="tab-syllabus" class="hidden space-y-3.5 anim-fade">
       
-      <div class="one-card p-4">
+      <div id="tourTargetSyllabusAdd" class="one-card p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold">📚 નવો વિષય ઉમેરો</span>
+          <button onclick="openBulkImportModal()" class="text-[10px] font-extrabold text-indigo-500 underline">📥 Bulk Import (Excel/Word)</button>
+        </div>
         <div class="flex gap-2">
-          <input id="newSubjectName" type="text" placeholder="નવો વિષય ઉમેરો (દા.ત. ભારતનું બંધારણ)"
+          <input id="newSubjectName" type="text" placeholder="દા.ત. ભારતનું બંધારણ"
             class="flex-1 theme-input px-3.5 py-2.5 text-xs font-semibold" />
           <button onclick="addSubject()"
             class="bg-indigo-600 text-white font-extrabold px-4 py-2.5 rounded-2xl text-xs shrink-0 shadow-sm">
@@ -485,8 +661,8 @@
 
     </section>
 
-    <!-- ================= TAB 3: ANALYSIS, GRAPHS, TESTS & WWW.THETARGET.IN ================= -->
-    <section id="tab-tests" class="hidden space-y-3.5">
+    <!-- ================= TAB 3: ANALYSIS, MOST READ/REVISED SUBJECT & CLEAN TEST SYSTEM ================= -->
+    <section id="tab-tests" class="hidden space-y-3.5 anim-fade">
       
       <a href="https://www.thetarget.in" target="_blank" class="one-card p-3.5 flex items-center justify-between bg-indigo-600/10 border-indigo-500/40 block">
         <div class="flex items-center gap-2.5">
@@ -499,9 +675,10 @@
         <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full">Open ↗</span>
       </a>
 
+      <!-- Sub-Navigation Pills -->
       <div class="grid grid-cols-3 gap-1.5 subtle-pill p-1">
         <button onclick="switchAnalysisSubView('overview')" id="subnav-overview" class="py-2 rounded-2xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm">
-          📊 Graphs & Psych
+          📊 Overview
         </button>
         <button onclick="switchAnalysisSubView('addtest')" id="subnav-addtest" class="py-2 rounded-2xl text-xs font-extrabold muted-text">
           🎯 + Add Test
@@ -511,57 +688,58 @@
         </button>
       </div>
 
+      <!-- SUBVIEW A: OVERVIEW, MOST READ/REVISED SUBJECT (Point 18) & GRAPHS -->
       <div id="an-view-overview" class="space-y-3.5">
         
-        <div class="one-card p-4 space-y-3 border-t-4 border-t-indigo-600">
+        <!-- 18) Most Read & Most Revised Subject Intelligence Card -->
+        <div id="tourTargetAnalysis" class="one-card p-4 space-y-3 border-t-4 border-t-indigo-600">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-sm font-extrabold">🧠 Study Psychology & Readiness</h2>
-              <p class="text-[10px] muted-text">તમારી વાંચન પદ્ધતિ અને યાદશક્તિનું મનોવૈજ્ઞાનિક વિશ્લેષણ</p>
+              <h2 class="text-sm font-extrabold">🧠 Reading & Revision Distribution</h2>
+              <p class="text-[10px] muted-text">તમે કયો વિષય સૌથી વધારે વાંચો છો અને રિવિઝન કરો છો?</p>
             </div>
-            <div id="readinessScoreBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-indigo-600 text-white">
-              0 / 100
-            </div>
-          </div>
-
-          <div class="subtle-pill p-3 space-y-1.5 border-l-4 border-l-amber-500">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-extrabold uppercase text-amber-500">Study Persona (તમારી શૈલી)</span>
-              <span id="psychMemoryScore" class="text-[10px] font-extrabold text-emerald-500">Memory Index: 100%</span>
-            </div>
-            <div id="psychPersonaTitle" class="text-xs font-extrabold">Consistent Builder</div>
-            <p id="psychActionAdvice" class="text-[11px] muted-text leading-relaxed"></p>
+            <div id="readinessScoreBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-indigo-600 text-white">0 / 100</div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
-            <div class="subtle-pill p-2.5">
-              <div class="text-[10px] font-bold muted-text">⚡ રોજની સરેરાશ ઝડપ</div>
-              <div id="deepVelocity" class="text-sm font-extrabold text-indigo-500 mt-0.5">0 p/day</div>
-              <div id="microActiveDays" class="text-[9px] muted-text">0/7 દિવસ સક્રિય</div>
+            <div class="subtle-pill p-2.5 border-l-4 border-l-indigo-500">
+              <div class="text-[9px] font-extrabold uppercase muted-text">📖 સૌથી વધુ વંચાયેલ વિષય</div>
+              <div id="mostReadSubName" class="text-xs font-extrabold text-indigo-500 mt-0.5 truncate">--</div>
+              <div id="mostReadSubMeta" class="text-[10px] muted-text">0 Pages (0% Share)</div>
             </div>
-            <div class="subtle-pill p-2.5">
-              <div class="text-[10px] font-bold muted-text">🔄 રિવિઝન કવરેજ</div>
-              <div id="microRevCoverage" class="text-sm font-extrabold text-emerald-500 mt-0.5">0%</div>
-              <div id="microUnrevBacklog" class="text-[9px] text-amber-500 font-bold">0p રિવિઝન બાકી</div>
+            <div class="subtle-pill p-2.5 border-l-4 border-l-emerald-500">
+              <div class="text-[9px] font-extrabold uppercase muted-text">🔄 સૌથી વધુ રિવિઝન વિષય</div>
+              <div id="mostRevSubName" class="text-xs font-extrabold text-emerald-500 mt-0.5 truncate">--</div>
+              <div id="mostRevSubMeta" class="text-[10px] muted-text">0 Pages Revised</div>
             </div>
-            <div class="subtle-pill p-2.5">
-              <div class="text-[10px] font-bold muted-text">🏆 શ્રેષ્ઠ ટેસ્ટ વિષય</div>
+            <div class="subtle-pill p-2.5 border-l-4 border-l-rose-500">
+              <div class="text-[9px] font-extrabold uppercase muted-text">⚠️ સૌથી ઓછું ધ્યાન (Least Read)</div>
+              <div id="leastReadSubName" class="text-xs font-extrabold text-rose-500 mt-0.5 truncate">--</div>
+              <div id="leastReadSubMeta" class="text-[10px] muted-text">Needs More Time</div>
+            </div>
+            <div class="subtle-pill p-2.5 border-l-4 border-l-purple-500">
+              <div class="text-[9px] font-extrabold uppercase muted-text">🏆 શ્રેષ્ઠ ટેસ્ટ વિષય</div>
               <div id="bestTestSubjectCard" class="text-xs font-extrabold text-purple-500 mt-0.5 truncate">--</div>
-              <div id="bestTestSubjectSub" class="text-[9px] muted-text">Subject Test Avg</div>
-            </div>
-            <div class="subtle-pill p-2.5">
-              <div class="text-[10px] font-bold muted-text">📖 Chapter Test Avg</div>
-              <div id="chapTestAvgCard" class="text-sm font-extrabold text-emerald-500 mt-0.5">--%</div>
-              <div id="microUntestedChaps" class="text-[9px] text-rose-500 font-bold">0 પૂર્ણ ચેપ્ટર ટેસ્ટ બાકી</div>
+              <div id="bestTestSubjectSub" class="text-[10px] muted-text">Highest Test Avg</div>
             </div>
           </div>
 
+          <!-- Psychology Persona -->
+          <div class="subtle-pill p-3 space-y-1 border-l-4 border-l-amber-500">
+            <div class="flex items-center justify-between">
+              <span id="psychPersonaTitle" class="text-xs font-extrabold">🌱 Steady Starter</span>
+              <span id="psychMemoryScore" class="text-[10px] font-extrabold text-emerald-500">Retention: 100%</span>
+            </div>
+            <p id="psychActionAdvice" class="text-[11px] muted-text leading-relaxed"></p>
+          </div>
+
           <div class="pt-2 border-t space-y-1.5" style="border-color: var(--border-col);">
-            <div class="text-xs font-extrabold">📊 Subject-Wise Test Average (વિષય મુજબ ટેસ્ટ સરેરાશ)</div>
+            <div class="text-xs font-extrabold">📊 Subject-Wise Test Average</div>
             <div id="overviewSubjectTestAverages" class="grid grid-cols-2 gap-1.5"></div>
           </div>
         </div>
 
+        <!-- 7-Day Study Consistency Bar Graph -->
         <div id="streakGraphCardAnchor" class="one-card p-4 space-y-2.5">
           <div class="flex items-center justify-between">
             <div>
@@ -573,6 +751,7 @@
           <div id="weeklyChartBars" class="grid grid-cols-7 gap-2 items-end h-28 pt-5 px-2 subtle-pill"></div>
         </div>
 
+        <!-- Test Score Trend SVG Line Chart -->
         <div class="one-card p-4 space-y-2.5">
           <div class="flex items-center justify-between">
             <div>
@@ -586,35 +765,40 @@
 
       </div>
 
-      <!-- SUBVIEW B: ADD TEST + SORTABLE HISTORY -->
+      <!-- 6) SUBVIEW B: CLEAN & USEFUL 3-MODE TEST ENTRY SYSTEM + EDITABLE HISTORY -->
       <div id="an-view-addtest" class="hidden space-y-3.5">
         
         <div class="one-card p-4 space-y-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold">🎯 ટેસ્ટના માર્ક્સ ઉમેરો (Add Test)</h2>
+            <h2 class="text-sm font-extrabold">🎯 ટેસ્ટના માર્ક્સ ઉમેરો</h2>
             <input type="date" id="testDateInput" class="theme-input text-[11px] font-bold px-2.5 py-1" />
           </div>
 
-          <div class="grid grid-cols-2 gap-1.5 subtle-pill p-1">
-            <button onclick="setTestEntryMode('chapter')" id="tmode-chapter" class="py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white">
-              📖 Chapter / Multi-Ch
+          <!-- 6) 3 Meaningful & Distinct Test Modes -->
+          <div class="grid grid-cols-3 gap-1 subtle-pill p-1">
+            <button onclick="setTestEntryMode('chapter')" id="tmode-chapter" class="py-1.5 rounded-xl text-[10px] font-extrabold bg-indigo-600 text-white">
+              📖 Chapter Test
             </button>
-            <button onclick="setTestEntryMode('general')" id="tmode-general" class="py-1.5 rounded-xl text-[11px] font-extrabold muted-text">
-              🌐 Full / General Test
+            <button onclick="setTestEntryMode('subject')" id="tmode-subject" class="py-1.5 rounded-xl text-[10px] font-extrabold muted-text">
+              📚 Full Subject
+            </button>
+            <button onclick="setTestEntryMode('mock')" id="tmode-mock" class="py-1.5 rounded-xl text-[10px] font-extrabold muted-text">
+              🏆 Grand Mock
             </button>
           </div>
 
           <input id="testCustomTitleInput" type="text" placeholder="ટેસ્ટનું નામ (Optional)"
             class="w-full theme-input px-3.5 py-2 text-xs font-semibold" />
 
-          <div class="subtle-pill p-3 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-extrabold uppercase muted-text">1. વિષય સિલેક્ટ કરો</span>
-              <button onclick="selectAllTestSubjects()" class="text-[10px] font-bold text-indigo-500">Select All (General)</button>
-            </div>
+          <!-- Dynamic Selector Box Based on Mode -->
+          <div id="testSubjectSelectorBox" class="subtle-pill p-3 space-y-2">
+            <div class="text-[10px] font-extrabold uppercase muted-text">1. વિષય સિલેક્ટ કરો</div>
             <div id="multiTestSubjectChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
-            <div class="text-[10px] font-extrabold uppercase muted-text pt-1">2. ચેપ્ટર સિલેક્ટ કરો</div>
-            <div id="multiTestChapterCheckboxes" class="max-h-36 overflow-y-auto space-y-1 pt-1 border-t" style="border-color: var(--border-col);"></div>
+
+            <div id="testChapterSelectorWrap">
+              <div class="text-[10px] font-extrabold uppercase muted-text pt-1 mb-1">2. ચેપ્ટર સિલેક્ટ કરો (1 કે વધુ)</div>
+              <div id="multiTestChapterCheckboxes" class="max-h-36 overflow-y-auto space-y-1 pt-1 border-t" style="border-color: var(--border-col);"></div>
+            </div>
           </div>
 
           <div class="grid grid-cols-3 gap-2">
@@ -634,9 +818,10 @@
           </div>
         </div>
 
+        <!-- 8) Editable Test History -->
         <div class="one-card p-4 space-y-3">
           <div class="flex items-center justify-between gap-2 flex-wrap">
-            <h2 class="text-sm font-extrabold">📋 ટેસ્ટ હિસ્ટ્રી (Test Results)</h2>
+            <h2 class="text-sm font-extrabold">📋 ટેસ્ટ હિસ્ટ્રી (Edit / Delete)</h2>
             <div class="flex gap-1.5">
               <select id="testHistSubFilter" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1">
                 <option value="ALL">All Subjects</option>
@@ -653,16 +838,16 @@
 
       </div>
 
-      <!-- SUBVIEW C: SUBJECT-WISE & CHAPTER-WISE DEEP BREAKDOWN -->
+      <!-- 11) SUBVIEW C: ENHANCED SUBJECT & CHAPTER DEEP BREAKDOWN -->
       <div id="an-view-chapters" class="hidden space-y-3.5">
         <div class="one-card p-4 space-y-2.5">
-          <h2 class="text-sm font-extrabold">📚 Subject-Wise Mastery & Test Average</h2>
-          <div id="deepSubjectBreakdown" class="space-y-2"></div>
+          <h2 class="text-sm font-extrabold">📚 Subject-Wise Share, Revision & Test Mastery</h2>
+          <div id="deepSubjectBreakdown" class="space-y-2.5"></div>
         </div>
 
         <div class="one-card p-4 space-y-2.5">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold">📖 Chapter-Wise Test & Revision</h2>
+            <h2 class="text-sm font-extrabold">📖 Chapter-Wise Mastery Matrix</h2>
             <select id="analysisSubjectFilter" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2.5 py-1">
               <option value="ALL">All Subjects</option>
             </select>
@@ -673,79 +858,108 @@
 
     </section>
 
-    <!-- ================= TAB 4: ACCOUNT, PLANS, WWW.THETARGET.IN & BUG/FEATURE REPORT ================= -->
-    <section id="tab-profile" class="hidden space-y-3.5">
+    <!-- ================= TAB 4: ACCOUNT, FOCUS TIMER, EXAM COUNTDOWN & SUPPORT ================= -->
+    <section id="tab-profile" class="hidden space-y-3.5 anim-fade">
       
-      <div class="one-card p-4 border-l-4 border-l-indigo-600 space-y-3">
+      <!-- 15) Upgraded Study Focus Timer (Custom Presets + Subject Tag + Session Counter) -->
+      <div class="one-card p-4 space-y-3 border-l-4 border-l-indigo-600">
         <div class="flex items-center justify-between">
           <div>
-            <span id="profPlanTypeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">5-Day Free Trial</span>
-            <h2 id="profPlanTitle" class="text-base font-extrabold mt-1">Free Trial Active</h2>
+            <h2 class="text-sm font-extrabold">⏱️ Smart Study Focus Timer</h2>
+            <p id="pomoSessionsCountText" class="text-[10px] muted-text">Today's Focus: 0 Mins (0 Sessions)</p>
           </div>
-          <div class="text-right">
-            <div id="subDaysRemainingBig" class="text-xl font-extrabold text-emerald-500">5 Days</div>
-            <div class="text-[10px] muted-text">Validity Left</div>
-          </div>
+          <span id="pomoClock" class="text-2xl font-mono font-extrabold text-indigo-500">25:00</span>
         </div>
 
-        <div class="w-full h-2 subtle-pill overflow-hidden">
-          <div id="subValidityBar" class="h-full bg-emerald-500 rounded-full" style="width:100%"></div>
-        </div>
-
-        <div class="flex items-center justify-between text-[11px] muted-text">
-          <span>Start: <b id="subStartDate">--</b></span>
-          <span>Valid Till: <b id="subEndDate" class="text-emerald-500">--</b></span>
-        </div>
-
-        <div class="pt-2 border-t space-y-2" style="border-color: var(--border-col);">
-          <div class="text-xs font-extrabold">💎 Upgrade Membership Plans:</div>
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="subtle-pill p-2">
-              <div class="text-[10px] font-bold muted-text">6 Months</div>
-              <div class="text-sm font-extrabold text-indigo-500">₹99</div>
-            </div>
-            <div class="subtle-pill p-2 border border-indigo-500">
-              <div class="text-[10px] font-bold text-indigo-500">1 Year</div>
-              <div class="text-sm font-extrabold text-emerald-500">₹149</div>
-            </div>
-            <div class="subtle-pill p-2 border border-amber-500/50">
-              <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
-              <div class="text-sm font-extrabold text-amber-500">₹999</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between pt-1 text-xs">
-            <span class="muted-text">Activate / Buy Contact: <b class="font-mono text-indigo-500">9033189251</b></span>
-            <a href="https://wa.me/919033189251?text=Hello%20The%20Target,%20I%20want%20to%20upgrade%20my%20plan" target="_blank" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded-full text-[11px]">💬 WhatsApp</a>
+        <div class="flex items-center gap-1.5">
+          <button onclick="setPomodoroPreset(15)" class="subtle-pill px-2.5 py-1 text-[10px] font-extrabold">15m</button>
+          <button onclick="setPomodoroPreset(25)" class="subtle-pill px-2.5 py-1 text-[10px] font-extrabold">25m</button>
+          <button onclick="setPomodoroPreset(45)" class="subtle-pill px-2.5 py-1 text-[10px] font-extrabold">45m</button>
+          <button onclick="setPomodoroPreset(60)" class="subtle-pill px-2.5 py-1 text-[10px] font-extrabold">60m</button>
+          <div class="ml-auto flex gap-1.5">
+            <button onclick="togglePomodoro()" id="pomoBtn" class="bg-indigo-600 text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-sm">▶ Start</button>
+            <button onclick="resetPomodoro()" class="subtle-pill text-xs font-bold px-2.5 py-1.5">↺</button>
           </div>
         </div>
       </div>
 
+      <!-- 22) Profile & Optional Exam Date Countdown Setup -->
+      <div id="tourTargetProfile" class="one-card p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-extrabold">🎯 પ્રોફાઈલ અને પરીક્ષા તારીખ (Optional)</h2>
+            <p class="text-[10px] muted-text">જો પરીક્ષાની તારીખ નાખશો તો જ ઉપર Countdown દેખાશે</p>
+          </div>
+          <button onclick="clearExamDate()" class="text-[10px] font-bold text-rose-500">Clear Date</button>
+        </div>
+        <input id="profName" type="text" placeholder="તમારું નામ" class="w-full theme-input px-3.5 py-2.5 text-xs font-semibold" />
+        <div class="grid grid-cols-2 gap-2">
+          <input id="profExam" type="text" placeholder="પરીક્ષા (e.g. GPSC)" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
+          <input id="profExamDate" type="date" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
+        </div>
+        <button onclick="saveProfileSettings()" class="w-full bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
+          ✓ સેવ કરો
+        </button>
+      </div>
+
+      <!-- Membership Plan & Direct WhatsApp Button (12: No Admin Phone Number Shown!) -->
+      <div class="one-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <span id="profPlanTypeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">Plan</span>
+            <h2 id="profPlanTitle" class="text-sm font-extrabold mt-1">Membership Status</h2>
+          </div>
+          <div class="text-right">
+            <div id="subDaysRemainingBig" class="text-base font-extrabold text-emerald-500">5 Days</div>
+            <div class="text-[10px] muted-text">Valid Till: <span id="subEndDate">--</span></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="subtle-pill p-2">
+            <div class="text-[10px] font-bold muted-text">6 Months</div>
+            <div class="text-sm font-extrabold text-indigo-500">₹99</div>
+          </div>
+          <div class="subtle-pill p-2 border border-indigo-500">
+            <div class="text-[10px] font-bold text-indigo-500">1 Year</div>
+            <div class="text-sm font-extrabold text-emerald-500">₹149</div>
+          </div>
+          <div class="subtle-pill p-2 border border-amber-500/50">
+            <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
+            <div class="text-sm font-extrabold text-amber-500">₹999</div>
+          </div>
+        </div>
+
+        <button onclick="openAdminWhatsApp('Hello The Target, I want to upgrade my membership plan.')"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
+          <span>💬</span> <span>Upgrade Plan on WhatsApp</span>
+        </button>
+      </div>
+
+      <!-- MCQ Website Card -->
       <a href="https://www.thetarget.in" target="_blank" class="one-card p-4 flex items-center justify-between border-l-4 border-l-purple-500 block">
         <div>
           <div class="text-xs font-extrabold text-purple-500">🌐 Online MCQ Practice Platform</div>
           <div class="text-sm font-extrabold mt-0.5">www.thetarget.in</div>
-          <div class="text-[10px] muted-text">રોજ નવા MCQ અને મોક ટેસ્ટની પ્રેક્ટિસ કરવા અહીં ક્લિક કરો</div>
         </div>
         <span class="bg-purple-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-2xl shrink-0">Visit ↗</span>
       </a>
 
-      <div class="one-card p-4 space-y-2.5 border-l-4 border-l-amber-500">
-        <div>
-          <h2 class="text-sm font-extrabold">🛠️ Report Bug / Request New Feature</h2>
-          <p class="text-[10px] muted-text">એપમાં કોઈ ભૂલ (Error/Bug) આવતી હોય કે નવું ફીચર જોઈતું હોય તો અહીં જણાવો:</p>
-        </div>
+      <!-- Bug / Feature Report -->
+      <div class="one-card p-4 space-y-2.5">
+        <h2 class="text-sm font-extrabold">🛠️ Report Bug / Request New Feature</h2>
         <div class="grid grid-cols-3 gap-1.5">
           <select id="feedbackTypeSelect" class="theme-input px-2.5 py-2 text-xs font-bold">
-            <option value="Feature Request">✨ New Feature</option>
-            <option value="Bug / Error">🐞 Bug / Error</option>
-            <option value="Suggestion">💡 Suggestion</option>
+            <option value="Feature Request">✨ Feature</option>
+            <option value="Bug / Error">🐞 Bug</option>
+            <option value="Suggestion">💡 Idea</option>
           </select>
           <input id="feedbackMessageInput" type="text" placeholder="તમારો મેસેજ અહીં લખો..."
             class="col-span-2 theme-input px-3 py-2 text-xs" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="submitFeedbackReport(false)" class="bg-indigo-600 text-white font-extrabold py-2 rounded-2xl text-xs">
-            📩 Submit to Admin
+            📩 Submit in App
           </button>
           <button onclick="submitFeedbackReport(true)" class="bg-emerald-600 text-white font-extrabold py-2 rounded-2xl text-xs">
             💬 Send on WhatsApp
@@ -753,61 +967,23 @@
         </div>
       </div>
 
-      <div class="one-card p-4 flex items-center justify-between">
-        <div>
-          <div class="text-xs font-extrabold">⏱️ Quick Study Focus Timer</div>
-          <div class="text-[11px] muted-text">25 Min Deep Reading Session</div>
-        </div>
-        <div class="flex items-center gap-2">
-          <span id="pomoClock" class="text-base font-mono font-extrabold text-indigo-500">25:00</span>
-          <button onclick="togglePomodoro()" id="pomoBtn" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-full">Start</button>
-          <button onclick="resetPomodoro()" class="subtle-pill text-xs font-bold px-2.5 py-1.5">↺</button>
-        </div>
-      </div>
-
-      <div class="one-card p-4 flex items-center justify-between">
-        <div>
-          <div class="text-xs font-extrabold">🎨 One UI Theme & App Tour</div>
-          <div class="text-[11px] muted-text">થીમ બદલો અથવા App Guide ફરી જુઓ</div>
-        </div>
-        <div class="flex gap-1.5">
-          <button onclick="startAppTour()" class="px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/15 text-indigo-500">🧭 Tour</button>
-          <button onclick="setTheme('cream')" class="px-2.5 py-1.5 rounded-full text-xs font-bold border border-amber-300 bg-[#F4F2EE] text-slate-900">☀️</button>
-          <button onclick="setTheme('black')" class="px-2.5 py-1.5 rounded-full text-xs font-bold border border-slate-700 bg-[#000000] text-white">🌙</button>
-        </div>
-      </div>
-
-      <div class="one-card p-4 space-y-2.5 border-l-4 border-l-emerald-500">
-        <h2 class="text-sm font-extrabold">🛡️ ડેટા બેકઅપ (Cloud + File Backup)</h2>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="downloadStudentBackup()" class="bg-emerald-600 text-white font-bold py-2.5 rounded-2xl text-xs">
-            ⬇ Download Backup
+      <!-- Backup & Restore + Bulk Import -->
+      <div class="one-card p-4 space-y-2.5">
+        <h2 class="text-sm font-extrabold">🛡️ ડેટા બેકઅપ અને Bulk Import</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="downloadStudentBackup()" class="bg-emerald-600 text-white font-bold py-2.5 rounded-2xl text-[11px]">
+            ⬇ Backup
           </button>
-          <label class="subtle-pill font-bold py-2.5 rounded-2xl text-xs text-center cursor-pointer">
-            ⬆ Restore File
+          <label class="subtle-pill font-bold py-2.5 rounded-2xl text-[11px] text-center cursor-pointer">
+            ⬆ Restore
             <input type="file" accept=".json" class="hidden" onchange="restoreStudentBackup(event)" />
           </label>
+          <button onclick="openBulkImportModal()" class="bg-indigo-600 text-white font-bold py-2.5 rounded-2xl text-[11px]">
+            📥 Excel Import
+          </button>
         </div>
       </div>
 
-      <div class="one-card p-4 space-y-2.5">
-        <h2 class="text-sm font-extrabold">🎯 પ્રોફાઈલ અને પરીક્ષા તારીખ</h2>
-        <input id="profName" type="text" class="w-full theme-input px-3.5 py-2.5 text-xs font-semibold" />
-        <div class="grid grid-cols-2 gap-2">
-          <input id="profExam" type="text" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
-          <input id="profExamDate" type="date" class="theme-input px-3.5 py-2.5 text-xs font-semibold" />
-        </div>
-        <button onclick="saveProfileSettings()" class="w-full bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs">
-          સેવ કરો
-        </button>
-      </div>
-
-      <div class="one-card p-4 flex items-center justify-between">
-        <div id="profMobileDisplay" class="text-xs font-mono font-bold text-indigo-500"></div>
-        <button onclick="logoutUser()" class="bg-rose-500/15 text-rose-500 font-bold px-4 py-1.5 rounded-full text-xs">
-          Logout
-        </button>
-      </div>
     </section>
 
     <!-- Bottom Navigation -->
@@ -815,78 +991,137 @@
       <div class="max-w-md mx-auto grid grid-cols-4 py-2 px-3">
         <button onclick="switchStudentTab('today')" id="nav-today" class="flex flex-col items-center py-1 text-indigo-500">
           <span class="text-base">🏠</span>
-          <span id="navLbl1" class="text-[10px] font-extrabold mt-0.5">આજે</span>
+          <span class="text-[10px] font-extrabold mt-0.5">આજે</span>
         </button>
         <button onclick="switchStudentTab('syllabus')" id="nav-syllabus" class="flex flex-col items-center py-1 muted-text">
           <span class="text-base">📚</span>
-          <span id="navLbl2" class="text-[10px] font-extrabold mt-0.5">સિલેબસ</span>
+          <span class="text-[10px] font-extrabold mt-0.5">સિલેબસ</span>
         </button>
         <button onclick="switchStudentTab('tests')" id="nav-tests" class="flex flex-col items-center py-1 muted-text">
           <span class="text-base">📊</span>
-          <span id="navLbl3" class="text-[10px] font-extrabold mt-0.5">એનાલિસિસ</span>
+          <span class="text-[10px] font-extrabold mt-0.5">એનાલિસિસ</span>
         </button>
         <button onclick="switchStudentTab('profile')" id="nav-profile" class="flex flex-col items-center py-1 muted-text">
           <span class="text-base">👤</span>
-          <span id="navLbl4" class="text-[10px] font-extrabold mt-0.5">પ્લાન</span>
+          <span class="text-[10px] font-extrabold mt-0.5">એકાઉન્ટ</span>
         </button>
       </div>
     </nav>
   </div>
 
-  <!-- ================= PRIVATE OWNER ADMIN PANEL (9106581326) ================= -->
+  <!-- ================= 21) MULTI-PAGE CLEAN OWNER ADMIN PANEL ================= -->
   <div id="adminApp" class="hidden max-w-3xl mx-auto px-4 pt-4 pb-24">
-    <header class="flex items-center justify-between one-card p-4 mb-4 border-l-4 border-l-indigo-600">
+    <header class="flex items-center justify-between one-card p-4 mb-3 border-l-4 border-l-indigo-600">
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-sm font-extrabold">🛡️ THE TARGET — OWNER ADMIN (91065 81326)</h1>
-          <span id="adminCloudBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">🔒 Secure Cloud</span>
+          <h1 class="text-sm font-extrabold">🛡️ THE TARGET — ADMIN OS</h1>
+          <span id="adminCloudBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">🔒 Live</span>
         </div>
-        <p class="text-[11px] muted-text">5D Trial • ₹99 (6M) • ₹149 (1Y) • ₹999 (Lifetime) • www.thetarget.in</p>
+        <p class="text-[10px] muted-text">Multi-Page Management Console</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="syncFromFirebaseCloud(true)" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-indigo-600 text-white">🔄 Refresh Cloud</button>
-        <button onclick="toggleTheme()" class="text-xs font-extrabold px-3 py-1.5 rounded-full subtle-pill">☀️/🌙</button>
-        <button onclick="logoutUser()" class="subtle-pill text-xs font-bold px-3.5 py-1.5">Logout</button>
+      <div class="flex items-center gap-1.5">
+        <button onclick="syncFromFirebaseCloud(true)" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-indigo-600 text-white">🔄 Sync</button>
+        <button onclick="toggleTheme()" class="text-xs font-extrabold px-2.5 py-1.5 rounded-full subtle-pill">☀️/🌙</button>
+        <button onclick="logoutUser()" class="subtle-pill text-xs font-bold px-3 py-1.5">Logout</button>
       </div>
     </header>
 
-    <div class="grid grid-cols-4 gap-2 mb-4">
-      <div class="one-card p-3">
-        <div class="text-[10px] muted-text">Total Users</div>
-        <div id="admTotalUsers" class="text-base font-extrabold">0</div>
+    <!-- 21) Admin Multi-Page Navigation Tabs -->
+    <div class="grid grid-cols-4 gap-1.5 subtle-pill p-1 mb-4">
+      <button onclick="switchAdminPage('dashboard')" id="admnav-dashboard" class="py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white">📊 Overview</button>
+      <button onclick="switchAdminPage('users')" id="admnav-users" class="py-2 rounded-xl text-xs font-extrabold muted-text">👥 Users</button>
+      <button onclick="switchAdminPage('tools')" id="admnav-tools" class="py-2 rounded-xl text-xs font-extrabold muted-text">📢 Broadcast</button>
+      <button onclick="switchAdminPage('feedback')" id="admnav-feedback" class="py-2 rounded-xl text-xs font-extrabold muted-text">🛠️ Reports</button>
+    </div>
+
+    <!-- ADMIN PAGE 1: OVERVIEW DASHBOARD -->
+    <div id="adm-page-dashboard" class="space-y-3.5 anim-fade">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="one-card p-3.5">
+          <div class="text-[10px] font-bold muted-text">Total Students</div>
+          <div id="admTotalUsers" class="text-xl font-extrabold mt-0.5">0</div>
+        </div>
+        <div class="one-card p-3.5">
+          <div class="text-[10px] font-bold muted-text">5D Trial / Exp</div>
+          <div id="admPendingUsers" class="text-xl font-extrabold text-amber-500 mt-0.5">0</div>
+        </div>
+        <div class="one-card p-3.5">
+          <div class="text-[10px] font-bold muted-text">Paid Active</div>
+          <div id="admApprovedUsers" class="text-xl font-extrabold text-emerald-500 mt-0.5">0</div>
+        </div>
+        <div class="one-card p-3.5">
+          <div class="text-[10px] font-bold muted-text">Feedback Inbox</div>
+          <div id="admFeedbackCount" class="text-xl font-extrabold text-indigo-500 mt-0.5">0</div>
+        </div>
       </div>
-      <div class="one-card p-3">
-        <div class="text-[10px] muted-text">5D Trial / Exp</div>
-        <div id="admPendingUsers" class="text-base font-extrabold text-amber-500">0</div>
-      </div>
-      <div class="one-card p-3">
-        <div class="text-[10px] muted-text">Paid Active</div>
-        <div id="admApprovedUsers" class="text-base font-extrabold text-emerald-500">0</div>
-      </div>
-      <div class="one-card p-3">
-        <div class="text-[10px] muted-text">Bug / Feedback</div>
-        <div id="admFeedbackCount" class="text-base font-extrabold text-indigo-500">0</div>
+
+      <div class="one-card p-4 space-y-2.5">
+        <h2 class="text-xs font-extrabold">🔥 Top Active Students Leaderboard</h2>
+        <div id="admTopStudentsList" class="space-y-1.5"></div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-      <div class="one-card p-3.5 space-y-2">
+    <!-- ADMIN PAGE 2: USER MANAGEMENT & IN-DETAIL REPORT -->
+    <div id="adm-page-users" class="hidden space-y-3.5 anim-fade">
+      <div class="one-card p-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-xs font-extrabold">👥 Student Accounts ('✎ Edit' કરવાથી કંટ્રોલ ખુલશે)</h2>
+          </div>
+          <div class="flex gap-1.5">
+            <input id="adminSearchInput" type="text" placeholder="🔍 Search Name or Mobile..." oninput="renderAdminPanel()"
+              class="theme-input px-3 py-1.5 text-xs font-semibold flex-1 sm:w-48" />
+            <select id="adminFilterStatus" onchange="renderAdminPanel()" class="theme-input px-2.5 py-1.5 text-xs font-bold">
+              <option value="ALL">All</option>
+              <option value="PAID">Paid</option>
+              <option value="TRIAL">Trial</option>
+              <option value="EXPIRED">Expired</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="adminStudentList" class="space-y-2.5"></div>
+      </div>
+
+      <div id="adminInspectBox" class="hidden one-card p-5 border-2 border-indigo-500 space-y-4">
+        <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-col);">
+          <h3 id="inspectStudentTitle" class="text-sm font-extrabold text-indigo-500"></h3>
+          <button onclick="document.getElementById('adminInspectBox').classList.add('hidden')" class="text-xs font-extrabold px-3 py-1 rounded-full subtle-pill">✕ Close</button>
+        </div>
+        <div id="inspectStudentContent" class="space-y-4 text-xs"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PAGE 3: BROADCAST, BULK EXTEND & BACKUP TOOLS -->
+    <div id="adm-page-tools" class="hidden space-y-3.5 anim-fade">
+      <div class="one-card p-4 space-y-2.5">
         <div class="text-xs font-extrabold">📢 Global Student Broadcast Notice</div>
-        <div class="flex gap-1.5">
+        <div class="flex gap-2">
           <input id="adminBroadcastInput" type="text" placeholder="બધા વિદ્યાર્થીઓને એપમાં ઉપર સૂચના બતાવો..."
-            class="flex-1 theme-input px-3 py-1.5 text-xs" />
-          <button onclick="saveAdminBroadcast()" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl">Post</button>
+            class="flex-1 theme-input px-3 py-2 text-xs" />
+          <button onclick="saveAdminBroadcast()" class="bg-indigo-600 text-white text-xs font-extrabold px-4 py-2 rounded-xl">Post</button>
         </div>
       </div>
 
-      <div class="one-card p-3.5 flex items-center justify-between">
+      <div class="one-card p-4 flex items-center justify-between">
         <div>
-          <div class="text-xs font-extrabold">💾 Master Database Backup</div>
-          <div class="text-[10px] muted-text">All Students JSON Export / Restore</div>
+          <div class="text-xs font-extrabold">🎁 Gift Bonus Validity to All Active Users</div>
+          <div class="text-[10px] muted-text">બધા જ વિદ્યાર્થીઓની વેલિડિટી એકસાથે વધારો</div>
         </div>
         <div class="flex gap-1.5">
-          <button onclick="exportAllDatabaseJSON()" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-xl font-bold">⬇ Export</button>
-          <label class="text-xs subtle-pill px-3 py-1.5 font-bold cursor-pointer">
+          <button onclick="bulkExtendAllUsersValidity(5)" class="subtle-pill px-3 py-1.5 text-xs font-extrabold text-emerald-500">+5 Days All</button>
+          <button onclick="bulkExtendAllUsersValidity(30)" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-extrabold">+30 Days All</button>
+        </div>
+      </div>
+
+      <div class="one-card p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-extrabold">💾 Master Database JSON Backup</div>
+          <div class="text-[10px] muted-text">Export or Restore Complete Cloud Database</div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportAllDatabaseJSON()" class="text-xs bg-indigo-600 text-white px-3.5 py-2 rounded-xl font-bold">⬇ Export</button>
+          <label class="text-xs subtle-pill px-3.5 py-2 font-bold cursor-pointer">
             ⬆ Restore
             <input type="file" accept=".json" class="hidden" onchange="importMasterDatabaseJSON(event)" />
           </label>
@@ -894,42 +1129,17 @@
       </div>
     </div>
 
-    <div class="one-card p-4 mb-4 space-y-3">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h2 class="text-xs font-extrabold">👥 Student Management (Locked Until '✎ Edit' Clicked)</h2>
-          <p class="text-[10px] muted-text">નામ કે મોબાઈલ નંબરથી સર્ચ કરો. Edit બટન દબાવ્યા પછી જ વેલિડિટી કે વિગત બદલી શકાશે.</p>
-        </div>
-        <div class="flex gap-1.5">
-          <input id="adminSearchInput" type="text" placeholder="🔍 Search Name or Mobile..." oninput="renderAdminPanel()"
-            class="theme-input px-3 py-1.5 text-xs font-semibold w-48" />
-          <select id="adminFilterStatus" onchange="renderAdminPanel()" class="theme-input px-2.5 py-1.5 text-xs font-bold">
-            <option value="ALL">All</option>
-            <option value="PAID">Paid Active</option>
-            <option value="TRIAL">5D Trial</option>
-            <option value="EXPIRED">Expired / Locked</option>
-          </select>
-        </div>
+    <!-- ADMIN PAGE 4: BUG REPORTS & FEATURE REQUESTS -->
+    <div id="adm-page-feedback" class="hidden space-y-3.5 anim-fade">
+      <div class="one-card p-4">
+        <h2 class="text-xs font-extrabold mb-2.5">🛠️ Student Bug Reports & Feature Requests</h2>
+        <div id="adminFeedbackList" class="space-y-2"></div>
       </div>
-
-      <div id="adminStudentList" class="space-y-2.5"></div>
     </div>
 
-    <div class="one-card p-4 mb-4">
-      <h2 class="text-xs font-extrabold mb-2">🛠️ Student Bug Reports & Feature Requests</h2>
-      <div id="adminFeedbackList" class="space-y-2"></div>
-    </div>
-
-    <div id="adminInspectBox" class="hidden one-card p-5 border-2 border-indigo-500 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-col);">
-        <h3 id="inspectStudentTitle" class="text-sm font-extrabold text-indigo-500"></h3>
-        <button onclick="document.getElementById('adminInspectBox').classList.add('hidden')" class="text-xs font-extrabold px-3 py-1 rounded-full subtle-pill">✕ Close Report</button>
-      </div>
-      <div id="inspectStudentContent" class="space-y-4 text-xs"></div>
-    </div>
   </div>
 
-  <!-- ================= APPLICATION & SECURE FIREBASE CONFIG LOGIC ================= -->
+  <!-- ================= APPLICATION LOGIC ================= -->
   <script>
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyCiHw4vS44EadG9fvw806qTDybf0Jk824o",
@@ -956,9 +1166,12 @@
     const ADMIN_MOBILE = "9106581326";
     const ADMIN_PASS   = "Zj@123456";
     const REQUIRED_STUDENT_PIN = "2026";
-    const DB_KEY = "THE_TARGET_CLEAN_DB_V6";
-    const DB_MIRROR_KEY = "THE_TARGET_CLEAN_DB_MIRROR_V6";
-    const SESSION_KEY = "THE_TARGET_ACTIVE_SESSION_V6";
+    // Encoded support contact so raw number is never displayed in UI
+    const SUPPORT_WA_ID = ["91", "9033", "189", "251"].join("");
+
+    const DB_KEY = "THE_TARGET_CLEAN_DB_V7";
+    const DB_MIRROR_KEY = "THE_TARGET_CLEAN_DB_MIRROR_V7";
+    const SESSION_KEY = "THE_TARGET_ACTIVE_SESSION_V7";
     const THEME_KEY = "THE_TARGET_THEME_PREF";
 
     let theme = localStorage.getItem(THEME_KEY) || "cream";
@@ -971,15 +1184,50 @@
     let expandedCompletedVault = {};
     let openOldChapterForm = {};
     let adminUnlockedUsers = {};
+    let pendingPopupReopenChapId = null;
 
-    let currentTestEntryMode = "chapter";
+    let currentTestEntryMode = "chapter"; // 'chapter' | 'subject' | 'mock'
     let selectedTestSubIds = [];
     let selectedTestChapKeys = [];
+    let currentBulkImportMode = "syllabus";
 
+    let pomoPresetMins = 25;
     let pomoSeconds = 25 * 60;
     let pomoTimer = null;
 
-    // Non-blocking timeout wrapper so login NEVER hangs!
+    // 12) Direct WhatsApp helper without showing phone number on screen
+    function openAdminWhatsApp(customText) {
+      const msg = encodeURIComponent(customText || "Hello The Target Team");
+      window.open("https://wa.me/" + SUPPORT_WA_ID + "?text=" + msg, "_blank");
+    }
+
+    // 10) Celebration Confetti & Motivation Toast
+    function triggerCelebration(title, desc) {
+      const toast = document.getElementById("motivationToast");
+      document.getElementById("motToastTitle").textContent = title || "🎉 ખૂબ સરસ!";
+      document.getElementById("motToastDesc").textContent = desc || "તમારો ટાર્ગેટ આગળ વધી રહ્યો છે!";
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 3200);
+
+      const container = document.getElementById("confettiContainer");
+      const colors = ["#2B50EC", "#10B981", "#F59E0B", "#EC4899", "#8B5CF6"];
+      for (let i = 0; i < 24; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.backgroundColor = colors[i % colors.length];
+        piece.style.animationDuration = (1.4 + Math.random() * 1.2) + "s";
+        container.appendChild(piece);
+        setTimeout(() => piece.remove(), 2600);
+      }
+    }
+
+    function nowFormattedTimestamp() {
+      const d = new Date();
+      return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) + ", " +
+             d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    }
+
     function withTimeout(promise, ms) {
       return Promise.race([
         promise,
@@ -1036,8 +1284,8 @@
         if (!el) return;
         el.textContent = text;
         el.className = isOk
-          ? "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500"
-          : "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500";
+          ? "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 shrink-0"
+          : "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 shrink-0";
       });
     }
 
@@ -1054,12 +1302,14 @@
       if (!Array.isArray(u.revisions)) u.revisions = [];
       if (!Array.isArray(u.tests)) u.tests = [];
       if (!Array.isArray(u.quickNotes)) u.quickNotes = [];
+      if (typeof u.focusMinutes !== "number") u.focusMinutes = 0;
+      if (typeof u.focusSessions !== "number") u.focusSessions = 0;
       return u;
     }
 
     async function syncFromFirebaseCloud(manualRefresh) {
       try {
-        setCloudBadgeStatus("🔒 Syncing...", true);
+        setCloudBadgeStatus("🔒 Syncing", true);
         await ensureFirebaseAuthToken();
         let res = await withTimeout(fetch(buildFirebaseUrl("/targetApp.json")), 3000);
         if ((!res || !res.ok) && firebaseIdToken) {
@@ -1084,21 +1334,21 @@
           await pushToFirebaseCloud();
         }
 
-        setCloudBadgeStatus("🔒 Secure Live", true);
+        setCloudBadgeStatus("🔒 Live", true);
         if (currentSession) {
           if (currentSession.role === "admin") renderAdminPanel();
           else if (currentSession.role === "student" && !isDemoMode) renderStudentAll();
         }
-        if (manualRefresh) alert("✅ Secure Firebase Cloud માંથી તાજો ડેટા લોડ થઈ ગયો છે!");
+        if (manualRefresh) triggerCelebration("☁️ Cloud Synced!", "તાજો ડેટા લોડ થઈ ગયો છે.");
       } catch (err) {
-        setCloudBadgeStatus("⚡ Local Ready", false);
+        setCloudBadgeStatus("⚡ Local", false);
       }
     }
 
     async function pushToFirebaseCloud() {
       try {
         if (isDemoMode) return;
-        setCloudBadgeStatus("🔒 Saving...", true);
+        setCloudBadgeStatus("🔒 Saving", true);
         await ensureFirebaseAuthToken();
 
         if (currentSession && currentSession.role === "student" && currentSession.mobile) {
@@ -1122,51 +1372,62 @@
             body: JSON.stringify(db)
           }), 3000);
         }
-        setCloudBadgeStatus("🔒 Secure Live", true);
+        setCloudBadgeStatus("🔒 Live", true);
       } catch (err) {
-        setCloudBadgeStatus("⚡ Saved Locally", false);
+        setCloudBadgeStatus("⚡ Saved", false);
       }
     }
 
+    // ================= 14) FIXED SPOTLIGHT APP TOUR (NO BACKGROUND BLUR!) =================
     let currentTourStep = 0;
     const TOUR_STEPS = [
       {
         tab: "today",
-        title: "1/6 • 🏠 Today's Study & Daily Goal",
-        desc: "અહીં તમે રોજ જે વિષય અને ચેપ્ટર વાંચો તેના પેજ (+ / -) ઉમેરી શકો છો. ઉપરનું કેલેન્ડર વાપરીને અગાઉના દિવસોની જૂની એન્ટ્રી પણ કરી શકાય છે.",
-        highlight: "💡 ચાલુ ચેપ્ટરના પેજ ઉમેરતા Today + 7-Day રિવિઝન બનશે, અને '✓ ચેપ્ટર પૂર્ણ' કરતા 1-7-30-60 દિવસનો માસ્ટર રિવિઝન પ્લાન બનશે!"
+        targetId: "tourTargetGoal",
+        title: "1/6 • 🎯 Automatic Daily Goal Bar",
+        desc: "આજનો ટાર્ગેટ બાર તમારા 'નવા વાંચેલા પેજ' અને 'આજે રિવિઝન કરેલા પેજ' બંનેને ઓટોમેટિક ગણીને પ્રોગ્રેસ બતાવશે!",
+        highlight: "💡 ટાર્ગેટ પૂરો થતાં જ સેલિબ્રેશન એનિમેશન આવશે!"
       },
       {
         tab: "today",
-        title: "2/6 • 🔔 Smart Spaced Revision Queue",
-        desc: "તમે વાંચેલા પેજ અને પૂર્ણ કરેલા ચેપ્ટરનું રિવિઝન ક્યારે કરવાનું છે તે અહીં ઓટોમેટિક બતાવશે. બાજુમાં '✓ Done' દબાવતા જ તે પેજ 'રિવાઈઝ્ડ' ગણાઈ જશે.",
-        highlight: "📌 નીચે Quick Formula & Key Notes માં તમે અગત્યના સૂત્રો અને અનુચ્છેદ પણ સાચવી શકો છો."
+        targetId: "tourTargetLogger",
+        title: "2/6 • 🏠 Daily Study Logger",
+        desc: "અહીં વિષય અને ચેપ્ટર સિલેક્ટ કરીને રોજના પેજ ઉમેરો. જો પૂર્ણ થયેલા ચેપ્ટર પર ક્લિક કરશો તો Reopen Popup ખુલશે.",
+        highlight: "💡 ચાલુ ચેપ્ટરમાં Today+7D રિવિઝન અને પૂર્ણ ચેપ્ટરમાં 1-7-30-60D માસ્ટર રિવિઝન બનશે."
+      },
+      {
+        tab: "today",
+        targetId: "dueRevisionsCardAnchor",
+        title: "3/6 • 🔔 Smart Revision & Reverse (Undo)",
+        desc: "રિવિઝન '✓ Done' કરતા જ રોજની એન્ટ્રીમાં Date & Time સાથે નોંધાઈ જશે. જો ભૂલથી Done થાય તો '↩️ Reverse' બટનથી પાછું Due માં લાવી શકાશે!",
+        highlight: "⏩ બાકી રહેલું રિવિઝન 1-7-30-60 સાયકલ બગાડ્યા વગર બીજા દિવસે ઓટોમેટિક ફોરવર્ડ થશે."
       },
       {
         tab: "syllabus",
-        title: "3/6 • 📚 Collapsible Syllabus & Edit Lock",
-        desc: "અહીં તમારા બધા વિષય અને ચેપ્ટર ઉમેરો. '📅 જૂનું પૂર્ણ?' બટન દબાવીને અગાઉ ચાલેલા ચેપ્ટર જૂની તારીખ સાથે ઉમેરી શકાય છે.",
-        highlight: "🔒 જે ચેપ્ટર '✓ પૂર્ણ' થઈ જાય તે લોક થઈ જશે — તેને ફરી '↺ પાછું ચાલુ કરો' કર્યા પછી જ એડિટ કરી શકાશે."
-      },
-      {
-        tab: "syllabus",
-        title: "4/6 • 🏆 Subject-Wise Completed Vault",
-        desc: "સિલેબસની નીચે પૂર્ણ થયેલા બધા ચેપ્ટર્સ વિષય પ્રમાણે Open / Close લિસ્ટમાં જોવા મળશે.",
-        highlight: "✅ કયા વિષયમાં કેટલા ચેપ્ટર પૂરા થયા અને તેના કેટલા માસ્ટર રિવિઝન થયા તે એક જ નજરમાં દેખાશે."
+        targetId: "tourTargetSyllabusAdd",
+        title: "4/6 • 📚 Syllabus & Excel/Word Import",
+        desc: "અહીં તમારા વિષયો અને ચેપ્ટર્સ ઉમેરો. '📥 Bulk Import' દ્વારા Excel કે Word માંથી એકસાથે બધા ચેપ્ટર પેસ્ટ કરી શકાય છે.",
+        highlight: "🏆 નીચે Completed Vault માં પૂરા થયેલા ચેપ્ટર વિષય મુજબ Open/Close કરી શકાશે."
       },
       {
         tab: "tests",
-        title: "5/6 • 📊 Graphs, Psychology & Multi-Chapter Tests",
-        desc: "અહીં તમારી તૈયારીનો 7-Day Graph, Test Progression Graph અને Study Psychology જોવા મળશે. તમે એકસાથે 2 કે વધુ ચેપ્ટર સિલેક્ટ કરીને ટેસ્ટ માર્ક્સ ઉમેરી શકો છો.",
-        highlight: "🌐 લાઈવ MCQ પ્રેક્ટિસ માટે www.thetarget.in ની લિંક પણ અહીં આપેલી છે."
+        targetId: "tourTargetAnalysis",
+        title: "5/6 • 📊 Most Read/Revised Subject & Tests",
+        desc: "અહીં તમે કયો વિષય સૌથી વધુ વાંચો છો, કયો રિવિઝન કરો છો અને કયો બાકી રહે છે તેનું સચોટ વિશ્લેષણ તથા ગ્રાફ મળશે.",
+        highlight: "🎯 '+ Add Test' માં Chapter Test, Full Subject અને Grand Mock એમ ૩ મોડ આપેલા છે."
       },
       {
         tab: "profile",
-        title: "6/6 • 👤 Membership Plans, Backup & Bug Report",
-        desc: "અહીં તમારી 5-Day Free Trial અથવા Paid Plan (₹99 / ₹149 / ₹999) ની વેલિડિટી, ડેટા બેકઅપ અને કોઈ નવું ફીચર કે ભૂલ (Bug) રિપોર્ટ કરવાનું ફોર્મ મળશે.",
-        highlight: "🎉 હવે તમે 'Finish' દબાવીને એપ વાપરવાનું શરૂ કરી શકો છો!"
+        targetId: "tourTargetProfile",
+        title: "6/6 • 👤 Optional Exam Countdown & Focus Timer",
+        desc: "જો તમારી પરીક્ષાની તારીખ નક્કી હોય તો અહીં નાખો — તો જ ઉપર Countdown દેખાશે! સાથે 25m/45m/60m Focus Timer પણ વાપરી શકો છો.",
+        highlight: "☰ ઉપર જમણી બાજુ 3-Line Menu માંથી બધા ક્વિક ઓપ્શન મળશે."
       }
     ];
+
+    function clearTourSpotlights() {
+      document.querySelectorAll(".tour-spotlight").forEach(el => el.classList.remove("tour-spotlight"));
+    }
 
     function startAppTour() {
       currentTourStep = 0;
@@ -1174,6 +1435,7 @@
       renderTourStep();
     }
     function closeAppTour() {
+      clearTourSpotlights();
       document.getElementById("appTourOverlay").classList.add("hidden");
     }
     function nextTourStep() {
@@ -1191,9 +1453,10 @@
       }
     }
     function renderTourStep() {
+      clearTourSpotlights();
       const st = TOUR_STEPS[currentTourStep];
       switchStudentTab(st.tab);
-      document.getElementById("tourStepBadge").textContent = "Step " + (currentTourStep + 1) + " / " + TOUR_STEPS.length;
+      document.getElementById("tourStepBadge").textContent = "Step " + (currentTourStep + 1) + "/" + TOUR_STEPS.length;
       document.getElementById("tourTitle").textContent = st.title;
       document.getElementById("tourDesc").textContent = st.desc;
       document.getElementById("tourHighlightBox").textContent = st.highlight;
@@ -1202,6 +1465,21 @@
       document.getElementById("tourDots").innerHTML = TOUR_STEPS.map((_, i) =>
         '<span class="w-2 h-2 rounded-full ' + (i === currentTourStep ? 'bg-indigo-600' : 'bg-slate-400/40') + '"></span>'
       ).join("");
+
+      setTimeout(() => {
+        const targetEl = document.getElementById(st.targetId);
+        if (targetEl) {
+          targetEl.classList.add("tour-spotlight");
+          targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 120);
+    }
+
+    function toggleSideDrawer() {
+      const dr = document.getElementById("sideMenuDrawer");
+      dr.classList.toggle("hidden");
+      const user = getCurrentStudent();
+      if (user) document.getElementById("drawerMobileText").textContent = "ID: " + user.mobile;
     }
 
     function todayISO() { return new Date().toISOString().split("T")[0]; }
@@ -1239,15 +1517,17 @@
         mobile: "DEMO",
         name: "Demo Aspirant",
         exam: "GPSC / CCE",
-        examDate: addDaysISO(td, 65),
+        examDate: addDaysISO(td, 60),
         status: "approved",
         planName: "5-Day Free Trial",
         planStartDate: td,
         planExpiryDate: addDaysISO(td, 5),
-        dailyGoal: 15,
+        dailyGoal: 20,
+        focusMinutes: 50,
+        focusSessions: 2,
         quickNotes: [
-          { id: "qn1", text: "અનુચ્છેદ 32 — બંધારણીય ઇલાજોનો અધિકાર (આત્મા)" },
-          { id: "qn2", text: "ચક્રવૃદ્ધિ વ્યાજ 2 વર્ષનો તફાવત = P(R/100)²" }
+          { id: "qn1", subject: "ભારતનું બંધારણ", text: "અનુચ્છેદ 32 — બંધારણીય ઇલાજોનો અધિકાર (આત્મા)" },
+          { id: "qn2", subject: "ગણિત અને રીઝનિંગ", text: "ચક્રવૃદ્ધિ વ્યાજ 2 વર્ષનો તફાવત = P(R/100)²" }
         ],
         subjects: [
           {
@@ -1268,31 +1548,32 @@
           }
         ],
         logs: [
-          { id: "dl1", date: addDaysISO(td, -2), subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc1", chapterName: "આમુખ અને મૂળભૂત અધિકારો", pages: 12, isChapterFinish: true, revised: true },
-          { id: "dl2", date: addDaysISO(td, -1), subjectId: "ds2", subjectName: "ગણિત અને રીઝનિંગ", chapterId: "dc3", chapterName: "ટકાવારી (Percentage)", pages: 10, isChapterFinish: true, revised: true },
+          { id: "dl1", date: addDaysISO(td, -2), subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc1", chapterName: "આમુખ અને મૂળભૂત અધિકારો", pages: 12, isChapterFinish: true, revised: true, revisedAt: "21 Oct, 08:30 PM", revId: "dr2" },
           { id: "dl3", date: td, subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc2", chapterName: "રાષ્ટ્રપતિ અને સંસદ", pages: 8, isChapterFinish: false, revised: false }
         ],
         revisions: [
-          { id: "dr1", logId: "dl3", subjectId: "ds1", chapterId: "dc2", subjectName: "ભારતનું બંધારણ", chapterName: "રાષ્ટ્રપતિ અને સંસદ", topicName: "Daily Study (+8p)", pagesCount: 8, revType: "daily", stageLabel: "Today Rev (Daily)", studiedDate: td, dueDate: td, done: false },
-          { id: "dr2", logId: "dl1", subjectId: "ds1", chapterId: "dc1", subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", topicName: "✓ Full Chapter (22p)", pagesCount: 22, revType: "master", stageLabel: "7-Day Master", studiedDate: addDaysISO(td, -7), dueDate: td, done: false }
+          { id: "dr1", logId: "dl3", subjectId: "ds1", chapterId: "dc2", subjectName: "ભારતનું બંધારણ", chapterName: "રાષ્ટ્રપતિ અને સંસદ", topicName: "Study (+8p)", pagesCount: 8, revType: "daily", stageLabel: "Day-1 Rev", studiedDate: td, dueDate: td, done: false },
+          { id: "dr2", logId: "dl1", subjectId: "ds1", chapterId: "dc1", subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", topicName: "✓ Full Chapter (22p)", pagesCount: 22, revType: "master", stageLabel: "7-Day Master", studiedDate: addDaysISO(td, -8), dueDate: addDaysISO(td, -1), done: false }
         ],
         tests: [
           { id: "dt1", date: addDaysISO(td, -4), testType: "chapter", title: "Polity Ch-1 Test", subjects: ["ભારતનું બંધારણ"], chapters: ["આમુખ અને મૂળભૂત અધિકારો"], subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", scored: 38, total: 50 },
-          { id: "dt2", date: addDaysISO(td, -2), testType: "chapter", title: "Maths + Polity Combined", subjects: ["ભારતનું બંધારણ", "ગણિત અને રીઝનિંગ"], chapters: ["રાષ્ટ્રપતિ અને સંસદ", "ટકાવારી (Percentage)"], subjectName: "ભારતનું બંધારણ, ગણિત અને રીઝનિંગ", chapterName: "રાષ્ટ્રપતિ અને સંસદ + ટકાવારી (Percentage)", scored: 41, total: 50 }
+          { id: "dt2", date: addDaysISO(td, -2), testType: "subject", title: "Maths Full Test", subjects: ["ગણિત અને રીઝનિંગ"], chapters: ["Full Subject"], subjectName: "ગણિત અને રીઝનિંગ", chapterName: "Full Subject", scored: 41, total: 50 }
         ]
       };
     }
 
     function guardDemoAction() {
       if (isDemoMode) {
-        alert("🔒 Read-Only Demo Mode! પ્લાન ખરીદવા સંપર્ક કરો: 9033189251\n• ₹99 (6 Months)\n• ₹149 (1 Year)\n• ₹999 (Lifetime)");
+        if (confirm("🔒 આ Read-Only Demo Mode છે.\n\nશું તમારે Full Plan એક્ટિવેટ કરવા WhatsApp પર સંપર્ક કરવો છે?")) {
+          openAdminWhatsApp("Hello The Target, I want to buy full access plan.");
+        }
         return true;
       }
       return false;
     }
 
     function loadDB() {
-      const keys = [DB_KEY, DB_MIRROR_KEY, "THE_TARGET_CLEAN_DB_V5", "THE_TARGET_CLEAN_DB_V4"];
+      const keys = [DB_KEY, DB_MIRROR_KEY, "THE_TARGET_CLEAN_DB_V6", "THE_TARGET_CLEAN_DB_V5"];
       for (const k of keys) {
         const raw = localStorage.getItem(k);
         if (raw) {
@@ -1355,7 +1636,6 @@
       errEl.classList.remove("hidden");
     }
 
-    // INSTANT NON-BLOCKING LOGIN (Works for Admin & Student even if Cloud is slow)
     async function submitAuth() {
       const mobile = normalizeMobile(document.getElementById("authMobile").value);
       if (mobile.length !== 10) return showAuthError("10 આંકડાનો મોબાઈલ નંબર નાખો.");
@@ -1374,13 +1654,12 @@
 
       const pin = document.getElementById("authPin").value.trim();
       if (pin !== REQUIRED_STUDENT_PIN) {
-        return showAuthError("સાચો PIN (2026) નાખો.");
+        return showAuthError("સાચો Platform Access PIN નાખો.");
       }
 
       const btn = document.getElementById("btnSubmitAuth");
       btn.textContent = "⏳ Opening Dashboard...";
 
-      // Quick background sync (max 2 seconds, never blocks login)
       await syncFromFirebaseCloud(false);
       btn.textContent = "🎁 Start 5-Day Free Trial / Login";
 
@@ -1388,17 +1667,19 @@
       let user = db.users[mobile];
       if (!user) {
         const name = document.getElementById("authName").value.trim() || ("Student " + mobile.slice(-4));
-        const exam = document.getElementById("authExam").value.trim() || "GPSC / CCE";
-        const examDate = document.getElementById("authExamDate").value || addDaysISO(todayISO(), 90);
+        const exam = document.getElementById("authExam").value.trim() || "General Preparation";
 
         user = {
-          mobile, name, exam, examDate,
+          mobile, name, exam,
+          examDate: "", // 22) Empty by default; student can set in Account tab if desired
           status: "approved",
           planName: "5-Day Free Trial",
           createdAt: todayISO(),
           planStartDate: todayISO(),
           planExpiryDate: addDaysISO(todayISO(), 5),
-          dailyGoal: 15,
+          dailyGoal: 20,
+          focusMinutes: 0,
+          focusSessions: 0,
           quickNotes: [],
           subjects: [], logs: [], revisions: [], tests: []
         };
@@ -1411,7 +1692,7 @@
       saveSession({ role: "student", mobile });
       bootApp();
       if (isFirstTimeUser) {
-        setTimeout(() => startAppTour(), 300);
+        setTimeout(() => startAppTour(), 350);
       }
     }
 
@@ -1431,6 +1712,7 @@
     function logoutUser() {
       isDemoMode = false;
       closeAppTour();
+      document.getElementById("sideMenuDrawer").classList.add("hidden");
       saveSession(null);
       document.getElementById("authMobile").value = "";
       document.getElementById("authAdminPass").value = "";
@@ -1583,11 +1865,18 @@
       const isLifetime = valLeft > 2000;
       const planLabel = isLifetime ? "Lifetime Pro" : (user.planName || (valLeft <= 5 ? "5D Free Trial" : "Pro Plan"));
 
-      document.getElementById("headerStudentName").textContent = user.name + " • " + user.exam;
-      document.getElementById("headerPlanBadge").textContent = isLifetime ? "♾️ Lifetime" : (valLeft + "d left");
+      // 16) Clean Header Name + Exam (Validity removed from header)
+      document.getElementById("headerStudentName").textContent = user.name + " • " + (user.exam || "Study OS");
 
-      const examDaysLeft = Math.max(0, daysBetween(todayISO(), user.examDate));
-      document.getElementById("headerDaysLeft").textContent = examDaysLeft + "d";
+      // 22) Show Exam Countdown in Header ONLY if user has set an examDate
+      const countdownBox = document.getElementById("headerExamCountdownBox");
+      if (user.examDate && /^\d{4}-\d{2}-\d{2}$/.test(user.examDate)) {
+        const examDaysLeft = Math.max(0, daysBetween(todayISO(), user.examDate));
+        document.getElementById("headerDaysLeft").textContent = examDaysLeft + "d";
+        countdownBox.classList.remove("hidden");
+      } else {
+        countdownBox.classList.add("hidden");
+      }
 
       let totalChaps = 0, doneChaps = 0, totalPagesRead = 0, totalPagesRevised = 0;
       user.subjects.forEach(s => {
@@ -1615,15 +1904,13 @@
       document.getElementById("profPlanTypeBadge").textContent = planLabel;
       document.getElementById("profPlanTitle").textContent = isLifetime ? "₹999 Lifetime Access" : (planLabel + " Active");
       document.getElementById("subDaysRemainingBig").textContent = isLifetime ? "♾️ Lifetime" : (valLeft + " Days");
-      document.getElementById("subStartDate").textContent = user.planStartDate || user.createdAt || todayISO();
       document.getElementById("subEndDate").textContent = isLifetime ? "Never Expires" : (user.planExpiryDate || "--");
-      const maxBarDays = valLeft <= 5 ? 5 : (valLeft <= 185 ? 180 : 365);
-      document.getElementById("subValidityBar").style.width = isLifetime ? "100%" : (Math.min(100, Math.round((valLeft / maxBarDays) * 100)) + "%");
 
       document.getElementById("profName").value = user.name;
-      document.getElementById("profExam").value = user.exam;
-      document.getElementById("profExamDate").value = user.examDate;
-      document.getElementById("profMobileDisplay").textContent = user.mobile;
+      document.getElementById("profExam").value = user.exam || "";
+      document.getElementById("profExamDate").value = user.examDate || "";
+      document.getElementById("pomoSessionsCountText").textContent =
+        "Total Focus: " + (user.focusMinutes || 0) + " Mins (" + (user.focusSessions || 0) + " Sessions)";
 
       renderTodayTab(user);
       renderSyllabusTab(user);
@@ -1633,24 +1920,39 @@
     function changeDailyPageGoal() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
-      const val = prompt("તમારો રોજનો કેટલા પેજ વાંચવાનો ટાર્ગેટ (Daily Page Goal) રાખવો છે?", user.dailyGoal || 15);
+      const val = prompt("તમારો રોજનો કેટલા પેજ (વાંચન + રિવિઝન) નો ટાર્ગેટ રાખવો છે?", user.dailyGoal || 20);
       if (val === null) return;
-      user.dailyGoal = Math.max(1, parseInt(val, 10) || 15);
+      user.dailyGoal = Math.max(1, parseInt(val, 10) || 20);
       saveDB();
       renderStudentAll();
     }
 
+    // 5) Subject-wise & Editable Quick Notes
     function addQuickNote() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
       if (!user.quickNotes) user.quickNotes = [];
+      const subTag = document.getElementById("quickNoteSubSelect").value || "General";
       const inp = document.getElementById("quickNoteInput");
       const txt = inp.value.trim();
       if (!txt) return;
-      user.quickNotes.unshift({ id: "qn_" + Date.now(), text: txt });
+      user.quickNotes.unshift({ id: "qn_" + Date.now(), subject: subTag, text: txt, date: todayISO() });
       inp.value = "";
       saveDB();
       renderStudentAll();
+    }
+
+    function editQuickNote(id) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const note = (user.quickNotes || []).find(n => n.id === id);
+      if (!note) return;
+      const newTxt = prompt("Edit Note / Formula:", note.text);
+      if (newTxt !== null && newTxt.trim()) {
+        note.text = newTxt.trim();
+        saveDB();
+        renderStudentAll();
+      }
     }
 
     function deleteQuickNote(id) {
@@ -1665,34 +1967,82 @@
       document.getElementById("todayTopicDrawer").classList.toggle("hidden");
     }
 
-    function reopenSelectedChapterFromToday() {
+    // 19) Popup Modal for Locked / Completed Chapter
+    function openChapLockModal(chapId, chapName) {
+      pendingPopupReopenChapId = chapId;
+      document.getElementById("lockModalChapName").textContent = "🔒 " + chapName + " પૂર્ણ થઈ ગયું છે";
+      document.getElementById("chapLockModal").classList.remove("hidden");
+    }
+    function closeChapLockModal() {
+      pendingPopupReopenChapId = null;
+      document.getElementById("chapLockModal").classList.add("hidden");
+    }
+    function confirmReopenChapterPopup() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
       const sub = user.subjects.find(s => s.id === selectedSubjectId);
-      const chap = sub ? sub.chapters.find(c => c.id === selectedChapterId) : null;
-      if (!chap) return;
-      chap.completed = false;
-      user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
-      saveDB();
-      renderStudentAll();
+      const chap = sub ? sub.chapters.find(c => c.id === (pendingPopupReopenChapId || selectedChapterId)) : null;
+      if (chap) {
+        chap.completed = false;
+        user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
+        saveDB();
+        renderStudentAll();
+      }
+      closeChapLockModal();
     }
 
     function renderTodayTab(user) {
       const today = todayISO();
-      const todayPages = (user.logs || []).filter(l => l.date === today).reduce((a, l) => a + Number(l.pages || 0), 0);
-      const goal = Number(user.dailyGoal || 15);
-      const goalPct = Math.min(100, Math.round((todayPages / goal) * 100));
-      document.getElementById("dailyGoalText").textContent = todayPages + " / " + goal + " Pages (" + goalPct + "%)";
+
+      // 4) Automatic Daily Goal Connection: Today's Read Pages + Today's Revised Pages!
+      const todayReadPages = (user.logs || [])
+        .filter(l => l.date === today && !l.isExtraRev)
+        .reduce((a, l) => a + Number(l.pages || 0), 0);
+
+      const todayRevisedPages = (user.revisions || [])
+        .filter(r => r.done && r.doneDate === today)
+        .reduce((a, r) => a + Number(r.pagesCount || 0), 0);
+
+      const combinedGoalPages = todayReadPages + todayRevisedPages;
+      const goal = Number(user.dailyGoal || 20);
+      const goalPct = Math.min(100, Math.round((combinedGoalPages / goal) * 100));
+
+      document.getElementById("dailyGoalText").textContent = combinedGoalPages + " / " + goal + "p (" + goalPct + "%)";
+      document.getElementById("dailyGoalBreakdownText").textContent =
+        "📖 વાંચન: " + todayReadPages + "p + ✅ રિવિઝન: " + todayRevisedPages + "p = કુલ " + combinedGoalPages + "p";
       document.getElementById("dailyGoalBar").style.width = goalPct + "%";
 
+      // 5) Populate Quick Notes Subject Dropdowns & List
+      const qnSubSel = document.getElementById("quickNoteSubSelect");
+      const qnFilterSel = document.getElementById("quickNoteFilterSub");
+      const curQnSub = qnSubSel.value || "General";
+      const curQnFilter = qnFilterSel.value || "ALL";
+
+      qnSubSel.innerHTML = '<option value="General">🌐 General</option>' +
+        user.subjects.map(s => `<option value="${s.name}">📚 ${s.name}</option>`).join("");
+      if (curQnSub) qnSubSel.value = curQnSub;
+
+      qnFilterSel.innerHTML = '<option value="ALL">All Notes</option><option value="General">🌐 General</option>' +
+        user.subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join("");
+      if (curQnFilter) qnFilterSel.value = curQnFilter;
+
       const qnList = document.getElementById("quickNotesList");
-      const notes = user.quickNotes || [];
+      let notes = user.quickNotes || [];
+      if (qnFilterSel.value !== "ALL") {
+        notes = notes.filter(n => (n.subject || "General") === qnFilterSel.value);
+      }
       qnList.innerHTML = notes.length === 0
-        ? '<div class="text-[11px] muted-text">હજુ કોઈ શોર્ટ-નોટ કે સૂત્ર સેવ કર્યું નથી.</div>'
+        ? '<div class="text-[11px] muted-text text-center py-2">હજુ કોઈ શોર્ટ-નોટ કે સૂત્ર સેવ કર્યું નથી.</div>'
         : notes.map(n => `
             <div class="subtle-pill px-3 py-2 flex items-center justify-between gap-2 text-xs">
-              <span class="font-semibold">📌 ${n.text}</span>
-              <button onclick="deleteQuickNote('${n.id}')" class="text-rose-500 font-bold text-xs">✕</button>
+              <div class="min-w-0 flex-1">
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-500 mr-1">${n.subject || 'General'}</span>
+                <span class="font-semibold">${n.text}</span>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <button onclick="editQuickNote('${n.id}')" class="px-1.5 py-0.5 rounded one-card text-[10px]">✎</button>
+                <button onclick="deleteQuickNote('${n.id}')" class="text-rose-500 font-bold text-xs px-1">✕</button>
+              </div>
             </div>
           `).join("");
 
@@ -1739,7 +2089,7 @@
           chapPills.innerHTML = activeSub.chapters.map((c, idx) => {
             const active = c.id === selectedChapterId;
             const rp = Math.min(c.donePages || 0, c.revisedPages || 0);
-            return `<button onclick="selectTodayChapter('${c.id}')"
+            return `<button onclick="selectTodayChapter('${c.id}', ${!!c.completed})"
               class="w-full px-3 py-2 rounded-2xl text-left flex items-center justify-between transition border ${
                 active
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
@@ -1753,7 +2103,7 @@
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-indigo-500/15 text-indigo-500'}">
                   ${c.donePages}p (Rev:${rp}p)
                 </span>
-                ${c.completed ? '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">🔒 ✓</span>' : ''}
+                ${c.completed ? '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">🔒 પૂર્ણ</span>' : ''}
               </div>
             </button>`;
           }).join("");
@@ -1765,23 +2115,10 @@
             const unrev = Math.max(0, dp - rp);
 
             document.getElementById("selectedChapterTitle").textContent =
-              activeChap.name + " (" + (activeChap.completed ? "🔒 ✓ પૂર્ણ" : "ચાલુ") + ")";
+              activeChap.name + " (" + (activeChap.completed ? "🔒 પૂર્ણ" : "ચાલુ") + ")";
             document.getElementById("statReadBadge").textContent = "📖 વાંચેલા: " + dp + "p";
             document.getElementById("statRevBadge").textContent = "✅ રિવાઈઝ્ડ: " + rp + "p";
             document.getElementById("statUnrevBadge").textContent = "⏳ બાકી: " + unrev + "p";
-
-            const stepperWrap = document.getElementById("todayStepperWrap");
-            const actionRow = document.getElementById("todayActionButtonsRow");
-            const lockedNotice = document.getElementById("todayChapLockedNotice");
-            if (activeChap.completed) {
-              stepperWrap.classList.add("hidden");
-              actionRow.classList.add("hidden");
-              lockedNotice.classList.remove("hidden");
-            } else {
-              stepperWrap.classList.remove("hidden");
-              actionRow.classList.remove("hidden");
-              lockedNotice.classList.add("hidden");
-            }
 
             const topSel = document.getElementById("todayTopicSelect");
             let opts = '<option value="NONE">-- No Sub-Topic --</option><option value="NEW">+ New Sub-Topic</option>';
@@ -1794,7 +2131,9 @@
         }
       }
 
+      // 7) Overdue Revisions Auto-Forward to Today WITHOUT altering original 1-7-30-60 dates!
       const dueList = user.revisions.filter(r => !r.done && r.dueDate <= today);
+      const doneRevsList = user.revisions.filter(r => r.done).slice().reverse();
       const upcomingList = user.revisions.filter(r => !r.done && r.dueDate > today).sort((a,b) => a.dueDate.localeCompare(b.dueDate));
 
       document.getElementById("kpiDueRev").textContent = dueList.length + " બાકી";
@@ -1806,19 +2145,24 @@
       } else {
         dueEl.innerHTML = dueList.map(r => {
           const isMaster = r.revType === "master";
+          const overdueDays = daysBetween(r.dueDate, today);
+          const forwardBadge = overdueDays > 0
+            ? `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-500">↪️ Forwarded (${overdueDays}d ago)</span>`
+            : "";
           return `
             <div class="flex items-center justify-between ${isMaster ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-amber-500/10 border border-amber-500/30'} rounded-2xl p-3 gap-2">
-              <div class="min-w-0">
+              <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isMaster ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}">${r.stageLabel}</span>
+                  ${forwardBadge}
                   <span class="text-xs font-extrabold truncate">${r.subjectName} ➔ ${r.chapterName}</span>
                 </div>
                 <div class="text-[10px] muted-text mt-0.5 font-medium">
-                  ${r.topicName} • તારીખ: ${r.studiedDate}
+                  ${r.topicName} • Studied: ${r.studiedDate}
                 </div>
               </div>
               <button onclick="markRevisionDone('${r.id}')"
-                class="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shrink-0 shadow-sm">
+                class="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs shrink-0 shadow-sm transition">
                 ✓ Done
               </button>
             </div>
@@ -1826,16 +2170,33 @@
         }).join("");
       }
 
+      // 3) Completed Revisions List with ↩️ Reverse (Undo) Button
+      const compRevEl = document.getElementById("completedRevisionList");
+      compRevEl.innerHTML = doneRevsList.length === 0
+        ? '<div class="text-[11px] muted-text">હજુ કોઈ રિવિઝન પૂર્ણ કર્યું નથી.</div>'
+        : doneRevsList.slice(0, 12).map(r => `
+          <div class="flex items-center justify-between text-[11px] subtle-pill px-3 py-2 gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="font-bold truncate">✅ [${r.stageLabel}] ${r.subjectName} ➔ ${r.chapterName}</div>
+              <div class="text-[10px] text-emerald-500 font-semibold">🕒 Done: ${r.doneAt || r.doneDate || 'Completed'}</div>
+            </div>
+            <button onclick="reverseRevisionDone('${r.id}')" class="px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px] shrink-0">
+              ↩️ Reverse
+            </button>
+          </div>
+        `).join("");
+
       const upEl = document.getElementById("upcomingRevisionList");
       upEl.innerHTML = upcomingList.length === 0
         ? '<div class="text-[11px] muted-text">--</div>'
         : upcomingList.slice(0, 12).map(r => `
           <div class="flex items-center justify-between text-[11px] subtle-pill px-3 py-1.5">
-            <span class="font-semibold"><b>[${r.stageLabel}]</b> ${r.subjectName}: ${r.chapterName}</span>
-            <span class="font-mono muted-text">${r.dueDate}</span>
+            <span class="font-semibold truncate pr-2"><b>[${r.stageLabel}]</b> ${r.subjectName}: ${r.chapterName}</span>
+            <span class="font-mono muted-text shrink-0">${r.dueDate}</span>
           </div>
         `).join("");
 
+      // 1 & 2) Daily Logs History with Timestamp & ↩️ Reverse to Due Revision
       const filterDate = document.getElementById("historyFilterDate").value;
       const histEl = document.getElementById("dailyLogsHistoryList");
       let logsToShow = (user.logs || []).slice().reverse();
@@ -1844,22 +2205,31 @@
       if (logsToShow.length === 0) {
         histEl.innerHTML = '<div class="text-xs muted-text text-center py-2">કોઈ એન્ટ્રી મળી નથી.</div>';
       } else {
-        histEl.innerHTML = logsToShow.slice(0, 12).map(l => `
-          <div class="subtle-pill p-2.5 flex items-center justify-between gap-2">
+        histEl.innerHTML = logsToShow.slice(0, 15).map(l => `
+          <div class="subtle-pill p-3 flex items-center justify-between gap-2">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${l.date}</span>
                 <span class="text-xs font-extrabold truncate">${l.subjectName} ➔ ${l.chapterName}</span>
-                ${l.isChapterFinish
-                  ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500">✓ પૂર્ણ</span>'
-                  : `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${l.revised ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">${l.revised ? '✓ Rev' : '⏳ બાકી'}</span>`
+                ${l.isExtraRev
+                  ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-500">⚡ Extra Rev</span>'
+                  : (l.isChapterFinish
+                      ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500">✓ પૂર્ણ</span>'
+                      : `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${l.revised ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">${l.revised ? '✓ Revised' : '⏳ Due'}</span>`)
                 }
               </div>
-              <div class="text-[10px] muted-text mt-0.5">
-                વાંચેલા: <b class="text-indigo-500">+${l.pages}p</b> ${l.topicName ? '• 📌 ' + l.topicName : ''}
+              <div class="text-[10px] muted-text mt-1">
+                પેજ: <b class="text-indigo-500">+${l.pages}p</b> ${l.topicName ? '• 📌 ' + l.topicName : ''}
+                ${l.revised && l.revisedAt ? `<div class="text-emerald-500 font-bold mt-0.5">🕒 રિવિઝન પૂર્ણ: ${l.revisedAt}</div>` : ''}
               </div>
             </div>
             <div class="flex items-center gap-1 shrink-0">
+              ${l.revised ? `
+                <button onclick="reverseLogRevision('${l.id}')" title="Reverse back to Due Revision"
+                  class="px-2 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px]">
+                  ↩️ Reverse
+                </button>
+              ` : ''}
               <button onclick="editDailyLog('${l.id}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
               <button onclick="deleteDailyLog('${l.id}')" class="px-2 py-1 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
             </div>
@@ -1877,7 +2247,18 @@
     }
 
     function selectTodaySubject(subId) { selectedSubjectId = subId; selectedChapterId = null; renderStudentAll(); }
-    function selectTodayChapter(chapId) { selectedChapterId = chapId; renderStudentAll(); }
+
+    // 19) If completed chapter is clicked in Today tab, open Popup Modal!
+    function selectTodayChapter(chapId, isCompleted) {
+      selectedChapterId = chapId;
+      renderStudentAll();
+      if (isCompleted) {
+        const user = getCurrentStudent();
+        const sub = user.subjects.find(s => s.id === selectedSubjectId);
+        const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
+        if (chap) openChapLockModal(chap.id, chap.name);
+      }
+    }
 
     function adjustStepper(delta) {
       const inp = document.getElementById("todayPageDeltaInput");
@@ -1893,7 +2274,7 @@
       const chap = sub ? sub.chapters.find(c => c.id === selectedChapterId) : null;
       if (!chap) return;
       if (chap.completed) {
-        return alert("🔒 આ ચેપ્ટર પૂર્ણ થઈ ગયું છે. સુધારો કરવા પહેલા તેને Reopen કરો.");
+        return openChapLockModal(chap.id, chap.name);
       }
       if (!Array.isArray(chap.topics)) chap.topics = [];
 
@@ -1942,14 +2323,15 @@
         topicName: topicLabel,
         pages: delta,
         isChapterFinish: !!markFinished,
-        revised: false
+        revised: false,
+        revisedAt: null
       });
 
       if (!markFinished) {
         const desc = topicLabel ? (topicLabel + " (+" + delta + "p)") : ("Study (+" + delta + "p)");
         [
-          { days: 0, label: "Day-1 Rev (Daily)" },
-          { days: 7, label: "7-Day Rev (Daily)" }
+          { days: 0, label: "Day-1 Rev" },
+          { days: 7, label: "7-Day Rev" }
         ].forEach(st => {
           user.revisions.push({
             id: "rev_" + logId + "_" + st.days,
@@ -1968,10 +2350,12 @@
             done: false
           });
         });
+        triggerCelebration("📖 +" + delta + " પેજ ઉમેરાયા!", sub.name + " ➔ " + chap.name);
       } else {
         chap.completed = true;
         chap.completedDate = chosenDate;
         scheduleMasterChapterRevisions(user, sub, chap, logId, chosenDate);
+        triggerCelebration("🏆 ચેપ્ટર પૂર્ણ!", chap.name + " હવે 1-7-30-60D માસ્ટર પ્લાનમાં ઉમેરાયું!");
       }
 
       document.getElementById("todayNewTopicName").value = "";
@@ -2007,30 +2391,186 @@
       });
     }
 
+    // 2) Mark Revision Done -> Records Exact Date & Time in Study Log & Credits Daily Goal!
     function markRevisionDone(revId) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
       const rev = user.revisions.find(r => r.id === revId);
       if (!rev || rev.done) return;
+
+      const stamp = nowFormattedTimestamp();
       rev.done = true;
+      rev.doneDate = todayISO();
+      rev.doneAt = stamp;
 
       const sub = user.subjects.find(s => s.id === rev.subjectId || s.name === rev.subjectName);
       const chap = sub ? sub.chapters.find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
       const linkedLog = user.logs.find(l => l.id === rev.logId);
 
+      if (linkedLog) {
+        linkedLog.revised = true;
+        linkedLog.revisedAt = stamp;
+        linkedLog.lastRevId = rev.id;
+      }
+
       if (rev.revType === "master" && chap) {
         chap.revisedPages = chap.donePages;
         (chap.topics || []).forEach(tp => { tp.revisedPages = tp.readPages; });
       } else if (chap) {
-        if (!linkedLog || !linkedLog.revised) {
-          const credit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
-          chap.revisedPages = Math.min(Number(chap.donePages || 0), Number(chap.revisedPages || 0) + credit);
-          if (linkedLog) linkedLog.revised = true;
-        }
+        const credit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
+        chap.revisedPages = Math.min(Number(chap.donePages || 0), Number(chap.revisedPages || 0) + credit);
       }
 
       saveDB();
       renderStudentAll();
+      triggerCelebration("✅ રિવિઝન પૂર્ણ!", rev.chapterName + " (" + stamp + ")");
+    }
+
+    // 1, 2, 3) Reverse Revision from Completed List OR from Daily Study Log back to Due Revisions!
+    function reverseRevisionDone(revId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const rev = user.revisions.find(r => r.id === revId);
+      if (!rev || !rev.done) return;
+
+      rev.done = false;
+      rev.doneDate = null;
+      rev.doneAt = null;
+
+      const sub = user.subjects.find(s => s.id === rev.subjectId || s.name === rev.subjectName);
+      const chap = sub ? sub.chapters.find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
+      const linkedLog = user.logs.find(l => l.id === rev.logId);
+
+      if (linkedLog) {
+        // Check if any other revision for this log is still done
+        const otherDone = user.revisions.some(r => r.logId === linkedLog.id && r.done);
+        if (!otherDone) {
+          linkedLog.revised = false;
+          linkedLog.revisedAt = null;
+        }
+      }
+
+      if (chap) {
+        const debit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
+        chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - debit);
+      }
+
+      saveDB();
+      renderStudentAll();
+    }
+
+    function reverseLogRevision(logId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const log = user.logs.find(l => l.id === logId);
+      if (!log) return;
+
+      // Find completed revisions linked to this log and reverse them back to Due
+      const linkedRevs = user.revisions.filter(r => r.logId === logId && r.done);
+      if (linkedRevs.length > 0) {
+        linkedRevs.forEach(r => reverseRevisionDone(r.id));
+      } else {
+        log.revised = false;
+        log.revisedAt = null;
+        // Re-create Today due revision if missing
+        user.revisions.push({
+          id: "rev_" + log.id + "_rev",
+          logId: log.id,
+          subjectId: log.subjectId,
+          chapterId: log.chapterId,
+          pagesCount: log.pages,
+          revType: "daily",
+          subjectName: log.subjectName,
+          chapterName: log.chapterName,
+          topicName: "Reversed (+ " + log.pages + "p)",
+          stageLabel: "Due Rev",
+          studiedDate: log.date,
+          dueDate: todayISO(),
+          done: false
+        });
+        saveDB();
+        renderStudentAll();
+      }
+    }
+
+    // 17) Extra Revision Modal & Save
+    function openExtraRevisionModal() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user || user.subjects.length === 0) return alert("પહેલા સિલેબસમાં વિષય ઉમેરો.");
+      const subSel = document.getElementById("extraRevSubSelect");
+      subSel.innerHTML = user.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+      populateExtraRevChaps();
+      document.getElementById("extraRevModal").classList.remove("hidden");
+    }
+
+    function populateExtraRevChaps() {
+      const user = getCurrentStudent();
+      const subId = document.getElementById("extraRevSubSelect").value;
+      const sub = user.subjects.find(s => s.id === subId);
+      const chapSel = document.getElementById("extraRevChapSelect");
+      if (!sub || sub.chapters.length === 0) {
+        chapSel.innerHTML = '<option value="Full Subject">Full Subject</option>';
+      } else {
+        chapSel.innerHTML = sub.chapters.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+      }
+    }
+
+    function saveExtraRevision() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const subId = document.getElementById("extraRevSubSelect").value;
+      const sub = user.subjects.find(s => s.id === subId);
+      if (!sub) return;
+      const chapId = document.getElementById("extraRevChapSelect").value;
+      const chap = sub.chapters.find(c => c.id === chapId);
+      const pages = Math.max(1, parseInt(document.getElementById("extraRevPagesInput").value || "10", 10));
+      const note = document.getElementById("extraRevNoteInput").value.trim();
+      const stamp = nowFormattedTimestamp();
+      const today = todayISO();
+
+      if (chap) {
+        chap.revisedPages = Math.min(chap.donePages || pages, Number(chap.revisedPages || 0) + pages);
+      }
+
+      const logId = "ext_" + Date.now();
+      user.logs.push({
+        id: logId,
+        date: today,
+        subjectId: sub.id,
+        subjectName: sub.name,
+        chapterId: chap ? chap.id : "general",
+        chapterName: chap ? chap.name : "Full Subject",
+        topicName: note || "Extra Revision",
+        pages,
+        isExtraRev: true,
+        revised: true,
+        revisedAt: stamp
+      });
+
+      user.revisions.push({
+        id: "rev_" + logId,
+        logId,
+        subjectId: sub.id,
+        chapterId: chap ? chap.id : "general",
+        pagesCount: pages,
+        revType: "extra",
+        subjectName: sub.name,
+        chapterName: chap ? chap.name : "Full Subject",
+        topicName: note || ("Extra (+" + pages + "p)"),
+        stageLabel: "⚡ Extra Rev",
+        studiedDate: today,
+        dueDate: today,
+        done: true,
+        doneDate: today,
+        doneAt: stamp
+      });
+
+      document.getElementById("extraRevNoteInput").value = "";
+      document.getElementById("extraRevModal").classList.add("hidden");
+      saveDB();
+      renderStudentAll();
+      triggerCelebration("⚡ Extra Revision સેવ થયું!", "+" + pages + " પેજ આજના ટાર્ગેટમાં ઉમેરાયા!");
     }
 
     function editDailyLog(logId) {
@@ -2042,7 +2582,7 @@
       const sub = user.subjects.find(s => s.id === log.subjectId);
       const chap = sub ? sub.chapters.find(c => c.id === log.chapterId) : null;
       if (chap && chap.completed) {
-        return alert("🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે. પહેલા સિલેબસમાંથી ચેપ્ટરને Reopen કરો.");
+        return openChapLockModal(chap.id, chap.name);
       }
 
       const newP = prompt("Edit Pages:", log.pages);
@@ -2053,7 +2593,7 @@
       log.pages = parsed;
       if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())) log.date = newDate.trim();
 
-      if (chap) chap.donePages = Math.max(0, Number(chap.donePages || 0) + diff);
+      if (chap && !log.isExtraRev) chap.donePages = Math.max(0, Number(chap.donePages || 0) + diff);
 
       saveDB();
       renderStudentAll();
@@ -2069,11 +2609,11 @@
       const sub = user.subjects.find(s => s.id === log.subjectId);
       const chap = sub ? sub.chapters.find(c => c.id === log.chapterId) : null;
       if (chap && chap.completed) {
-        return alert("🔒 આ ચેપ્ટર પૂર્ણ (Completed) થઈ ગયું છે. પહેલા સિલેબસમાંથી ચેપ્ટરને Reopen કરો.");
+        return openChapLockModal(chap.id, chap.name);
       }
 
       if (!confirm("Delete this entry?")) return;
-      if (chap) {
+      if (chap && !log.isExtraRev) {
         chap.donePages = Math.max(0, Number(chap.donePages || 0) - Number(log.pages || 0));
         if (log.revised) chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - Number(log.pages || 0));
       }
@@ -2176,6 +2716,7 @@
       renderStudentAll();
     }
 
+    // 8) Editable Pages & Name for Chapters
     function editChapter(subId, chapId) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -2183,10 +2724,14 @@
       const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
       if (!chap) return;
       if (chap.completed) {
-        return alert("🔒 પૂર્ણ થયેલા ચેપ્ટરમાં સુધારો કરવા પહેલા '↺ પાછું ચાલુ કરો' પર ક્લિક કરો.");
+        return openChapLockModal(chap.id, chap.name);
       }
-      const val = prompt("Chapter Name:", chap.name);
+      const val = prompt("ચેપ્ટરનું નામ સુધારો:", chap.name);
       if (val && val.trim()) chap.name = val.trim();
+      const newRead = prompt("વાંચેલા પેજ (Read Pages) સુધારો:", chap.donePages || 0);
+      if (newRead !== null) chap.donePages = Math.max(0, parseInt(newRead, 10) || 0);
+      const newRev = prompt("રિવિઝન થયેલા પેજ (Revised Pages) સુધારો:", chap.revisedPages || 0);
+      if (newRev !== null) chap.revisedPages = Math.min(chap.donePages, Math.max(0, parseInt(newRev, 10) || 0));
       saveDB();
       renderStudentAll();
     }
@@ -2198,7 +2743,7 @@
       const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
       if (!chap) return;
       if (chap.completed) {
-        return alert("🔒 પૂર્ણ થયેલા ચેપ્ટરને ડિલીટ કરવા પહેલા '↺ પાછું ચાલુ કરો' પર ક્લિક કરો.");
+        return openChapLockModal(chap.id, chap.name);
       }
       if (!confirm("Delete Chapter?")) return;
       sub.chapters = sub.chapters.filter(c => c.id !== chapId);
@@ -2213,7 +2758,7 @@
       const chap = sub ? sub.chapters.find(c => c.id === chapId) : null;
       if (!chap) return;
       if (chap.completed) {
-        return alert("🔒 આ ચેપ્ટર પૂર્ણ થઈ ગયું છે. પેજ બદલવા પહેલા '↺ પાછું ચાલુ કરો' દબાવો.");
+        return openChapLockModal(chap.id, chap.name);
       }
       chap.donePages = Math.max(0, Number(chap.donePages || 0) + delta);
       saveDB();
@@ -2231,6 +2776,7 @@
       if (chap.completed) {
         chap.completedDate = todayISO();
         scheduleMasterChapterRevisions(user, sub, chap, null, todayISO());
+        triggerCelebration("🏆 ચેપ્ટર પૂર્ણ!", chap.name);
       } else {
         user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
       }
@@ -2318,7 +2864,7 @@
                           ` : `
                             <button onclick="toggleChapterFinished('${sub.id}','${c.id}')"
                               class="px-3 py-1 rounded-full text-[10px] font-extrabold one-card text-amber-500 border border-amber-500/40">
-                              ↺ પાછું ચાલુ કરો (Reopen)
+                              ↺ પાછું ચાલુ કરો
                             </button>
                           `}
                         </div>
@@ -2405,15 +2951,28 @@
       completedShowcase.innerHTML = compHtml || '<div class="text-xs muted-text text-center py-2">હજુ કોઈ ચેપ્ટર પૂર્ણ થયું નથી.</div>';
     }
 
-    // ================= TEST ENTRY & ANALYSIS =================
+    // ================= 6, 8, 11, 18) 3-MODE TEST ENTRY & MOST READ/REVISED SUBJECT ANALYSIS =================
     function setTestEntryMode(mode) {
       currentTestEntryMode = mode;
-      document.getElementById("tmode-chapter").className = mode === "chapter"
-        ? "py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white"
-        : "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
-      document.getElementById("tmode-general").className = mode === "general"
-        ? "py-1.5 rounded-xl text-[11px] font-extrabold bg-purple-600 text-white"
-        : "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
+      ["chapter", "subject", "mock"].forEach(m => {
+        const btn = document.getElementById("tmode-" + m);
+        btn.className = m === mode
+          ? "py-1.5 rounded-xl text-[10px] font-extrabold bg-indigo-600 text-white shadow-sm"
+          : "py-1.5 rounded-xl text-[10px] font-extrabold muted-text";
+      });
+
+      const subBox = document.getElementById("testSubjectSelectorBox");
+      const chapWrap = document.getElementById("testChapterSelectorWrap");
+      if (mode === "mock") {
+        subBox.classList.add("hidden");
+      } else if (mode === "subject") {
+        subBox.classList.remove("hidden");
+        chapWrap.classList.add("hidden");
+      } else {
+        subBox.classList.remove("hidden");
+        chapWrap.classList.remove("hidden");
+      }
+      renderMultiTestSelectors(getCurrentStudent());
     }
 
     function toggleTestSubSelection(subId) {
@@ -2423,14 +2982,6 @@
         selectedTestSubIds.push(subId);
       }
       renderMultiTestSelectors(getCurrentStudent());
-    }
-
-    function selectAllTestSubjects() {
-      const user = getCurrentStudent();
-      if (!user) return;
-      selectedTestSubIds = user.subjects.map(s => s.id);
-      selectedTestChapKeys = ["ALL::General Full Syllabus"];
-      renderMultiTestSelectors(user);
     }
 
     function toggleTestChapSelection(key) {
@@ -2465,14 +3016,7 @@
       }).join("");
 
       const activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id));
-      let html = `
-        <label class="flex items-center gap-2 text-xs font-bold p-1 cursor-pointer">
-          <input type="checkbox" ${selectedTestChapKeys.includes("ALL::General Full Syllabus") ? "checked" : ""}
-            onchange="toggleTestChapSelection('ALL::General Full Syllabus')" class="accent-indigo-600" />
-          <span class="text-indigo-500">🌐 Full Subject / General Combined Test</span>
-        </label>
-      `;
-
+      let html = "";
       activeSubs.forEach(s => {
         s.chapters.forEach(c => {
           const key = s.name + "::" + c.name;
@@ -2486,7 +3030,7 @@
           `;
         });
       });
-      chapsEl.innerHTML = html;
+      chapsEl.innerHTML = html || '<div class="text-[11px] muted-text py-1">આ વિષયમાં કોઈ ચેપ્ટર નથી.</div>';
     }
 
     function addTestScore() {
@@ -2501,13 +3045,27 @@
       const tDate = document.getElementById("testDateInput").value || todayISO();
       const customTitle = document.getElementById("testCustomTitleInput").value.trim();
 
-      const activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id)).map(s => s.name);
-      const subDisplay = activeSubs.length > 0 ? activeSubs.join(", ") : "General";
+      let activeSubs = [];
+      let subDisplay = "All Subjects";
+      let chapNames = [];
+      let chapDisplay = "Grand Full Syllabus Mock";
 
-      const chapNames = selectedTestChapKeys.map(k => k.split("::")[1]).filter(Boolean);
-      const chapDisplay = chapNames.length > 0
-        ? chapNames.join(" + ")
-        : (currentTestEntryMode === "general" ? "Full Syllabus Test" : "General Combined");
+      if (currentTestEntryMode === "mock") {
+        activeSubs = user.subjects.map(s => s.name);
+        subDisplay = "All Subjects (Grand Mock)";
+        chapDisplay = customTitle || "Grand Full Syllabus Mock";
+        chapNames = [chapDisplay];
+      } else if (currentTestEntryMode === "subject") {
+        activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id)).map(s => s.name);
+        subDisplay = activeSubs.length > 0 ? activeSubs.join(", ") : "Subject Test";
+        chapDisplay = customTitle || "Full Subject Test";
+        chapNames = ["Full Subject"];
+      } else {
+        activeSubs = user.subjects.filter(s => selectedTestSubIds.includes(s.id)).map(s => s.name);
+        subDisplay = activeSubs.length > 0 ? activeSubs.join(", ") : "Subject";
+        chapNames = selectedTestChapKeys.map(k => k.split("::")[1]).filter(Boolean);
+        chapDisplay = chapNames.length > 0 ? chapNames.join(" + ") : (customTitle || "Chapter Test");
+      }
 
       user.tests.push({
         id: "tst_" + Date.now(),
@@ -2524,6 +3082,32 @@
 
       document.getElementById("testScoredInput").value = "";
       document.getElementById("testCustomTitleInput").value = "";
+      saveDB();
+      renderStudentAll();
+      triggerCelebration("🎯 ટેસ્ટ માર્ક્સ સેવ થયા!", scored + " / " + total + " (" + Math.round((scored/total)*100) + "%)");
+    }
+
+    // 8) Edit Test Score
+    function editTestScore(id) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const tst = (user.tests || []).find(x => x.id === id);
+      if (!tst) return;
+      const newTitle = prompt("ટેસ્ટનું નામ સુધારો:", tst.title || tst.chapterName);
+      if (newTitle !== null && newTitle.trim()) tst.title = newTitle.trim();
+      const newSc = prompt("મેળવેલ માર્ક્સ (Scored Marks) સુધારો:", tst.scored);
+      if (newSc !== null) tst.scored = parseFloat(newSc) || tst.scored;
+      const newTot = prompt("કુલ માર્ક્સ (Total Marks) સુધારો:", tst.total);
+      if (newTot !== null) tst.total = Math.max(1, parseFloat(newTot) || tst.total);
+      saveDB();
+      renderStudentAll();
+    }
+
+    function deleteTestScore(id) {
+      if (guardDemoAction()) return;
+      if (!confirm("Delete this test score?")) return;
+      const user = getCurrentStudent();
+      user.tests = user.tests.filter(x => x.id !== id);
       saveDB();
       renderStudentAll();
     }
@@ -2554,15 +3138,10 @@
         const shortDay = new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short" });
         daysArr.push({ p, shortDay, isToday: d === today });
       }
-      const avgVel = (last7Pages / 7).toFixed(1);
-      document.getElementById("deepVelocity").textContent = avgVel + " p/day";
-      document.getElementById("microActiveDays").textContent = activeDays7 + "/7 દિવસ સક્રિય";
       document.getElementById("graph7DayTotalBadge").textContent = last7Pages + "p (7D)";
 
       const revCovPct = totalPagesRead > 0 ? Math.round((totalPagesRevised / totalPagesRead) * 100) : 100;
       const unrevPages = Math.max(0, totalPagesRead - totalPagesRevised);
-      document.getElementById("microRevCoverage").textContent = revCovPct + "%";
-      document.getElementById("microUnrevBacklog").textContent = unrevPages + "p રિવિઝન બાકી";
 
       const dueToDate = user.revisions.filter(r => r.dueDate <= today).length;
       const doneRev = user.revisions.filter(r => r.done).length;
@@ -2579,11 +3158,32 @@
         const cDone = s.chapters.filter(c => c.completed).length;
         const pRead = s.chapters.reduce((a, c) => a + Number(c.donePages || 0), 0);
         const pRev = s.chapters.reduce((a, c) => a + Number(c.revisedPages || 0), 0);
+        const revSessions = user.revisions.filter(r => r.done && (r.subjectId === s.id || r.subjectName === s.name)).length;
         const sTests = (user.tests || []).filter(t => (t.subjects || []).includes(s.name) || (t.subjectName || "").includes(s.name));
         const tAvg = calcPct(sTests);
         const chapPct = cTot > 0 ? Math.round((cDone / cTot) * 100) : 0;
-        return { id: s.id, name: s.name, cTot, cDone, pRead, pRev, tAvg, testCount: sTests.length, chapPct };
+        const readShare = totalPagesRead > 0 ? Math.round((pRead / totalPagesRead) * 100) : 0;
+        return { id: s.id, name: s.name, cTot, cDone, pRead, pRev, revSessions, readShare, tAvg, testCount: sTests.length, chapPct };
       });
+
+      // 18) Most Read, Most Revised & Least Read Subject Analysis
+      if (subMetrics.length > 0) {
+        const byRead = [...subMetrics].sort((a, b) => b.pRead - a.pRead);
+        const byRev = [...subMetrics].sort((a, b) => (b.pRev + b.revSessions * 3) - (a.pRev + a.revSessions * 3));
+        document.getElementById("mostReadSubName").textContent = byRead[0].name;
+        document.getElementById("mostReadSubMeta").textContent = byRead[0].pRead + "p (" + byRead[0].readShare + "% Share)";
+
+        document.getElementById("mostRevSubName").textContent = byRev[0].name;
+        document.getElementById("mostRevSubMeta").textContent = byRev[0].pRev + "p (" + byRev[0].revSessions + " Revs)";
+
+        const least = byRead[byRead.length - 1];
+        document.getElementById("leastReadSubName").textContent = least.name;
+        document.getElementById("leastReadSubMeta").textContent = least.pRead + "p (" + least.readShare + "% Share)";
+      } else {
+        document.getElementById("mostReadSubName").textContent = "--";
+        document.getElementById("mostRevSubName").textContent = "--";
+        document.getElementById("leastReadSubName").textContent = "--";
+      }
 
       const testedSubs = subMetrics.filter(sm => sm.tAvg !== null).sort((a, b) => b.tAvg - a.tAvg);
       if (testedSubs.length > 0) {
@@ -2593,8 +3193,6 @@
         document.getElementById("bestTestSubjectCard").textContent = "--";
         document.getElementById("bestTestSubjectSub").textContent = "No Subject Tests";
       }
-
-      document.getElementById("chapTestAvgCard").textContent = overallTestPct !== null ? (overallTestPct + "%") : "--%";
 
       const subAvgGrid = document.getElementById("overviewSubjectTestAverages");
       subAvgGrid.innerHTML = subMetrics.length === 0
@@ -2608,36 +3206,22 @@
             </div>
           `).join("");
 
-      let untestedCompChaps = 0;
-      user.subjects.forEach(s => {
-        s.chapters.filter(c => c.completed).forEach(c => {
-          const tested = (user.tests || []).some(t =>
-            (t.chapters || []).includes(c.name) || (t.chapterName || "").includes(c.name)
-          );
-          if (!tested) untestedCompChaps++;
-        });
-      });
-      document.getElementById("microUntestedChaps").textContent = untestedCompChaps + " પૂર્ણ ચેપ્ટર ટેસ્ટ બાકી";
-
       const chapCompRatio = totalChaps > 0 ? (doneChaps / totalChaps) * 100 : 0;
       const readiness = Math.round((chapCompRatio * 0.35) + (revCovPct * 0.25) + (revRate * 0.20) + ((overallTestPct || 50) * 0.20));
       document.getElementById("readinessScoreBadge").textContent = "Readiness: " + readiness + "/100";
 
       const memIndex = Math.round((revCovPct * 0.6) + (revRate * 0.4));
-      document.getElementById("psychMemoryScore").textContent = "🧠 Memory Retention: " + memIndex + "%";
+      document.getElementById("psychMemoryScore").textContent = "🧠 Retention: " + memIndex + "%";
 
       let persona = "🌱 Steady Starter (શરૂઆતનો તબક્કો)";
       let advice = "રોજ નિયમિત પેજ ઉમેરવાનું ચાલુ રાખો અને જે ચેપ્ટર પૂરું થાય તેને તરત જ Finish માર્ક કરો.";
 
       if (unrevPages > 25 && revCovPct < 50) {
-        persona = "⚡ Fast Reader, Low Revision (વાંચન ઝડપી પણ રિવિઝન ઓછું)";
-        advice = "તમે " + totalPagesRead + " પેજ વાંચ્યા છે પણ " + unrevPages + " પેજનું રિવિઝન બાકી છે! નવું વાંચતા પહેલા આજે જ જૂનું રિવિઝન પૂરું કરો.";
+        persona = "⚡ Fast Reader, Low Revision";
+        advice = "તમે " + totalPagesRead + " પેજ વાંચ્યા છે પણ " + unrevPages + " પેજનું રિવિઝન બાકી છે! આજે જ જૂનું રિવિઝન પૂરું કરો.";
       } else if (activeDays7 >= 5 && revCovPct >= 75 && (overallTestPct || 0) >= 70) {
-        persona = "🏆 Topper Mindset (સંતુલિત વાંચન + રિવિઝન + ટેસ્ટ)";
+        persona = "🏆 Topper Mindset (સંતુલિત તૈયારી)";
         advice = "જબરદસ્ત! તમારી વાંચવાની ઝડપ, રિવિઝન અને ટેસ્ટ માર્ક્સ ત્રણેય સંતુલિત છે.";
-      } else if (doneChaps >= 2 && untestedCompChaps >= 2) {
-        persona = "📚 Theory Master, Test Shy (વાંચન સારું પણ ટેસ્ટ ઓછી)";
-        advice = "તમે " + untestedCompChaps + " ચેપ્ટર પૂર્ણ કર્યા છે પણ તેની ટેસ્ટ આપી નથી. www.thetarget.in પર જઈને MCQ પ્રેક્ટિસ કરો.";
       }
 
       document.getElementById("psychPersonaTitle").textContent = persona;
@@ -2672,7 +3256,7 @@
             <line x1="15" y1="22" x2="285" y2="22" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3" />
             <line x1="15" y1="55" x2="285" y2="55" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3" />
             <line x1="15" y1="90" x2="285" y2="90" stroke="currentColor" stroke-opacity="0.15" />
-            <polyline fill="none" stroke="#4F46E5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}" />
+            <polyline fill="none" stroke="#2B50EC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}" />
             ${pts.map(p => `
               <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#10B981" stroke="#fff" stroke-width="1.5" />
               <text x="${p.x}" y="${p.y - 8}" text-anchor="middle" font-size="9" font-weight="bold" fill="currentColor">${p.pct}%</text>
@@ -2718,29 +3302,34 @@
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
                   <span class="text-xs font-extrabold px-2.5 py-1 rounded-full ${col}">${pct}%</span>
+                  <button onclick="editTestScore('${x.id}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
                   <button onclick="deleteTestScore('${x.id}')" class="text-rose-500 text-xs px-1.5">🗑</button>
                 </div>
               </div>
             `;
           }).join("");
 
-      document.getElementById("deepSubjectBreakdown").innerHTML = subMetrics.map(sm => `
-        <div class="subtle-pill p-3 space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold">${sm.name}</span>
-            <span class="text-[11px] font-extrabold ${sm.tAvg !== null ? (sm.tAvg >= 75 ? 'text-emerald-500' : (sm.tAvg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
-              Test Avg: ${sm.tAvg !== null ? sm.tAvg + '%' : 'N/A'} (${sm.testCount})
-            </span>
+      // 11) Enhanced Subject & Chapter Analysis
+      document.getElementById("deepSubjectBreakdown").innerHTML = subMetrics.map(sm => {
+        const revPct = sm.pRead > 0 ? Math.round((sm.pRev / sm.pRead) * 100) : 0;
+        return `
+          <div class="subtle-pill p-3 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold">${sm.name} <span class="text-[10px] text-indigo-500">(${sm.readShare}% Share)</span></span>
+              <span class="text-[11px] font-extrabold ${sm.tAvg !== null ? (sm.tAvg >= 75 ? 'text-emerald-500' : (sm.tAvg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
+                Test: ${sm.tAvg !== null ? sm.tAvg + '%' : 'N/A'} (${sm.testCount})
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-[10px] muted-text">
+              <span>પૂર્ણ ચેપ્ટર: <b>${sm.cDone}/${sm.cTot} (${sm.chapPct}%)</b></span>
+              <span>Read: <b>${sm.pRead}p</b> • Rev: <b class="text-emerald-500">${sm.pRev}p (${revPct}%)</b></span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-400/20 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 rounded-full" style="width:${sm.chapPct}%"></div>
+            </div>
           </div>
-          <div class="flex items-center justify-between text-[10px] muted-text">
-            <span>પૂર્ણ ચેપ્ટર: <b>${sm.cDone}/${sm.cTot} (${sm.chapPct}%)</b></span>
-            <span>Read: <b>${sm.pRead}p</b> • Rev: <b class="text-emerald-500">${sm.pRev}p</b></span>
-          </div>
-          <div class="w-full h-1.5 bg-slate-400/20 rounded-full overflow-hidden">
-            <div class="h-full bg-indigo-600 rounded-full" style="width:${sm.chapPct}%"></div>
-          </div>
-        </div>
-      `).join("") || '<div class="text-xs muted-text">--</div>';
+        `;
+      }).join("") || '<div class="text-xs muted-text">--</div>';
 
       const filterSel = document.getElementById("analysisSubjectFilter");
       const curF = filterSel.value || "ALL";
@@ -2777,12 +3366,170 @@
       `).join("") || '<div class="text-xs muted-text text-center py-2">--</div>';
     }
 
-    function deleteTestScore(id) {
+    // ================= 24) EXCEL / CSV / WORD BULK IMPORT ENGINE =================
+    function openBulkImportModal() {
       if (guardDemoAction()) return;
+      document.getElementById("bulkImportModal").classList.remove("hidden");
+    }
+
+    function setBulkImportMode(mode) {
+      currentBulkImportMode = mode;
+      document.getElementById("bmode-syllabus").className = mode === "syllabus"
+        ? "py-1.5 rounded-xl text-xs font-extrabold bg-indigo-600 text-white"
+        : "py-1.5 rounded-xl text-xs font-extrabold muted-text";
+      document.getElementById("bmode-tests").className = mode === "tests"
+        ? "py-1.5 rounded-xl text-xs font-extrabold bg-indigo-600 text-white"
+        : "py-1.5 rounded-xl text-xs font-extrabold muted-text";
+
+      const hint = document.getElementById("bulkImportFormatHint");
+      if (mode === "syllabus") {
+        hint.innerHTML = 'Format (દરેક લાઈનમાં):<br/><b>Subject Name, Chapter Name, Pages(Optional)</b><br/>દા.ત.<br/>ભારતનું બંધારણ, આમુખ, 12<br/>ભારતનું બંધારણ, મૂળભૂત અધિકારો, 20';
+      } else {
+        hint.innerHTML = 'Format (દરેક લાઈનમાં):<br/><b>Subject Name, Chapter/Test Name, Scored, Total</b><br/>દા.ત.<br/>ભારતનું બંધારણ, આમુખ ટેસ્ટ, 42, 50<br/>ગણિત, ટકાવારી, 38, 50';
+      }
+    }
+
+    function handleBulkFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("bulkImportTextarea").value = e.target.result || "";
+      };
+      reader.readAsText(file);
+    }
+
+    function processBulkImport() {
+      if (guardDemoAction()) return;
+      const raw = document.getElementById("bulkImportTextarea").value.trim();
+      if (!raw) return alert("પહેલા ડેટા પેસ્ટ કરો અથવા ફાઈલ અપલોડ કરો.");
+
       const user = getCurrentStudent();
-      user.tests = user.tests.filter(x => x.id !== id);
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let importedCount = 0;
+
+      lines.forEach(line => {
+        const parts = line.split(/\t|,|-/).map(p => p.trim()).filter(Boolean);
+        if (parts.length < 2) return;
+
+        if (currentBulkImportMode === "syllabus") {
+          const subName = parts[0];
+          const chapName = parts[1];
+          const pages = parts[2] ? Math.max(0, parseInt(parts[2], 10) || 0) : 0;
+
+          let sub = user.subjects.find(s => s.name.toLowerCase() === subName.toLowerCase());
+          if (!sub) {
+            sub = { id: "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), name: subName, chapters: [] };
+            user.subjects.push(sub);
+          }
+          if (!sub.chapters.some(c => c.name.toLowerCase() === chapName.toLowerCase())) {
+            sub.chapters.push({
+              id: "ch_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+              name: chapName,
+              donePages: pages,
+              revisedPages: 0,
+              completed: false,
+              topics: []
+            });
+            importedCount++;
+          }
+        } else {
+          const subName = parts[0];
+          const chapName = parts[1];
+          const scored = parseFloat(parts[2]);
+          const total = parseFloat(parts[3] || "100");
+          if (!isNaN(scored) && !isNaN(total) && total > 0) {
+            user.tests.push({
+              id: "tst_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+              date: todayISO(),
+              testType: "chapter",
+              title: chapName,
+              subjects: [subName],
+              chapters: [chapName],
+              subjectName: subName,
+              chapterName: chapName,
+              scored,
+              total
+            });
+            importedCount++;
+          }
+        }
+      });
+
+      document.getElementById("bulkImportTextarea").value = "";
+      document.getElementById("bulkImportModal").classList.add("hidden");
       saveDB();
       renderStudentAll();
+      triggerCelebration("📥 Bulk Import પૂર્ણ!", importedCount + " રેકોર્ડ્સ સફળતાપૂર્વક ઉમેરાયા!");
+    }
+
+    // 15) Modified Study Focus Timer
+    function setPomodoroPreset(mins) {
+      if (pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
+      pomoPresetMins = mins;
+      pomoSeconds = mins * 60;
+      document.getElementById("pomoClock").textContent = String(mins).padStart(2, "0") + ":00";
+      document.getElementById("pomoBtn").textContent = "▶ Start";
+    }
+
+    function togglePomodoro() {
+      const btn = document.getElementById("pomoBtn");
+      if (pomoTimer) {
+        clearInterval(pomoTimer);
+        pomoTimer = null;
+        btn.textContent = "▶ Resume";
+      } else {
+        btn.textContent = "⏸ Pause";
+        pomoTimer = setInterval(() => {
+          if (pomoSeconds > 0) {
+            pomoSeconds--;
+            const m = String(Math.floor(pomoSeconds / 60)).padStart(2, "0");
+            const s = String(pomoSeconds % 60).padStart(2, "0");
+            document.getElementById("pomoClock").textContent = m + ":" + s;
+          } else {
+            clearInterval(pomoTimer);
+            pomoTimer = null;
+            btn.textContent = "▶ Start";
+            const user = getCurrentStudent();
+            if (user && !isDemoMode) {
+              user.focusMinutes = Number(user.focusMinutes || 0) + pomoPresetMins;
+              user.focusSessions = Number(user.focusSessions || 0) + 1;
+              saveDB();
+              renderStudentAll();
+            }
+            triggerCelebration("⏱️ Focus Session પૂર્ણ!", pomoPresetMins + " મિનિટનું સેશન પૂરું થયું!");
+            resetPomodoro();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      if (pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
+      pomoSeconds = pomoPresetMins * 60;
+      document.getElementById("pomoClock").textContent = String(pomoPresetMins).padStart(2, "0") + ":00";
+      document.getElementById("pomoBtn").textContent = "▶ Start";
+    }
+
+    // 22) Clear Exam Date if doing General Preparation
+    function clearExamDate() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      user.examDate = "";
+      document.getElementById("profExamDate").value = "";
+      saveDB();
+      renderStudentAll();
+    }
+
+    function saveProfileSettings() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      user.name = document.getElementById("profName").value.trim() || user.name;
+      user.exam = document.getElementById("profExam").value.trim() || user.exam;
+      user.examDate = document.getElementById("profExamDate").value || "";
+      saveDB();
+      renderStudentAll();
+      triggerCelebration("✅ પ્રોફાઈલ અપડેટ થઈ!", user.examDate ? ("પરીક્ષા તારીખ: " + user.examDate) : "General Prep Mode");
     }
 
     function submitFeedbackReport(sendWhatsApp) {
@@ -2805,42 +3552,10 @@
       document.getElementById("feedbackMessageInput").value = "";
 
       if (sendWhatsApp) {
-        const waText = encodeURIComponent("*The Target App — " + type + "*\nStudent: " + user.name + " (" + user.mobile + ")\nMessage: " + msg);
-        window.open("https://wa.me/919033189251?text=" + waText, "_blank");
+        openAdminWhatsApp("*The Target App — " + type + "*\nStudent: " + user.name + " (" + user.mobile + ")\nMessage: " + msg);
       } else {
-        alert("✅ તમારો રિપોર્ટ Admin ને મોકલી દેવામાં આવ્યો છે! આભાર.");
+        triggerCelebration("📩 રિપોર્ટ મોકલાઈ ગયો!", "Admin ટૂંક સમયમાં ચેક કરશે.");
       }
-    }
-
-    function togglePomodoro() {
-      const btn = document.getElementById("pomoBtn");
-      if (pomoTimer) {
-        clearInterval(pomoTimer);
-        pomoTimer = null;
-        btn.textContent = "Resume";
-      } else {
-        btn.textContent = "Pause";
-        pomoTimer = setInterval(() => {
-          if (pomoSeconds > 0) {
-            pomoSeconds--;
-            const m = String(Math.floor(pomoSeconds / 60)).padStart(2, "0");
-            const s = String(pomoSeconds % 60).padStart(2, "0");
-            document.getElementById("pomoClock").textContent = m + ":" + s;
-          } else {
-            clearInterval(pomoTimer);
-            pomoTimer = null;
-            btn.textContent = "Start";
-            alert("🎉 25 Min Focus Session પૂર્ણ!");
-            resetPomodoro();
-          }
-        }, 1000);
-      }
-    }
-    function resetPomodoro() {
-      if (pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
-      pomoSeconds = 25 * 60;
-      document.getElementById("pomoClock").textContent = "25:00";
-      document.getElementById("pomoBtn").textContent = "Start";
     }
 
     function downloadStudentBackup() {
@@ -2851,6 +3566,7 @@
       a.download = "target_backup_" + user.mobile + ".json";
       a.click();
     }
+
     function restoreStudentBackup(event) {
       if (guardDemoAction()) return;
       const file = event.target.files[0];
@@ -2864,22 +3580,13 @@
           user.logs = imp.logs || [];
           user.revisions = imp.revisions || [];
           user.tests = imp.tests || [];
+          user.quickNotes = imp.quickNotes || [];
           saveDB();
           renderStudentAll();
-          alert("✅ Backup Restored!");
+          triggerCelebration("✅ Backup Restored!", "તમારો ડેટા પાછો આવી ગયો છે.");
         } catch (err) { alert("Invalid file"); }
       };
       reader.readAsText(file);
-    }
-    function saveProfileSettings() {
-      if (guardDemoAction()) return;
-      const user = getCurrentStudent();
-      user.name = document.getElementById("profName").value.trim() || user.name;
-      user.exam = document.getElementById("profExam").value.trim() || user.exam;
-      user.examDate = document.getElementById("profExamDate").value || user.examDate;
-      saveDB();
-      renderStudentAll();
-      alert("✅ પ્રોફાઈલ સેવ થઈ ગઈ!");
     }
 
     function switchStudentTab(tab) {
@@ -2890,7 +3597,17 @@
       });
     }
 
-    // ================= OWNER ADMIN PANEL FUNCTIONS =================
+    // ================= 21) MULTI-PAGE OWNER ADMIN PANEL =================
+    function switchAdminPage(page) {
+      ["dashboard", "users", "tools", "feedback"].forEach(p => {
+        document.getElementById("adm-page-" + p).classList.toggle("hidden", p !== page);
+        const btn = document.getElementById("admnav-" + p);
+        btn.className = p === page
+          ? "py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white"
+          : "py-2 rounded-xl text-xs font-extrabold muted-text";
+      });
+    }
+
     function toggleAdminUserEditLock(mobile) {
       adminUnlockedUsers[mobile] = !adminUnlockedUsers[mobile];
       renderAdminPanel();
@@ -2899,7 +3616,18 @@
     function saveAdminBroadcast() {
       db.broadcast = document.getElementById("adminBroadcastInput").value.trim();
       saveDB();
-      alert("📢 Broadcast Notice Updated on Secure Cloud!");
+      triggerCelebration("📢 Broadcast Posted!", "બધા વિદ્યાર્થીઓને સૂચના દેખાશે.");
+    }
+
+    function bulkExtendAllUsersValidity(extraDays) {
+      if (!confirm("બધા જ વિદ્યાર્થીઓની વેલિડિટીમાં +" + extraDays + " દિવસ ઉમેરવા છે?")) return;
+      Object.values(db.users).forEach(u => {
+        const base = (u.planExpiryDate && u.planExpiryDate > todayISO()) ? u.planExpiryDate : todayISO();
+        u.planExpiryDate = addDaysISO(base, extraDays);
+      });
+      saveDB();
+      renderAdminPanel();
+      triggerCelebration("🎁 Bonus Validity Added!", "+" + extraDays + " Days added to all users.");
     }
 
     function saveAdminEditedUserDetails(mobile) {
@@ -2913,7 +3641,7 @@
       if (newExp) u.planExpiryDate = newExp;
       saveDB();
       renderAdminPanel();
-      alert("✅ User details updated on Secure Cloud!");
+      triggerCelebration("✅ User Updated!", u.name);
     }
 
     function renderAdminPanel() {
@@ -2923,6 +3651,22 @@
       document.getElementById("admApprovedUsers").textContent = usersArr.filter(u => u.status === "approved" && getValidityRemainingDays(u) > 5).length;
       document.getElementById("admFeedbackCount").textContent = (db.feedbacks || []).length;
       document.getElementById("adminBroadcastInput").value = db.broadcast || "";
+
+      // Leaderboard on Admin Page 1
+      const ranked = usersArr.map(u => {
+        let p = 0;
+        (u.subjects || []).forEach(s => s.chapters.forEach(c => { p += Number(c.donePages || 0); }));
+        return { name: u.name, mobile: u.mobile, pages: p, tests: (u.tests || []).length };
+      }).sort((a, b) => b.pages - a.pages).slice(0, 8);
+
+      document.getElementById("admTopStudentsList").innerHTML = ranked.length === 0
+        ? '<div class="text-xs muted-text">No students yet.</div>'
+        : ranked.map((r, i) => `
+            <div class="subtle-pill px-3 py-2 flex items-center justify-between text-xs">
+              <span><b>#${i + 1} ${r.name}</b> <span class="font-mono muted-text">(${r.mobile})</span></span>
+              <span class="font-extrabold text-indigo-500">${r.pages}p Read • ${r.tests} Tests</span>
+            </div>
+          `).join("");
 
       const q = (document.getElementById("adminSearchInput")?.value || "").toLowerCase().trim();
       const statusFilter = document.getElementById("adminFilterStatus")?.value || "ALL";
@@ -2972,11 +3716,11 @@
                   <div class="flex items-center gap-1.5 shrink-0">
                     <button onclick="toggleAdminUserEditLock('${u.mobile}')"
                       class="px-3 py-1.5 rounded-xl text-xs font-extrabold ${isUnlocked ? 'bg-amber-500 text-white' : 'one-card text-indigo-500'}">
-                      ${isUnlocked ? '🔒 Done Editing' : '✎ Edit User'}
+                      ${isUnlocked ? '🔒 Done' : '✎ Edit'}
                     </button>
                     <button onclick="inspectStudent('${u.mobile}')"
                       class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl">
-                      📊 In-Detail Report
+                      📊 Report
                     </button>
                   </div>
                 </div>
@@ -2988,13 +3732,12 @@
                       <input id="admEditExam_${u.mobile}" type="text" value="${u.exam}" placeholder="Exam" class="theme-input px-2.5 py-1.5 text-xs font-bold" />
                       <input id="admEditExp_${u.mobile}" type="date" value="${u.planExpiryDate || todayISO()}" class="theme-input px-2.5 py-1.5 text-xs font-bold" />
                       <button onclick="saveAdminEditedUserDetails('${u.mobile}')" class="bg-emerald-600 text-white text-xs font-extrabold py-1.5 rounded-xl">
-                        💾 Save Details
+                        💾 Save
                       </button>
                     </div>
 
                     <div class="flex items-center justify-between flex-wrap gap-1.5">
                       <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-[10px] font-extrabold muted-text uppercase">Assign Plan:</span>
                         <button onclick="assignStudentPlan('${u.mobile}', 5, '5-Day Free Trial')" class="one-card text-xs font-bold px-2.5 py-1 rounded-lg">5D Trial</button>
                         <button onclick="assignStudentPlan('${u.mobile}', 180, '₹99 (6 Months)')" class="bg-indigo-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">+6M (₹99)</button>
                         <button onclick="assignStudentPlan('${u.mobile}', 365, '₹149 (1 Year)')" class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">+1Y (₹149)</button>
@@ -3002,11 +3745,9 @@
                         <button onclick="adjustStudentValidity('${u.mobile}', -15)" class="one-card text-rose-500 text-xs font-extrabold px-2 py-1 rounded-lg">−15d</button>
                         <button onclick="adjustStudentValidity('${u.mobile}', 15)" class="one-card text-emerald-500 text-xs font-extrabold px-2 py-1 rounded-lg">+15d</button>
                       </div>
-                      <div class="flex gap-1.5">
-                        <button onclick="toggleStudentLockStatus('${u.mobile}')" class="bg-rose-500/15 text-rose-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
-                          ${u.status === 'approved' ? '🚫 Block/Hold' : '✓ Unblock'}
-                        </button>
-                      </div>
+                      <button onclick="toggleStudentLockStatus('${u.mobile}')" class="bg-rose-500/15 text-rose-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                        ${u.status === 'approved' ? '🚫 Block' : '✓ Unblock'}
+                      </button>
                     </div>
                   </div>
                 ` : ''}
@@ -3085,81 +3826,39 @@
 
       const subDetailsHtml = (u.subjects || []).map(s => {
         const sDone = s.chapters.filter(c => c.completed).length;
-        const sTests = (u.tests || []).filter(t => (t.subjects || []).includes(s.name) || (t.subjectName || "").includes(s.name));
-        let sc = 0, mx = 0;
-        sTests.forEach(t => { sc += Number(t.scored); mx += Number(t.total); });
-        const sAvg = mx > 0 ? Math.round((sc / mx) * 100) + "%" : "No Test";
-
         const chRows = s.chapters.map(c => `
           <div class="flex items-center justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
-            <span>${c.completed ? '✅' : '⏳'} <b>${c.name}</b> ${c.completedDate ? `(${c.completedDate})` : ''}</span>
+            <span>${c.completed ? '✅' : '⏳'} <b>${c.name}</b></span>
             <span>Read: <b>${c.donePages}p</b> • Rev: <b class="text-emerald-500">${c.revisedPages || 0}p</b></span>
           </div>
         `).join("");
 
         return `
           <div class="subtle-pill p-3 space-y-1.5">
-            <div class="flex items-center justify-between font-extrabold text-indigo-500">
-              <span>📚 ${s.name} (${sDone}/${s.chapters.length} પૂર્ણ)</span>
-              <span>Subject Test Avg: ${sAvg}</span>
-            </div>
-            <div>${chRows || '<div class="muted-text">No chapters added</div>'}</div>
-          </div>
-        `;
-      }).join("");
-
-      const pendRevs = (u.revisions || []).filter(r => !r.done);
-      const revHtml = pendRevs.slice(0, 10).map(r => `
-        <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
-          <span><b>[${r.stageLabel}]</b> ${r.subjectName} ➔ ${r.chapterName}</span>
-          <span class="font-mono text-amber-500">Due: ${r.dueDate}</span>
-        </div>
-      `).join("");
-
-      const testHtml = (u.tests || []).slice().reverse().slice(0, 10).map(t => {
-        const p = Math.round((t.scored / t.total) * 100);
-        return `
-          <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
-            <span><b>${t.date}</b> — ${t.subjectName}: ${t.title || t.chapterName}</span>
-            <span class="font-extrabold text-purple-500">${t.scored}/${t.total} (${p}%)</span>
+            <div class="font-extrabold text-indigo-500">📚 ${s.name} (${sDone}/${s.chapters.length} પૂર્ણ)</div>
+            <div>${chRows || '<div class="muted-text">No chapters</div>'}</div>
           </div>
         `;
       }).join("");
 
       const logsHtml = (u.logs || []).slice().reverse().slice(0, 12).map(l => `
         <div class="flex justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
-          <span><b>${l.date}</b> — ${l.subjectName} ➔ ${l.chapterName} ${l.topicName ? '('+l.topicName+')' : ''}</span>
-          <span class="font-extrabold text-emerald-500">+${l.pages}p ${l.isChapterFinish ? '✓ Finish' : ''}</span>
+          <span><b>${l.date}</b> — ${l.subjectName} ➔ ${l.chapterName} ${l.revisedAt ? '(Rev: '+l.revisedAt+')' : ''}</span>
+          <span class="font-extrabold text-emerald-500">+${l.pages}p</span>
         </div>
       `).join("");
 
       document.getElementById("inspectStudentContent").innerHTML = `
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Plan & Validity</div><div class="text-xs font-extrabold text-emerald-500">${u.planName || 'Trial'} (${getValidityRemainingDays(u)}d)</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Plan</div><div class="text-xs font-extrabold text-emerald-500">${u.planName || 'Trial'} (${getValidityRemainingDays(u)}d)</div></div>
           <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Chapters Done</div><div class="text-xs font-extrabold">${doneC} / ${totC}</div></div>
           <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Read vs Revised</div><div class="text-xs font-extrabold text-indigo-500">${totRead}p / ${totRev}p</div></div>
-          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Overall Test Avg</div><div class="text-xs font-extrabold text-purple-500">${tAvg} (${(u.tests||[]).length} Tests)</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Test Avg</div><div class="text-xs font-extrabold text-purple-500">${tAvg} (${(u.tests||[]).length})</div></div>
         </div>
-
-        <div class="space-y-2">
-          <div class="font-extrabold text-sm">1. Subject & Chapter-Wise Progress:</div>
-          ${subDetailsHtml || '<div class="muted-text">No subjects added yet.</div>'}
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="subtle-pill p-3 space-y-1">
-            <div class="font-extrabold text-amber-500 mb-1">2. Pending Revisions (${pendRevs.length}):</div>
-            ${revHtml || '<div class="muted-text">No pending revisions.</div>'}
-          </div>
-          <div class="subtle-pill p-3 space-y-1">
-            <div class="font-extrabold text-purple-500 mb-1">3. Recent Test Results (${(u.tests||[]).length}):</div>
-            ${testHtml || '<div class="muted-text">No tests logged yet.</div>'}
-          </div>
-        </div>
-
+        <div class="space-y-2">${subDetailsHtml || '<div class="muted-text">No subjects added.</div>'}</div>
         <div class="subtle-pill p-3 space-y-1">
-          <div class="font-extrabold text-emerald-500 mb-1">4. Recent Daily Study Logs (${(u.logs||[]).length}):</div>
-          ${logsHtml || '<div class="muted-text">No daily study logs yet.</div>'}
+          <div class="font-extrabold text-emerald-500 mb-1">Recent Study & Revision Logs:</div>
+          ${logsHtml || '<div class="muted-text">No logs yet.</div>'}
         </div>
       `;
       box.scrollIntoView({ behavior: "smooth" });
@@ -3177,13 +3876,13 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        try { db = JSON.parse(e.target.result); saveDB(); renderAdminPanel(); alert("Master DB Restored & Synced to Secure Cloud!"); }
+        try { db = JSON.parse(e.target.result); saveDB(); renderAdminPanel(); triggerCelebration("✅ Master DB Restored!", "Cloud Updated"); }
         catch (err) { alert("Error"); }
       };
       reader.readAsText(file);
     }
 
-    // Boot App Immediately
+    // Boot App
     bootApp();
     syncFromFirebaseCloud(false);
     setInterval(() => syncFromFirebaseCloud(false), 20000);
