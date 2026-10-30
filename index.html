@@ -5,37 +5,37 @@
   <meta name="theme-color" content="#3B5BDB">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>The Target — Smart Study OS</title>
+  <title>Target Track — Smart Study OS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- OFFICIAL FIREBASE SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- OFFICIAL FIREBASE SDK (DEFERRED FOR FAST LCP) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Gujarati:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
-    /* SAMSUNG ONE UI 6.1 — MINIMAL CREAM THEME */
+    /* SAMSUNG ONE UI 9 — MINIMAL CREAM THEME */
     html[data-theme="cream"] {
-      --bg-main: #F6F5F2;
+      --bg-main: #F4F4F8;
       --bg-card: #FFFFFF;
-      --bg-subtle: #EFECE6;
+      --bg-subtle: #ECEDF3;
       --bg-nav: rgba(255, 255, 255, 0.96);
-      --text-main: #141619;
-      --text-muted: #68707A;
-      --border-col: #E5E1D8;
+      --text-main: #121417;
+      --text-muted: #646D7A;
+      --border-col: #E2E4EC;
       --accent: #2B50EC;
     }
 
-    /* SAMSUNG ONE UI 6.1 — DEEP BLACK AMOLED THEME */
+    /* SAMSUNG ONE UI 9 — DEEP BLACK AMOLED THEME */
     html[data-theme="black"] {
       --bg-main: #000000;
-      --bg-card: #111317;
-      --bg-subtle: #1A1D24;
-      --bg-nav: rgba(17, 19, 23, 0.96);
+      --bg-card: #12141A;
+      --bg-subtle: #1B1E26;
+      --bg-nav: rgba(18, 20, 26, 0.96);
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
-      --border-col: #242933;
+      --border-col: #252A36;
       --accent: #4C6EF5;
     }
 
@@ -50,21 +50,21 @@
     .one-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-col);
-      border-radius: 24px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+      border-radius: 28px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .subtle-pill {
       background-color: var(--bg-subtle);
       border: 1px solid var(--border-col);
-      border-radius: 16px;
+      border-radius: 18px;
       transition: all 0.2s ease;
     }
     .theme-input {
       background-color: var(--bg-subtle);
       border: 1px solid var(--border-col);
       color: var(--text-main);
-      border-radius: 14px;
+      border-radius: 16px;
       transition: border-color 0.2s ease;
     }
     .theme-input:focus {
@@ -77,14 +77,12 @@
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* Smooth UI Animations */
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .anim-fade { animation: fadeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-    /* Spotlight Highlight for Active Tour Target (No Blur!) */
     .tour-spotlight {
       position: relative;
       z-index: 45 !important;
@@ -111,6 +109,135 @@
 </head>
 <body class="min-h-screen pb-28 selection:bg-indigo-600 selection:text-white">
 
+  <!-- ================= NEW UPDATE POPUP FOR RETURNING USERS (FEATURES ONLY) ================= -->
+  <div id="whatsNewModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm one-card p-5 space-y-3.5 anim-fade border-2 border-indigo-600">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg font-extrabold shadow-md">✨</div>
+          <div>
+            <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">New Update</span>
+            <h3 class="text-sm font-extrabold mt-0.5">Target Track — નવા ફીચર્સ</h3>
+          </div>
+        </div>
+        <button onclick="dismissWhatsNewPopup()" class="w-7 h-7 rounded-full subtle-pill text-xs font-extrabold">✕</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="subtle-pill p-2.5 flex items-start gap-2">
+          <span>🎯</span>
+          <div><b>Multiple Exam Management & Smart Sync:</b> એક કરતા વધારે પરીક્ષાના કાઉન્ટડાઉન ઉમેરો, એક્ઝામ સ્વીચ કરો અને કોમન સબ્જેક્ટ/ચેપ્ટરનો પ્રોગ્રેસ ઓટોમેટિક સિન્ક કરો.</div>
+        </div>
+        <div class="subtle-pill p-2.5 flex items-start gap-2">
+          <span>⏳</span>
+          <div><b>Daily Light Countdown UI:</b> રોજ બદલાતા લાઈટ કલર સાથે Days, Hrs, Mins અને Exam Date દર્શાવતું નવું કાઉન્ટડાઉન.</div>
+        </div>
+        <div class="subtle-pill p-2.5 flex items-start gap-2">
+          <span>🗂️</span>
+          <div><b>Quick Formula & Key Folders:</b> ફ્રન્ટ પેજ પરથી જ સબ્જેક્ટ અને ચેપ્ટર મુજબ અલગ ફોલ્ડરમાં શોર્ટ નોટ્સ અને સૂત્રો સાચવો.</div>
+        </div>
+        <div class="subtle-pill p-2.5 flex items-start gap-2">
+          <span>🎨</span>
+          <div><b>Unified Color-Coded History:</b> વાંચન, પૂર્ણ કરેલા રિવિઝન અને એડિટની બધી જ હિસ્ટ્રી અલગ કલર કેટેગરી સાથે એક જ પાર્ટમાં.</div>
+        </div>
+        <div class="subtle-pill p-2.5 flex items-start gap-2">
+          <span>⚡</span>
+          <div><b>Online + Offline Mode:</b> એપ હવે ઓનલાઇન અને ઓફલાઇન બંને મોડમાં કાર્યરત રહેશે.</div>
+        </div>
+      </div>
+      <button onclick="dismissWhatsNewPopup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-md">
+        🚀 ચાલો શરૂ કરીએ!
+      </button>
+    </div>
+  </div>
+
+<!-- ================= POP-UP BROADCAST & 1-TO-1 ADMIN MESSAGE MODAL ================= -->
+  <div id="popupBroadcastModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm one-card p-5 space-y-3.5 anim-fade border-2 border-amber-500">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg font-extrabold shadow-md">📢</div>
+          <div>
+            <span id="popupNoticeTag" class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">Important Announcement</span>
+            <h3 id="popupNoticeTitle" class="text-sm font-extrabold mt-0.5">Admin Broadcast</h3>
+          </div>
+        </div>
+        <button onclick="dismissPopupBroadcast()" class="w-7 h-7 rounded-full subtle-pill text-xs font-extrabold">✕</button>
+      </div>
+      <div id="popupBroadcastBody" class="subtle-pill p-3.5 text-xs font-semibold leading-relaxed whitespace-pre-wrap break-words"></div>
+      <button onclick="dismissPopupBroadcast()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-md">
+        ✓ સમજી ગયા (Got It)
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MULTIPLE EXAM MANAGER MODAL ================= -->
+  <div id="multiExamModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm one-card p-5 space-y-3.5 anim-fade">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-extrabold">🎯 Multiple Exam Switcher</h3>
+        </div>
+        <button onclick="document.getElementById('multiExamModal').classList.add('hidden')" class="w-7 h-7 rounded-full subtle-pill text-xs font-extrabold">✕</button>
+      </div>
+
+      <div id="multiExamListContainer" class="space-y-2 max-h-52 overflow-y-auto pr-0.5"></div>
+
+      <div class="subtle-pill p-3 space-y-2 border-t" style="border-color: var(--border-col);">
+        <div class="text-[10px] font-extrabold uppercase muted-text">+ નવી પરીક્ષા ઉમેરો</div>
+        <input id="newMultiExamName" type="text" placeholder="પરીક્ષાનું નામ (e.g. GPSC / CCE)" class="w-full theme-input px-3 py-2 text-xs font-bold" />
+        <div class="grid grid-cols-2 gap-2">
+          <input id="newMultiExamDate" type="date" class="theme-input px-3 py-2 text-xs font-bold" />
+          <label class="subtle-pill px-2.5 py-2 flex items-center gap-1.5 text-[10px] font-extrabold cursor-pointer">
+            <input id="copyCurrentSyllabusChk" type="checkbox" class="accent-indigo-600" />
+            <span>હાલના વિષય કોપી કરો</span>
+          </label>
+        </div>
+        <button onclick="addNewExamProfile()" class="w-full bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
+          + Add & Switch Exam
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DEDICATED INTERNAL PAGE: QUICK FORMULA & KEY NOTES FOLDERS ================= -->
+  <div id="quickNotesPageModal" class="hidden fixed inset-0 z-50 overflow-y-auto px-3.5 py-4" style="background-color: var(--bg-main);">
+    <div class="max-w-md mx-auto space-y-3.5 anim-fade pb-16">
+      <div class="one-card p-4 flex items-center justify-between sticky top-2 z-10">
+        <div class="flex items-center gap-2.5">
+          <button onclick="closeQuickNotesPage()" class="w-9 h-9 rounded-2xl subtle-pill font-extrabold text-sm">←</button>
+          <div>
+            <h2 id="qnPageHeaderTitle" class="text-sm font-extrabold">📌 Quick Formula & Key Folders</h2>
+          </div>
+        </div>
+        <span id="qnTotalCountBadge" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-indigo-500/15 text-indigo-500">0 Notes</span>
+      </div>
+
+      <!-- Add New Formula / Key Note inside Subject/Chapter Folder -->
+      <div class="one-card p-4 space-y-2.5">
+        <div class="grid grid-cols-2 gap-2">
+          <select id="qnPageSubSelect" onchange="populateQnPageChapSelect()" class="theme-input px-3 py-2 text-xs font-bold"></select>
+          <select id="qnPageChapSelect" class="theme-input px-3 py-2 text-xs font-bold"></select>
+        </div>
+        <div>
+          <input id="qnPageTitleInput" type="text" placeholder="ટાઈટલ / ટોપિક (Formula કે Key નું નામ)" class="w-full theme-input px-3 py-2 text-xs font-bold" />
+        </div>
+        <textarea id="qnPageTextInput" rows="2" placeholder="સૂત્ર, શોર્ટ-કી અથવા અગત્યની નોંધ લખો..." class="w-full theme-input p-3 text-xs font-semibold"></textarea>
+        <button onclick="saveNoteFromDedicatedPage()" class="w-full bg-indigo-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
+          + ફોલ્ડરમાં સેવ કરો
+        </button>
+      </div>
+
+      <!-- Subject Folder Filter Bar -->
+      <div id="qnFolderTabsBar" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+
+      <!-- Chapter Filter Bar -->
+      <div id="qnChapFolderTabsBar" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+
+      <!-- Bento Grid Folder Cards -->
+      <div id="qnDedicatedFoldersContainer" class="grid grid-cols-2 gap-2.5"></div>
+    </div>
+  </div>
+
   <!-- CELEBRATION CONFETTI CONTAINER & TOAST -->
   <div id="confettiContainer"></div>
   <div id="motivationToast" class="hidden fixed top-4 inset-x-4 max-w-sm mx-auto z-50 one-card p-3.5 bg-emerald-600 text-white border-none shadow-2xl flex items-center gap-3 anim-fade">
@@ -121,20 +248,20 @@
     </div>
   </div>
 
-  <!-- DEMO STICKY BAR (No raw phone number displayed) -->
+  <!-- DEMO STICKY BAR -->
   <div id="demoBanner" class="hidden sticky top-0 z-40 bg-amber-500 text-white px-4 py-2 shadow-md">
     <div class="max-w-md mx-auto flex items-center justify-between gap-2">
       <div class="text-xs font-extrabold truncate">
         👁️ DEMO MODE • <button onclick="startAppTour()" class="underline">🧭 Guide Tour</button>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
-        <button onclick="openAdminWhatsApp('Hello The Target, I want to buy full access plan.')" class="bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">💬 Buy Plan</button>
+        <button onclick="openAdminWhatsApp('Hello Target Track, I want to buy full access plan.')" class="bg-emerald-700 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">💬 Buy Plan</button>
         <button onclick="exitDemoMode()" class="bg-white text-amber-900 font-extrabold text-[10px] px-2.5 py-1 rounded-full">Exit</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= 14) NON-BLUR SPOTLIGHT APP TOUR FLOATING SHEET ================= -->
+  <!-- NON-BLUR SPOTLIGHT APP TOUR FLOATING SHEET -->
   <div id="appTourOverlay" class="hidden fixed inset-x-0 bottom-16 z-50 px-3.5 pointer-events-none">
     <div class="w-full max-w-md mx-auto one-card p-4 space-y-2.5 border-2 border-indigo-600 shadow-2xl pointer-events-auto anim-fade">
       <div class="flex items-center justify-between">
@@ -144,14 +271,11 @@
         </div>
         <button onclick="closeAppTour()" class="text-xs font-extrabold muted-text hover:text-rose-500 px-2 py-0.5">✕ Skip</button>
       </div>
-
       <div>
-        <h3 id="tourTitle" class="text-sm font-extrabold">🎯 Welcome to The Target</h3>
+        <h3 id="tourTitle" class="text-sm font-extrabold">🎯 Welcome to Target Track</h3>
         <p id="tourDesc" class="text-xs muted-text leading-relaxed mt-0.5"></p>
       </div>
-
       <div id="tourHighlightBox" class="subtle-pill px-3 py-2 text-[11px] font-semibold text-indigo-500"></div>
-
       <div class="flex items-center justify-between pt-1">
         <button onclick="prevTourStep()" id="tourPrevBtn" class="subtle-pill px-3.5 py-1.5 text-xs font-extrabold">◀ Back</button>
         <div id="tourDots" class="flex gap-1.5"></div>
@@ -160,7 +284,7 @@
     </div>
   </div>
 
-  <!-- ================= 19) POPUP MODAL FOR LOCKED / COMPLETED CHAPTER ================= -->
+  <!-- POPUP MODAL FOR LOCKED / COMPLETED CHAPTER -->
   <div id="chapLockModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
     <div class="w-full max-w-xs one-card p-5 text-center space-y-3 anim-fade">
       <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto text-2xl">🔒</div>
@@ -173,19 +297,29 @@
     </div>
   </div>
 
-  <!-- ================= 17) EXTRA REVISION MODAL ================= -->
+  <!-- EXTRA REVISION MODAL -->
   <div id="extraRevModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
     <div class="w-full max-w-sm one-card p-5 space-y-3 anim-fade">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-extrabold">⚡ Extra Revision ઉમેરો</h3>
         <button onclick="document.getElementById('extraRevModal').classList.add('hidden')" class="text-xs font-extrabold muted-text">✕</button>
       </div>
-      <p class="text-[11px] muted-text">શેડ્યૂલ સિવાય તમે આજે જે વિષય/ચેપ્ટરનું વધારાનું રિવિઝન કર્યું હોય તે અહીં નોંધો:</p>
-      <div class="space-y-2">
+      <div class="space-y-2.5">
         <select id="extraRevSubSelect" onchange="populateExtraRevChaps()" class="w-full theme-input px-3 py-2 text-xs font-bold"></select>
-        <select id="extraRevChapSelect" class="w-full theme-input px-3 py-2 text-xs font-bold"></select>
+        <select id="extraRevChapSelect" onchange="handleExtraRevModeChange()" class="w-full theme-input px-3 py-2 text-xs font-bold"></select>
+        
+        <!-- Progress Tracking: Few Pages vs Full Chapter -->
+        <div class="grid grid-cols-2 gap-1.5 subtle-pill p-1">
+          <button type="button" id="extModeFewBtn" onclick="setExtraRevMode('few')" class="py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white shadow-sm">📄 થોડા પેજ (Few Pages)</button>
+          <button type="button" id="extModeFullBtn" onclick="setExtraRevMode('full')" class="py-1.5 rounded-xl text-[11px] font-extrabold muted-text">📚 આખું ચેપ્ટર (Full Chap)</button>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
-          <input id="extraRevPagesInput" type="number" placeholder="રિવિઝન પેજ (e.g. 10)" value="10" class="theme-input px-3 py-2 text-xs font-bold" />
+          <div id="extraRevStepperWrap" class="flex items-center justify-between theme-input px-1.5 py-1">
+            <button type="button" onclick="stepExtraRevModalPages(-1)" class="w-7 h-7 rounded-xl subtle-pill font-extrabold text-sm">−</button>
+            <input id="extraRevPagesInput" type="number" value="10" min="1" max="500" class="w-12 text-center bg-transparent text-xs font-extrabold outline-none" />
+            <button type="button" onclick="stepExtraRevModalPages(1)" class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-extrabold text-sm">+</button>
+          </div>
           <input id="extraRevNoteInput" type="text" placeholder="નોંધ (Optional)" class="theme-input px-3 py-2 text-xs" />
         </div>
       </div>
@@ -193,7 +327,7 @@
     </div>
   </div>
 
-  <!-- ================= 24 & 25) 3-LINE SIDE MENU DRAWER & BULK IMPORT MODAL ================= -->
+  <!-- 3-LINE SIDE MENU DRAWER -->
   <div id="sideMenuDrawer" class="hidden fixed inset-0 z-50 bg-black/60 flex justify-end">
     <div class="w-72 max-w-[82vw] h-full one-card rounded-none rounded-l-3xl p-5 flex flex-col justify-between anim-fade">
       <div class="space-y-4">
@@ -201,19 +335,28 @@
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm">🎯</div>
             <div>
-              <div class="text-xs font-extrabold">THE TARGET OS</div>
-              <div class="text-[10px] muted-text">Quick Actions Menu</div>
+              <div class="text-xs font-extrabold">TARGET TRACK OS</div>
+              <div class="text-[10px] muted-text">One UI 9 Quick Menu</div>
             </div>
           </div>
           <button onclick="toggleSideDrawer()" class="w-7 h-7 rounded-full subtle-pill text-xs font-bold">✕</button>
         </div>
 
         <div class="space-y-1.5 text-xs font-bold">
+          <button onclick="toggleSideDrawer(); openMultiExamModal();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>🎯</span> <span>Multiple Exam Switcher</span>
+          </button>
+          <button onclick="toggleSideDrawer(); openQuickNotesPage('ALL');" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>🗂️</span> <span>Quick Formal & Key Folders</span>
+          </button>
           <button onclick="toggleSideDrawer(); openExtraRevisionModal();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
             <span>⚡</span> <span>+ Add Extra Revision</span>
           </button>
           <button onclick="toggleSideDrawer(); openBulkImportModal();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
             <span>📥</span> <span>Excel / Word Bulk Import</span>
+          </button>
+          <button onclick="toggleSideDrawer(); showWhatsNewModalManual();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
+            <span>✨</span> <span>What's New Features</span>
           </button>
           <button onclick="toggleSideDrawer(); startAppTour();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
             <span>🧭</span> <span>Interactive App Guide Tour</span>
@@ -224,10 +367,10 @@
           <button onclick="toggleSideDrawer(); downloadStudentBackup();" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5">
             <span>💾</span> <span>Download Data Backup</span>
           </button>
-          <a href="https://www.thetarget.in" target="_blank" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5 text-indigo-500 block">
-            <span>🌐</span> <span>MCQ Practice (thetarget.in)</span>
-          </a>
-          <button onclick="openAdminWhatsApp('Hello The Target Team, I need help with my account.')" class="w-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 rounded-2xl p-3 text-left flex items-center gap-2.5">
+         <button type="button" onclick="openTelegramChannel()" class="w-full subtle-pill p-3 text-left flex items-center gap-2.5 text-indigo-500">
+            <span>✈️</span> <span>Telegram (@thetarget_MCQ)</span>
+          </button>
+          <button onclick="openAdminWhatsApp('Hello Target Track Team, I need help with my account.')" class="w-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 rounded-2xl p-3 text-left flex items-center gap-2.5">
             <span>💬</span> <span>WhatsApp Admin Support</span>
           </button>
         </div>
@@ -240,13 +383,12 @@
     </div>
   </div>
 
-  <!-- 24) EXCEL / CSV / WORD BULK IMPORT MODAL -->
+  <!-- EXCEL / CSV / WORD BULK IMPORT MODAL -->
   <div id="bulkImportModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
     <div class="w-full max-w-md one-card p-5 space-y-3.5 anim-fade">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-sm font-extrabold">📥 Excel / CSV / Word Bulk Import</h3>
-          <p class="text-[10px] muted-text">એકસાથે વિષય-ચેપ્ટર અથવા ટેસ્ટ માર્ક્સ કોપી-પેસ્ટ કે ફાઈલથી ઉમેરો</p>
         </div>
         <button onclick="document.getElementById('bulkImportModal').classList.add('hidden')" class="text-xs font-extrabold muted-text">✕</button>
       </div>
@@ -257,11 +399,7 @@
       </div>
 
       <div id="bulkImportFormatHint" class="subtle-pill p-2.5 text-[10px] muted-text leading-relaxed font-mono">
-        Format (દરેક લાઈનમાં):<br/>
-        <b>Subject Name, Chapter Name, Pages(Optional)</b><br/>
-        દા.ત.<br/>
-        ભારતનું બંધારણ, આમુખ, 12<br/>
-        ભારતનું બંધારણ, મૂળભૂત અધિકારો, 20
+        Format:<br/><b>Subject Name, Chapter Name, Pages(Optional)</b>
       </div>
 
       <textarea id="bulkImportTextarea" rows="5" placeholder="Excel કે Word માંથી કોપી કરીને અહીં પેસ્ટ કરો..." class="w-full theme-input p-3 text-xs font-mono"></textarea>
@@ -278,7 +416,7 @@
     </div>
   </div>
 
-  <!-- ================= LOGIN & PLAN GATE SCREEN (CLEAN & MINIMAL) ================= -->
+  <!-- ================= LOGIN & PLAN GATE SCREEN ================= -->
   <div id="authScreen" class="fixed inset-0 z-40 overflow-y-auto flex flex-col justify-center items-center px-4 py-6" style="background-color: var(--bg-main);">
     <div class="w-full max-w-sm one-card p-6 anim-fade">
       
@@ -286,8 +424,8 @@
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md">🎯</div>
           <div>
-            <h1 class="text-lg font-extrabold tracking-tight leading-none">THE TARGET</h1>
-            <p class="text-[11px] muted-text mt-1">Smart Study & Revision OS</p>
+            <h1 class="text-sm font-extrabold tracking-tight truncate">TARGET TRACK</h1>
+            <p class="text-[11px] muted-text mt-0.5">Smart Study OS</p>
           </div>
         </div>
         <div class="flex items-center gap-1.5">
@@ -296,7 +434,6 @@
         </div>
       </div>
 
-      <!-- 13 & 22) Clean Login Form (No 2026 hint in placeholder & No Exam Date on Login) -->
       <div id="loginFormContainer" class="space-y-3.5">
         <div>
           <label class="block text-[11px] font-bold muted-text mb-1 ml-1">મોબાઈલ નંબર</label>
@@ -311,7 +448,7 @@
             class="w-full theme-input border-amber-500 px-4 py-3 text-sm" />
         </div>
 
-        <!-- Student Fields (Clean: Name + Target Exam / General Prep) -->
+        <!-- Student Fields -->
         <div id="studentFieldsWrapper" class="space-y-3">
           <div id="newStudentFields" class="space-y-3">
             <div>
@@ -326,8 +463,18 @@
 
           <div>
             <label class="block text-[11px] font-bold muted-text mb-1 ml-1">પ્લેટફોર્મ PIN</label>
-            <!-- 13) No 2026 mentioned in placeholder -->
             <input id="authPin" type="password" placeholder="Enter Platform Access PIN" class="w-full theme-input px-4 py-3 text-sm" />
+            <!-- Login & Socials: Contact Admin for PIN + Telegram Channel Link -->
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <button type="button" onclick="openAdminWhatsApp('Hello Admin, please share the Platform Access PIN for Target Track.')"
+                class="subtle-pill py-2 px-2.5 text-[11px] font-extrabold text-emerald-600 flex items-center justify-center gap-1">
+                <span>💬</span> <span>Contact admin for pin</span>
+              </button>
+              <button type="button" onclick="openTelegramChannel()"
+                class="subtle-pill py-2 px-2.5 text-[11px] font-extrabold text-indigo-600 flex items-center justify-center gap-1">
+                <span>✈️</span> <span>Telegram Channel PIN</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -339,12 +486,12 @@
         </button>
       </div>
 
-      <!-- POST-LOGIN EXPIRED / APPROVAL LOCK + PRICING PLANS (No raw number shown) -->
+      <!-- POST-LOGIN EXPIRED / APPROVAL LOCK + PRICING PLANS WITH RAZORPAY & SHARE SS -->
       <div id="pendingApprovalView" class="hidden space-y-3.5">
         <div class="text-center">
           <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto text-xl mb-1.5">⏳</div>
           <h2 id="txtPendTitle" class="text-sm font-extrabold">5-Day Free Trial પૂર્ણ થયો છે</h2>
-          <p class="text-[11px] muted-text mt-0.5">તમારો ડેટા ૧૦૦% સુરક્ષિત છે. આગળ વાપરવા પ્લાન પસંદ કરો:</p>
+          <p class="text-[11px] muted-text mt-0.5">આગળ વાપરવા પ્લાન પસંદ કરી Razorpay થી પેમેન્ટ કરો:</p>
         </div>
 
         <div class="subtle-pill p-3 text-xs space-y-1">
@@ -353,37 +500,36 @@
         </div>
 
         <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="subtle-pill p-2.5">
+          <a href="https://razorpay.me/@thetarget?amount=99" target="_blank" class="subtle-pill p-2.5 block hover:border-indigo-500 transition">
             <div class="text-[10px] font-bold muted-text">6 Months</div>
             <div class="text-base font-extrabold text-indigo-500 mt-0.5">₹99</div>
-            <div class="text-[9px] muted-text">180 Days</div>
-          </div>
-          <div class="subtle-pill p-2.5 border-2 border-indigo-500 relative">
+            <div class="text-[9px] font-extrabold bg-indigo-600 text-white rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
+          <a href="https://razorpay.me/@thetarget?amount=149" target="_blank" class="subtle-pill p-2.5 border-2 border-indigo-500 relative block">
             <span class="absolute -top-2 inset-x-2 bg-indigo-600 text-white text-[8px] font-extrabold rounded-full py-0.5">POPULAR</span>
             <div class="text-[10px] font-bold muted-text mt-1">1 Year</div>
             <div class="text-base font-extrabold text-emerald-500 mt-0.5">₹149</div>
-            <div class="text-[9px] muted-text">365 Days</div>
-          </div>
-          <div class="subtle-pill p-2.5 border border-amber-500/40">
+            <div class="text-[9px] font-extrabold bg-emerald-600 text-white rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
+          <a href="https://razorpay.me/@thetarget?amount=999" target="_blank" class="subtle-pill p-2.5 border border-amber-500/40 block">
             <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
             <div class="text-base font-extrabold text-amber-500 mt-0.5">₹999</div>
-            <div class="text-[9px] muted-text">Unlimited</div>
-          </div>
+            <div class="text-[9px] font-extrabold bg-amber-500 text-white rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
         </div>
+
+        <button onclick="openAdminWhatsApp('Hello Target Track Admin, I have completed my plan payment. Sharing my Payment Screenshot (SS):')"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
+          <span>📸</span> <span>Share SS of Payment</span>
+        </button>
 
         <button onclick="startReadOnlyDemo(true)"
           class="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm">
           🧭 એપનો ડેમો અને ટૂર જુઓ (Interactive Demo Tour)
         </button>
 
-        <!-- 12) Direct WhatsApp Button without showing Admin Phone Number -->
-        <button onclick="openAdminWhatsApp('Hello The Target, I want to activate my Study App Plan.')"
-          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
-          <span>💬</span> <span>પ્લાન એક્ટિવેટ કરવા WhatsApp પર મેસેજ કરો</span>
-        </button>
-
         <div class="flex gap-2">
-          <button onclick="checkApprovalStatus()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs">🔄 સ્ટેટસ ચેક કરો</button>
+          <button onclick="checkApprovalStatus()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">🔄 સ્ટેટસ ચેક કરો</button>
           <button onclick="logoutUser()" class="px-3.5 subtle-pill font-bold py-2.5 rounded-xl text-xs">Logout</button>
         </div>
       </div>
@@ -391,7 +537,7 @@
     </div>
   </div>
 
-  <!-- ================= STUDENT APP (SAMSUNG ONE UI 6.1 SHELL) ================= -->
+  <!-- ================= STUDENT APP (SAMSUNG ONE UI 9 SHELL) ================= -->
   <div id="studentApp" class="hidden max-w-md mx-auto px-3.5 pt-3.5">
     
     <div id="studentBroadcastBanner" class="hidden mb-3 one-card p-3 bg-indigo-600/10 border-indigo-500/40 flex items-center justify-between gap-2">
@@ -400,31 +546,57 @@
       </div>
     </div>
 
-    <!-- 16, 22, 25) Clean Minimal Header (Validity removed from header; Optional Exam Countdown; 3-Line Menu) -->
+    <!-- Clean Minimal Header -->
     <header class="flex items-center justify-between mb-3 gap-2">
       <div class="flex items-center gap-2.5 min-w-0">
         <div class="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm shrink-0">🎯</div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-extrabold tracking-tight truncate">THE TARGET</h1>
-            <span id="cloudSyncBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 shrink-0">🔒 Live</span>
+            <h1 class="text-sm font-extrabold tracking-tight truncate">TARGET TRACK</h1>
+            <span id="cloudSyncBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 shrink-0">🔒 Online</span>
           </div>
           <p id="headerStudentName" class="text-[10px] muted-text font-medium truncate"></p>
         </div>
       </div>
 
-      <div class="flex items-center gap-1.5 shrink-0">
-        <!-- 22) Exam Countdown shown ONLY if student sets an Exam Date in Account tab -->
-        <div id="headerExamCountdownBox" onclick="switchStudentTab('profile')" class="hidden text-right one-card px-2.5 py-1 rounded-2xl cursor-pointer active:scale-95 transition">
-          <div class="text-[8px] muted-text font-bold uppercase">પરીક્ષા બાકી</div>
-          <div id="headerDaysLeft" class="text-xs font-extrabold text-indigo-500">--</div>
-        </div>
-        <button onclick="startAppTour()" title="App Guide Tour" class="text-xs font-extrabold w-8 h-8 rounded-2xl one-card flex items-center justify-center text-indigo-500">🧭</button>
+     <div class="flex items-center gap-1.5 shrink-0">
+        <!-- Minimal Header: Only 3-Line Menu (Duplicate Exam buttons removed) -->
         <button onclick="toggleSideDrawer()" title="More Options" class="text-sm font-extrabold w-9 h-9 rounded-2xl one-card flex items-center justify-center">☰</button>
       </div>
     </header>
 
-    <!-- CLICKABLE TOP 4 KPI CARDS (Clean Typography, No Overflow) -->
+    <!-- COMPACT DAILY LIGHT-COLOR COUNTDOWN (Visible ONLY on Today Page, with Seconds) -->
+    <div id="dailyCountdownWidget" class="mb-3 rounded-3xl p-3.5 border transition-all shadow-sm">
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <button onclick="openMultiExamModal()" class="text-xs font-extrabold px-3 py-1 rounded-full bg-white/85 text-slate-900 shadow-sm flex items-center gap-1.5 truncate">
+          <span>🎯</span> <span id="cdExamTitleText" class="truncate">GPSC / CCE</span> <span class="text-[10px] opacity-70">▾ Switch</span>
+        </button>
+        <div onclick="openMultiExamModal()" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-white/80 text-slate-800 cursor-pointer shrink-0 flex items-center gap-1">
+          <span>📅</span> <span id="cdExamDateBadge">Set Exam Date</span>
+        </div>
+      </div>
+
+      <div id="cdTimerBoxesRow" class="grid grid-cols-4 gap-1.5 text-center">
+        <div class="bg-white/85 backdrop-blur-sm rounded-2xl py-1.5 px-1.5 shadow-sm border border-white/70">
+          <div id="cdDaysVal" class="text-base font-extrabold text-slate-900 leading-tight font-mono">00</div>
+          <div class="text-[8px] font-extrabold uppercase tracking-wider text-slate-600">DAYS</div>
+        </div>
+        <div class="bg-white/85 backdrop-blur-sm rounded-2xl py-1.5 px-1.5 shadow-sm border border-white/70">
+          <div id="cdHoursVal" class="text-base font-extrabold text-slate-900 leading-tight font-mono">00</div>
+          <div class="text-[8px] font-extrabold uppercase tracking-wider text-slate-600">HRS</div>
+        </div>
+        <div class="bg-white/85 backdrop-blur-sm rounded-2xl py-1.5 px-1.5 shadow-sm border border-white/70">
+          <div id="cdMinsVal" class="text-base font-extrabold text-slate-900 leading-tight font-mono">00</div>
+          <div class="text-[8px] font-extrabold uppercase tracking-wider text-slate-600">MINS</div>
+        </div>
+        <div class="bg-white/85 backdrop-blur-sm rounded-2xl py-1.5 px-1.5 shadow-sm border border-white/70">
+          <div id="cdSecsVal" class="text-base font-extrabold text-indigo-600 leading-tight font-mono">00</div>
+          <div class="text-[8px] font-extrabold uppercase tracking-wider text-indigo-600">SECS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLICKABLE TOP 4 KPI CARDS -->
     <div id="tourTargetKpi" class="grid grid-cols-4 gap-2 mb-3.5">
       <button onclick="onKpiClick('completed')" class="one-card p-2.5 text-left active:scale-95 transition">
         <div class="text-[9px] font-bold muted-text truncate">પૂર્ણ ચેપ્ટર</div>
@@ -451,14 +623,14 @@
       </button>
     </div>
 
-    <!-- ================= TAB 1: TODAY ================= -->
+   <!-- ================= TAB 1: TODAY ================= -->
     <section id="tab-today" class="space-y-3.5 anim-fade">
       
-      <!-- 4) Daily Goal Automatic Connection (New Pages Read + Today's Revised Pages) -->
+      <!-- 1. Daily Goal Automatic Connection -->
       <div id="tourTargetGoal" class="one-card p-3.5 space-y-2">
         <div class="flex items-center justify-between gap-2">
           <div>
-            <div class="text-xs font-extrabold">🎯 આજનો ટાર્ગેટ (વાંચન + રિવિઝન પેજ)</div>
+            <div class="text-xs font-extrabold">🎯 આજનો ટાર્ગેટ</div>
             <div id="dailyGoalBreakdownText" class="text-[10px] muted-text">વાંચન: 0p + રિવિઝન: 0p = કુલ 0p</div>
           </div>
           <div class="flex items-center gap-1.5">
@@ -471,13 +643,10 @@
         </div>
       </div>
 
-      <!-- Daily Study Logger Card -->
+      <!-- 2. Daily Study Logger Card (આજે શું ચાલ્યું?) -->
       <div id="tourTargetLogger" class="one-card p-4 space-y-3">
         <div class="flex items-center justify-between gap-2">
-          <div>
-            <h2 id="txtTodayLogTitle" class="text-sm font-extrabold">આજે શું ચાલ્યું?</h2>
-            <p class="text-[10px] muted-text">વિષય અને ચેપ્ટર સિલેક્ટ કરીને પેજ ઉમેરો</p>
-          </div>
+          <h2 id="txtTodayLogTitle" class="text-sm font-extrabold">આજે શું ચાલ્યું?</h2>
           <div class="flex items-center gap-1 subtle-pill px-2.5 py-1">
             <span class="text-xs">📅</span>
             <input id="dailyLogDatePicker" type="date" onchange="handleDailyDateChange()"
@@ -554,13 +723,24 @@
         </div>
       </div>
 
-      <!-- 2, 3, 7, 17) Due Revisions Card + Overdue Auto-Forward + Extra Revision + Undo/Reverse -->
+      <!-- 3. NOTES & FOLDERS SECTION (Moved right below "Aje shu chaliu" & Merged Quick Formal + Key) -->
+      <div class="one-card p-3.5 flex items-center justify-between gap-2 border-l-4 border-l-indigo-500">
+        <div onclick="openQuickNotesPage('ALL')" class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
+          <div class="w-9 h-9 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center font-extrabold text-base shrink-0">🗂️</div>
+          <div class="min-w-0">
+            <div class="text-xs font-extrabold truncate">Notes & Formula Folders</div>
+            <div id="frontQuickNotesSubtext" class="text-[10px] muted-text truncate">Subject & Chapter Key Notes</div>
+          </div>
+        </div>
+        <button onclick="openQuickNotesPage('ALL')" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-[11px] font-extrabold shadow-sm shrink-0">
+          🔑 Formula & Key ➔
+        </button>
+      </div>
+
+      <!-- 4. Due Revisions Card (Today's Revision) -->
       <div id="dueRevisionsCardAnchor" class="one-card p-4">
         <div class="flex items-center justify-between mb-2.5 gap-2">
-          <div>
-            <h2 class="text-sm font-extrabold">🔔 આજનું રિવિઝન (Due Revisions)</h2>
-            <p class="text-[10px] muted-text">બાકી રહેલું રિવિઝન 1-7-30-60 સાયકલ બગાડ્યા વગર આગળના દિવસે ફોરવર્ડ થશે</p>
-          </div>
+          <h2 class="text-sm font-extrabold">🔔 આજનું રિવિઝન (Due Revisions)</h2>
           <div class="flex items-center gap-1.5 shrink-0">
             <button onclick="openExtraRevisionModal()" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-indigo-500/15 text-indigo-500">+ Extra Rev</button>
             <span id="dueRevBadgeCount" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500">0</span>
@@ -568,14 +748,7 @@
         </div>
 
         <div id="dueRevisionList" class="space-y-2"></div>
-
-        <!-- 3) Completed Revisions Today (With Reverse/Undo Option!) -->
-        <details class="mt-3 pt-2.5 border-t" style="border-color: var(--border-col);">
-          <summary class="text-xs font-bold text-emerald-500 cursor-pointer select-none">
-            ✅ પૂર્ણ કરેલા રિવિઝન ( ભૂલથી Done થયું હોય તો ↩️ Reverse કરો )
-          </summary>
-          <div id="completedRevisionList" class="mt-2 space-y-1.5"></div>
-        </details>
+        <div id="completedRevisionList" class="hidden"></div>
 
         <details class="mt-2.5 pt-2.5 border-t" style="border-color: var(--border-col);">
           <summary class="text-xs font-bold muted-text cursor-pointer select-none">
@@ -585,36 +758,43 @@
         </details>
       </div>
 
-      <!-- 5) Subject-Tagged & General Quick Formula & Key Notes -->
+      <!-- 5. QUICK NOTES SECTION (Moved right below Today's Revision section) -->
       <div class="one-card p-4 space-y-2.5">
         <div class="flex items-center justify-between gap-2">
-          <div>
-            <h2 class="text-sm font-extrabold">📌 Quick Formula & Key Notes</h2>
-            <p class="text-[10px] muted-text">વિષય મુજબ અથવા General શોર્ટ-નોટ્સ સેવ અને એડિટ કરો</p>
+          <h2 class="text-sm font-extrabold">📌 Quick Notes</h2>
+          <div class="flex items-center gap-1.5">
+            <select id="quickNoteFilterSub" onchange="renderStudentAll()" class="theme-input px-2 py-1 text-[10px] font-bold">
+              <option value="ALL">All Notes</option>
+            </select>
+            <button onclick="openQuickNotesPage('ALL')" class="text-[10px] font-extrabold px-2.5 py-1 rounded-full subtle-pill text-indigo-500">🗂️ Folders</button>
           </div>
-          <select id="quickNoteFilterSub" onchange="renderStudentAll()" class="theme-input px-2 py-1 text-[10px] font-bold">
-            <option value="ALL">All Notes</option>
-          </select>
         </div>
         <div class="grid grid-cols-3 gap-1.5">
           <select id="quickNoteSubSelect" class="theme-input px-2.5 py-2 text-xs font-bold">
             <option value="General">🌐 General</option>
           </select>
-          <input id="quickNoteInput" type="text" placeholder="સૂત્ર કે નોંધ લખો..."
+          <input id="quickNoteInput" type="text" placeholder="સૂત્ર કે શોર્ટ નોંધ લખો..."
             class="col-span-2 theme-input px-3 py-2 text-xs" />
         </div>
-        <button onclick="addQuickNote()" class="w-full bg-indigo-600 text-white font-extrabold py-2 rounded-2xl text-xs">+ Save Note</button>
-        <div id="quickNotesList" class="space-y-1.5 max-h-44 overflow-y-auto pt-1"></div>
+        <button onclick="addQuickNote()" class="w-full bg-indigo-600 text-white font-extrabold py-2 rounded-2xl text-xs">+ Save Quick Note</button>
+        <div id="quickNotesList" class="space-y-1.5 max-h-40 overflow-y-auto pt-1"></div>
       </div>
 
-      <!-- 1 & 2) Daily Logs History (Shows Revision Timestamp & ↩️ Reverse to Due Revision Button!) -->
-      <div class="one-card p-4">
-        <div class="flex items-center justify-between mb-2.5">
-          <div>
-            <h2 class="text-sm font-extrabold">🕒 રોજની એન્ટ્રી (Study & Revision Logs)</h2>
-            <p class="text-[10px] muted-text">રિવિઝનનો સમય અને ↩️ Reverse કરી ફરી Due માં મોકલવાનો ઓપ્શન</p>
+      <!-- 6. Unified Color-Coded Daily Entry & History -->
+      <div class="one-card p-4 space-y-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-sm font-extrabold">🕒 રોજની એન્ટ્રી અને હિસ્ટ્રી</h2>
+          <div class="flex items-center gap-1">
+            <input type="date" id="historyFilterDate" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1" />
+            <button onclick="setHistoryDateToday()" class="subtle-pill px-2 py-1 text-[9px] font-extrabold text-indigo-500">Today</button>
+            <button onclick="clearHistoryDateFilter()" class="subtle-pill px-2 py-1 text-[9px] font-extrabold muted-text">All</button>
           </div>
-          <input type="date" id="historyFilterDate" onchange="renderStudentAll()" class="theme-input text-[10px] font-bold px-2 py-1" />
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap text-[9px] font-extrabold">
+          <span class="px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">📘 વાંચન</span>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">✅ પૂર્ણ રિવિઝન</span>
+          <span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">🏆 ચેપ્ટર પૂર્ણ</span>
+          <span class="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-500">⚡ Extra / Edit</span>
         </div>
         <div id="dailyLogsHistoryList" class="space-y-2"></div>
       </div>
@@ -640,7 +820,7 @@
       </div>
 
       <div class="flex items-center justify-between px-2">
-        <span class="text-[11px] font-bold muted-text">વિષય પર ટચ કરીને ચેપ્ટર Open / Close કરો</span>
+        <span class="text-[11px] font-bold muted-text">વિષય Open / Close</span>
         <div class="flex gap-2">
           <button onclick="setAllSubjectsAccordion(true)" class="text-[11px] font-extrabold text-indigo-500">Open All</button>
           <span class="muted-text">•</span>
@@ -652,10 +832,7 @@
 
       <div id="completedChaptersVaultAnchor" class="one-card p-4 border-l-4 border-l-emerald-500">
         <div class="flex items-center justify-between mb-2.5">
-          <div>
-            <h2 class="text-sm font-extrabold text-emerald-500">🏆 પૂર્ણ થયેલા ચેપ્ટર્સ (Completed Vault)</h2>
-            <p class="text-[10px] muted-text">વિષય પર ટચ કરીને પૂર્ણ ચેપ્ટર્સ Open / Close કરો</p>
-          </div>
+          <h2 class="text-sm font-extrabold text-emerald-500">🏆 પૂર્ણ થયેલા ચેપ્ટર્સ (Completed Vault)</h2>
           <span id="completedVaultTotalBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-500">0 Done</span>
         </div>
         <div id="completedChaptersBySubjectBox" class="space-y-2"></div>
@@ -663,7 +840,7 @@
 
     </section>
 
-    <!-- ================= TAB 3: ANALYSIS, MOST READ/REVISED SUBJECT & CLEAN TEST SYSTEM ================= -->
+    <!-- ================= TAB 3: ANALYSIS & TEST SYSTEM ================= -->
     <section id="tab-tests" class="hidden space-y-3.5 anim-fade">
       
       <a href="https://www.thetarget.in" target="_blank" class="one-card p-3.5 flex items-center justify-between bg-indigo-600/10 border-indigo-500/40 block">
@@ -690,16 +867,11 @@
         </button>
       </div>
 
-      <!-- SUBVIEW A: OVERVIEW, MOST READ/REVISED SUBJECT (Point 18) & GRAPHS -->
+      <!-- SUBVIEW A: OVERVIEW -->
       <div id="an-view-overview" class="space-y-3.5">
-        
-        <!-- 18) Most Read & Most Revised Subject Intelligence Card -->
         <div id="tourTargetAnalysis" class="one-card p-4 space-y-3 border-t-4 border-t-indigo-600">
           <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-extrabold">🧠 Reading & Revision Distribution</h2>
-              <p class="text-[10px] muted-text">તમે કયો વિષય સૌથી વધારે વાંચો છો અને રિવિઝન કરો છો?</p>
-            </div>
+            <h2 class="text-sm font-extrabold">🧠 Reading & Revision Distribution</h2>
             <div id="readinessScoreBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-indigo-600 text-white">0 / 100</div>
           </div>
 
@@ -726,7 +898,6 @@
             </div>
           </div>
 
-          <!-- Psychology Persona -->
           <div class="subtle-pill p-3 space-y-1 border-l-4 border-l-amber-500">
             <div class="flex items-center justify-between">
               <span id="psychPersonaTitle" class="text-xs font-extrabold">🌱 Steady Starter</span>
@@ -744,10 +915,7 @@
         <!-- 7-Day Study Consistency Bar Graph -->
         <div id="streakGraphCardAnchor" class="one-card p-4 space-y-2.5">
           <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-extrabold">📊 7-Day Study Consistency Graph</h2>
-              <p class="text-[10px] muted-text">છેલ્લા ૭ દિવસમાં રોજ કેટલા પેજ ચાલ્યા</p>
-            </div>
+            <h2 class="text-sm font-extrabold">📊 7-Day Study Consistency Graph</h2>
             <span id="graph7DayTotalBadge" class="text-xs font-extrabold text-indigo-500">0p Total</span>
           </div>
           <div id="weeklyChartBars" class="grid grid-cols-7 gap-2 items-end h-28 pt-5 px-2 subtle-pill"></div>
@@ -756,27 +924,21 @@
         <!-- Test Score Trend SVG Line Chart -->
         <div class="one-card p-4 space-y-2.5">
           <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-extrabold">📈 Test Score Progression Graph</h2>
-              <p class="text-[10px] muted-text">તમારી છેલ્લી ૧૦ ટેસ્ટના ટકાવારીનો ગ્રાફ</p>
-            </div>
+            <h2 class="text-sm font-extrabold">📈 Test Score Progression Graph</h2>
             <span id="deepTestAvg" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-500">Avg: --%</span>
           </div>
           <div id="testTrendSvgContainer" class="subtle-pill p-3 h-32 flex items-center justify-center"></div>
         </div>
-
       </div>
 
-      <!-- 6) SUBVIEW B: CLEAN & USEFUL 3-MODE TEST ENTRY SYSTEM + EDITABLE HISTORY -->
+      <!-- SUBVIEW B: 3-MODE TEST ENTRY SYSTEM -->
       <div id="an-view-addtest" class="hidden space-y-3.5">
-        
         <div class="one-card p-4 space-y-3">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-extrabold">🎯 ટેસ્ટના માર્ક્સ ઉમેરો</h2>
             <input type="date" id="testDateInput" class="theme-input text-[11px] font-bold px-2.5 py-1" />
           </div>
 
-          <!-- 6) 3 Meaningful & Distinct Test Modes -->
           <div class="grid grid-cols-3 gap-1 subtle-pill p-1">
             <button onclick="setTestEntryMode('chapter')" id="tmode-chapter" class="py-1.5 rounded-xl text-[10px] font-extrabold bg-indigo-600 text-white">
               📖 Chapter Test
@@ -792,13 +954,12 @@
           <input id="testCustomTitleInput" type="text" placeholder="ટેસ્ટનું નામ (Optional)"
             class="w-full theme-input px-3.5 py-2 text-xs font-semibold" />
 
-          <!-- Dynamic Selector Box Based on Mode -->
           <div id="testSubjectSelectorBox" class="subtle-pill p-3 space-y-2">
             <div class="text-[10px] font-extrabold uppercase muted-text">1. વિષય સિલેક્ટ કરો</div>
             <div id="multiTestSubjectChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
 
             <div id="testChapterSelectorWrap">
-              <div class="text-[10px] font-extrabold uppercase muted-text pt-1 mb-1">2. ચેપ્ટર સિલેક્ટ કરો (1 કે વધુ)</div>
+              <div class="text-[10px] font-extrabold uppercase muted-text pt-1 mb-1">2. ચેપ્ટર સિલેક્ટ કરો</div>
               <div id="multiTestChapterCheckboxes" class="max-h-36 overflow-y-auto space-y-1 pt-1 border-t" style="border-color: var(--border-col);"></div>
             </div>
           </div>
@@ -820,7 +981,6 @@
           </div>
         </div>
 
-        <!-- 8) Editable Test History -->
         <div class="one-card p-4 space-y-3">
           <div class="flex items-center justify-between gap-2 flex-wrap">
             <h2 class="text-sm font-extrabold">📋 ટેસ્ટ હિસ્ટ્રી (Edit / Delete)</h2>
@@ -837,10 +997,9 @@
           </div>
           <div id="testAnalyticsList" class="space-y-2"></div>
         </div>
-
       </div>
 
-      <!-- 11) SUBVIEW C: ENHANCED SUBJECT & CHAPTER DEEP BREAKDOWN -->
+      <!-- SUBVIEW C: SUBJECT & CHAPTER BREAKDOWN -->
       <div id="an-view-chapters" class="hidden space-y-3.5">
         <div class="one-card p-4 space-y-2.5">
           <h2 class="text-sm font-extrabold">📚 Subject-Wise Share, Revision & Test Mastery</h2>
@@ -860,10 +1019,10 @@
 
     </section>
 
-    <!-- ================= TAB 4: ACCOUNT, FOCUS TIMER, EXAM COUNTDOWN & SUPPORT ================= -->
+    <!-- ================= TAB 4: ACCOUNT, FOCUS TIMER, MULTI-EXAM & PRICING ================= -->
     <section id="tab-profile" class="hidden space-y-3.5 anim-fade">
       
-      <!-- 15) Upgraded Study Focus Timer (Custom Presets + Subject Tag + Session Counter) -->
+      <!-- Smart Study Focus Timer -->
       <div class="one-card p-4 space-y-3 border-l-4 border-l-indigo-600">
         <div class="flex items-center justify-between">
           <div>
@@ -885,14 +1044,14 @@
         </div>
       </div>
 
-      <!-- 22) Profile & Optional Exam Date Countdown Setup -->
+      <!-- Profile & Active Exam Date Countdown Setup -->
       <div id="tourTargetProfile" class="one-card p-4 space-y-2.5">
         <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold">🎯 પ્રોફાઈલ અને પરીક્ષા તારીખ (Optional)</h2>
-            <p class="text-[10px] muted-text">જો પરીક્ષાની તારીખ નાખશો તો જ ઉપર Countdown દેખાશે</p>
+          <h2 class="text-sm font-extrabold">🎯 પ્રોફાઈલ અને પરીક્ષા તારીખ</h2>
+          <div class="flex items-center gap-2">
+            <button onclick="openMultiExamModal()" class="text-[10px] font-extrabold text-indigo-500 underline">+ Multiple Exams</button>
+            <button onclick="clearExamDate()" class="text-[10px] font-bold text-rose-500">Clear Date</button>
           </div>
-          <button onclick="clearExamDate()" class="text-[10px] font-bold text-rose-500">Clear Date</button>
         </div>
         <input id="profName" type="text" placeholder="તમારું નામ" class="w-full theme-input px-3.5 py-2.5 text-xs font-semibold" />
         <div class="grid grid-cols-2 gap-2">
@@ -904,7 +1063,7 @@
         </button>
       </div>
 
-      <!-- Membership Plan & Direct WhatsApp Button (12: No Admin Phone Number Shown!) -->
+      <!-- Membership Plan & Razorpay Direct Links + Share SS of Payment -->
       <div class="one-card p-4 space-y-3">
         <div class="flex items-center justify-between">
           <div>
@@ -918,43 +1077,71 @@
         </div>
 
         <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="subtle-pill p-2">
+          <a href="https://razorpay.me/@thetarget?amount=99" target="_blank" class="subtle-pill p-2 block hover:border-indigo-500">
             <div class="text-[10px] font-bold muted-text">6 Months</div>
             <div class="text-sm font-extrabold text-indigo-500">₹99</div>
-          </div>
-          <div class="subtle-pill p-2 border border-indigo-500">
+            <div class="text-[9px] font-extrabold text-white bg-indigo-600 rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
+          <a href="https://razorpay.me/@thetarget?amount=149" target="_blank" class="subtle-pill p-2 border border-indigo-500 block">
             <div class="text-[10px] font-bold text-indigo-500">1 Year</div>
             <div class="text-sm font-extrabold text-emerald-500">₹149</div>
-          </div>
-          <div class="subtle-pill p-2 border border-amber-500/50">
+            <div class="text-[9px] font-extrabold text-white bg-emerald-600 rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
+          <a href="https://razorpay.me/@thetarget?amount=999" target="_blank" class="subtle-pill p-2 border border-amber-500/50 block">
             <div class="text-[10px] font-bold text-amber-500">Lifetime</div>
             <div class="text-sm font-extrabold text-amber-500">₹999</div>
-          </div>
+            <div class="text-[9px] font-extrabold text-white bg-amber-500 rounded-full py-0.5 mt-1">Razorpay ↗</div>
+          </a>
         </div>
 
-        <button onclick="openAdminWhatsApp('Hello The Target, I want to upgrade my membership plan.')"
+        <button onclick="openAdminWhatsApp('Hello Target Track Admin, I have completed payment on Razorpay. Here is my Payment Screenshot (SS):')"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
+          <span>📸</span> <span>Share SS of Payment</span>
+        </button>
+
+        <button onclick="openAdminWhatsApp('Hello Target Track, I want to upgrade my membership plan.')"
           class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 rounded-2xl text-xs shadow-sm flex items-center justify-center gap-2">
           <span>💬</span> <span>Upgrade Plan on WhatsApp</span>
         </button>
       </div>
 
-      <!-- MCQ Website Card -->
-      <a href="https://www.thetarget.in" target="_blank" class="one-card p-4 flex items-center justify-between border-l-4 border-l-purple-500 block">
-        <div>
-          <div class="text-xs font-extrabold text-purple-500">🌐 Online MCQ Practice Platform</div>
-          <div class="text-sm font-extrabold mt-0.5">www.thetarget.in</div>
-        </div>
-        <span class="bg-purple-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-2xl shrink-0">Visit ↗</span>
-      </a>
+      <!-- Telegram & MCQ Website Card -->
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="openTelegramChannel()" class="one-card p-3.5 flex items-center justify-between border-l-4 border-l-indigo-500 text-left w-full">
+          <div>
+            <div class="text-[10px] font-extrabold text-indigo-500">✈️ Telegram</div>
+            <div class="text-xs font-extrabold mt-0.5">@thetarget_MCQ</div>
+          </div>
+          <span class="text-xs">↗</span>
+        </button>
+        <a href="https://www.thetarget.in" target="_blank" class="one-card p-3.5 flex items-center justify-between border-l-4 border-l-purple-500 block">
+          <div>
+            <div class="text-[10px] font-extrabold text-purple-500">🌐 MCQ Practice</div>
+            <div class="text-xs font-extrabold mt-0.5">thetarget.in</div>
+          </div>
+          <span class="text-xs">↗</span>
+        </a>
+      </div>
 
-      <!-- Bug / Feature Report -->
+      <!-- Notification API Reminder Card -->
+      <div class="one-card p-4 flex items-center justify-between gap-2 border-l-4 border-l-amber-500">
+        <div>
+          <h2 class="text-xs font-extrabold">🔔 Today's Revision Notification</h2>
+          <p id="notifStatusSubtext" class="text-[10px] muted-text mt-0.5">બાકી રિવિઝન માટે બ્રાઉઝર નોટિફિકેશન ચાલુ કરો</p>
+        </div>
+        <button onclick="enableRevisionNotifications()" id="btnEnableNotif" class="bg-amber-500 text-white font-extrabold px-3 py-2 rounded-2xl text-[11px] shrink-0 shadow-sm">
+          🔔 Enable Alert
+        </button>
+      </div>
+
+      <!-- Feedback / Bug Report + 1-to-1 Admin Reply Inbox -->
       <div class="one-card p-4 space-y-2.5">
-        <h2 class="text-sm font-extrabold">🛠️ Report Bug / Request New Feature</h2>
+        <h2 class="text-sm font-extrabold">🛠️ Bug Report / Feature Request</h2>
         <div class="grid grid-cols-3 gap-1.5">
           <select id="feedbackTypeSelect" class="theme-input px-2.5 py-2 text-xs font-bold">
+            <option value="Bug Report">🐞 Bug</option>
             <option value="Feature Request">✨ Feature</option>
-            <option value="Bug / Error">🐞 Bug</option>
-            <option value="Suggestion">💡 Idea</option>
+            <option value="Feedback">💡 Idea</option>
           </select>
           <input id="feedbackMessageInput" type="text" placeholder="તમારો મેસેજ અહીં લખો..."
             class="col-span-2 theme-input px-3 py-2 text-xs" />
@@ -967,11 +1154,13 @@
             💬 Send on WhatsApp
           </button>
         </div>
+        <!-- Student 1-to-1 Admin Replies List -->
+        <div id="studentDirectMessagesBox" class="space-y-1.5 pt-1"></div>
       </div>
 
-      <!-- Backup & Restore + Bulk Import -->
+      <!-- Backup & Restore + Bulk Import + Clear All My Data (Strict 2-Step) -->
       <div class="one-card p-4 space-y-2.5">
-        <h2 class="text-sm font-extrabold">🛡️ ડેટા બેકઅપ અને Bulk Import</h2>
+        <h2 class="text-sm font-extrabold">🛡️ ડેટા બેકઅપ અને મેનેજમેન્ટ</h2>
         <div class="grid grid-cols-3 gap-2">
           <button onclick="downloadStudentBackup()" class="bg-emerald-600 text-white font-bold py-2.5 rounded-2xl text-[11px]">
             ⬇ Backup
@@ -982,6 +1171,11 @@
           </label>
           <button onclick="openBulkImportModal()" class="bg-indigo-600 text-white font-bold py-2.5 rounded-2xl text-[11px]">
             📥 Excel Import
+          </button>
+        </div>
+        <div class="pt-2 border-t" style="border-color: var(--border-col);">
+          <button onclick="clearAllMyDataTwoStep()" class="w-full bg-rose-500/15 hover:bg-rose-500/25 text-rose-500 border border-rose-500/30 font-extrabold py-2.5 rounded-2xl text-xs transition">
+            🗑️ Clear All My Data (2-Step Reset)
           </button>
         </div>
       </div>
@@ -1011,12 +1205,12 @@
     </nav>
   </div>
 
-  <!-- ================= 21) MULTI-PAGE CLEAN OWNER ADMIN PANEL ================= -->
+  <!-- ================= MULTI-PAGE OWNER ADMIN PANEL ================= -->
   <div id="adminApp" class="hidden max-w-3xl mx-auto px-4 pt-4 pb-24">
     <header class="flex items-center justify-between one-card p-4 mb-3 border-l-4 border-l-indigo-600">
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-sm font-extrabold">🛡️ THE TARGET — ADMIN OS</h1>
+          <h1 class="text-sm font-extrabold">🛡️ TARGET TRACK — ADMIN OS</h1>
           <span id="adminCloudBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">🔒 Live</span>
         </div>
         <p class="text-[10px] muted-text">Multi-Page Management Console</p>
@@ -1028,7 +1222,6 @@
       </div>
     </header>
 
-    <!-- 21) Admin Multi-Page Navigation Tabs -->
     <div class="grid grid-cols-4 gap-1.5 subtle-pill p-1 mb-4">
       <button onclick="switchAdminPage('dashboard')" id="admnav-dashboard" class="py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white">📊 Overview</button>
       <button onclick="switchAdminPage('users')" id="admnav-users" class="py-2 rounded-xl text-xs font-extrabold muted-text">👥 Users</button>
@@ -1063,13 +1256,22 @@
       </div>
     </div>
 
-    <!-- ADMIN PAGE 2: USER MANAGEMENT & IN-DETAIL REPORT -->
+    <!-- ADMIN PAGE 2: USER MANAGEMENT (ACTIVE DATA vs DELETED/OLD DATA VAULT) -->
     <div id="adm-page-users" class="hidden space-y-3.5 anim-fade">
-      <div class="one-card p-4 space-y-3">
+      <!-- Sub-tabs for Active Data vs Deleted/Old Data -->
+      <div class="grid grid-cols-2 gap-2 subtle-pill p-1">
+        <button onclick="switchAdminUserDataView('active')" id="admDataTabActive" class="py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm">
+          🟢 Active Student Data
+        </button>
+        <button onclick="switchAdminUserDataView('deleted')" id="admDataTabDeleted" class="py-2 rounded-xl text-xs font-extrabold muted-text">
+          🗑️ Deleted / Old Data Vault (<span id="admDeletedCountBadge">0</span>)
+        </button>
+      </div>
+
+      <!-- Active Users Box -->
+      <div id="admActiveUsersSection" class="one-card p-4 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 class="text-xs font-extrabold">👥 Student Accounts ('✎ Edit' કરવાથી કંટ્રોલ ખુલશે)</h2>
-          </div>
+          <h2 class="text-xs font-extrabold">👥 Active Student Accounts</h2>
           <div class="flex gap-1.5">
             <input id="adminSearchInput" type="text" placeholder="🔍 Search Name or Mobile..." oninput="renderAdminPanel()"
               class="theme-input px-3 py-1.5 text-xs font-semibold flex-1 sm:w-48" />
@@ -1081,8 +1283,21 @@
             </select>
           </div>
         </div>
-
         <div id="adminStudentList" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Deleted / Old Data Vault Box (Admin Final Authority to Permanently Delete) -->
+      <div id="admDeletedUsersSection" class="hidden one-card p-4 space-y-3 border-2 border-rose-500/40">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xs font-extrabold text-rose-500">🗑️ Deleted / Old Data Archive</h2>
+            <p class="text-[10px] muted-text">યુઝરે Clear કરેલો અથવા Admin એ Archive કરેલો જૂનો ડેટા (Admin પાસે કાયમી ડિલીટ કરવાની સત્તા)</p>
+          </div>
+          <button onclick="adminEmptyDeletedVault()" class="bg-rose-600 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-xl">
+            🔥 Delete All Permanently
+          </button>
+        </div>
+        <div id="adminDeletedDataList" class="space-y-2.5"></div>
       </div>
 
       <div id="adminInspectBox" class="hidden one-card p-5 border-2 border-indigo-500 space-y-4">
@@ -1094,21 +1309,36 @@
       </div>
     </div>
 
-    <!-- ADMIN PAGE 3: BROADCAST, BULK EXTEND & BACKUP TOOLS -->
+    <!-- ADMIN PAGE 3: BANNER & POP-UP BROADCAST, BULK EXTEND & BACKUP TOOLS -->
     <div id="adm-page-tools" class="hidden space-y-3.5 anim-fade">
       <div class="one-card p-4 space-y-2.5">
-        <div class="text-xs font-extrabold">📢 Global Student Broadcast Notice</div>
+        <div class="text-xs font-extrabold">📢 Global Top Banner Broadcast</div>
         <div class="flex gap-2">
-          <input id="adminBroadcastInput" type="text" placeholder="બધા વિદ્યાર્થીઓને એપમાં ઉપર સૂચના બતાવો..."
+          <input id="adminBroadcastInput" type="text" placeholder="બધા વિદ્યાર્થીઓને એપમાં ઉપર બેનર સૂચના બતાવો..."
             class="flex-1 theme-input px-3 py-2 text-xs" />
           <button onclick="saveAdminBroadcast()" class="bg-indigo-600 text-white text-xs font-extrabold px-4 py-2 rounded-xl">Post</button>
         </div>
       </div>
 
+      <!-- NEW: Pop-up Broadcast Announcement -->
+      <div class="one-card p-4 space-y-2.5 border-l-4 border-l-amber-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs font-extrabold">🔔 Pop-up Broadcast Announcement</div>
+            <div class="text-[10px] muted-text">યુઝર એપ ખોલે ત્યારે સ્ક્રીન વચ્ચે Pop-up બોક્સમાં જાહેરાત બતાવો</div>
+          </div>
+          <button onclick="clearAdminPopupBroadcast()" class="text-[10px] font-extrabold text-rose-500">Clear Pop-up</button>
+        </div>
+        <input id="adminPopupTitleInput" type="text" placeholder="Pop-up ટાઈટલ (e.g. નવી ટેસ્ટ સીરીઝ જાહેરાત)" class="w-full theme-input px-3 py-2 text-xs font-bold" />
+        <textarea id="adminPopupMsgInput" rows="2" placeholder="Pop-up મેસેજ અહીં લખો..." class="w-full theme-input p-3 text-xs font-semibold"></textarea>
+        <button onclick="saveAdminPopupBroadcast()" class="w-full bg-amber-500 text-white text-xs font-extrabold py-2.5 rounded-xl shadow-sm">
+          🚀 Send Pop-up Broadcast to All Users
+        </button>
+      </div>
+
       <div class="one-card p-4 flex items-center justify-between">
         <div>
           <div class="text-xs font-extrabold">🎁 Gift Bonus Validity to All Active Users</div>
-          <div class="text-[10px] muted-text">બધા જ વિદ્યાર્થીઓની વેલિડિટી એકસાથે વધારો</div>
         </div>
         <div class="flex gap-1.5">
           <button onclick="bulkExtendAllUsersValidity(5)" class="subtle-pill px-3 py-1.5 text-xs font-extrabold text-emerald-500">+5 Days All</button>
@@ -1119,7 +1349,6 @@
       <div class="one-card p-4 flex items-center justify-between">
         <div>
           <div class="text-xs font-extrabold">💾 Master Database JSON Backup</div>
-          <div class="text-[10px] muted-text">Export or Restore Complete Cloud Database</div>
         </div>
         <div class="flex gap-2">
           <button onclick="exportAllDatabaseJSON()" class="text-xs bg-indigo-600 text-white px-3.5 py-2 rounded-xl font-bold">⬇ Export</button>
@@ -1131,11 +1360,11 @@
       </div>
     </div>
 
-    <!-- ADMIN PAGE 4: BUG REPORTS & FEATURE REQUESTS -->
+    <!-- ADMIN PAGE 4: REPORTS (WITH COPY ICON, NAME/PHONE & 1-TO-1 DIRECT REPLY) -->
     <div id="adm-page-feedback" class="hidden space-y-3.5 anim-fade">
       <div class="one-card p-4">
-        <h2 class="text-xs font-extrabold mb-2.5">🛠️ Student Bug Reports & Feature Requests</h2>
-        <div id="adminFeedbackList" class="space-y-2"></div>
+        <h2 class="text-xs font-extrabold mb-2.5">🛠️ Student Bug Reports & Feature Requests (1-to-1 Reply)</h2>
+        <div id="adminFeedbackList" class="space-y-2.5"></div>
       </div>
     </div>
 
@@ -1168,13 +1397,13 @@
     const ADMIN_MOBILE = "9106581326";
     const ADMIN_PASS   = "Zj@123456";
     const REQUIRED_STUDENT_PIN = "2026";
-    // Encoded support contact so raw number is never displayed in UI
     const SUPPORT_WA_ID = ["91", "9033", "189", "251"].join("");
 
     const DB_KEY = "THE_TARGET_CLEAN_DB_V7";
     const DB_MIRROR_KEY = "THE_TARGET_CLEAN_DB_MIRROR_V7";
     const SESSION_KEY = "THE_TARGET_ACTIVE_SESSION_V7";
     const THEME_KEY = "THE_TARGET_THEME_PREF";
+    const WHATS_NEW_VER = "TARGET_TRACK_V9_UPDATE_SEEN";
 
     let theme = localStorage.getItem(THEME_KEY) || "cream";
     let db = loadDB();
@@ -1186,24 +1415,69 @@
     let expandedCompletedVault = {};
     let openOldChapterForm = {};
     let adminUnlockedUsers = {};
+    let adminReportSubAccordion = {};
     let pendingPopupReopenChapId = null;
 
-    let currentTestEntryMode = "chapter"; // 'chapter' | 'subject' | 'mock'
+    let currentTestEntryMode = "chapter";
     let selectedTestSubIds = [];
     let selectedTestChapKeys = [];
     let currentBulkImportMode = "syllabus";
+
+    let qnActiveFolderSub = "ALL";
+    let qnActiveFolderChap = "ALL";
+    let qnActiveTypeFilter = "ALL";
+    let historyDefaultedToday = false;
 
     let pomoPresetMins = 25;
     let pomoSeconds = 25 * 60;
     let pomoTimer = null;
 
-    // 12) Direct WhatsApp helper without showing phone number on screen
+    // ================= ONLINE & OFFLINE DUAL MODE CAPABILITY =================
+    function registerOfflineSupport() {
+      window.addEventListener("online", () => {
+        setCloudBadgeStatus("🔒 Online", true);
+        syncFromFirebaseCloud(false);
+      });
+      window.addEventListener("offline", () => {
+        setCloudBadgeStatus("⚡ Offline Mode", false);
+      });
+      if (!navigator.onLine) {
+        setCloudBadgeStatus("⚡ Offline Mode", false);
+      }
+      if ("serviceWorker" in navigator) {
+        try {
+          const swCode = `
+            const CACHE_NAME = 'target-track-os-v9';
+            self.addEventListener('install', e => { self.skipWaiting(); });
+            self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+            self.addEventListener('fetch', e => {
+              if (e.request.method !== 'GET') return;
+              e.respondWith(
+                fetch(e.request).then(res => {
+                  const clone = res.clone();
+                  caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+                  return res;
+                }).catch(() => caches.match(e.request))
+              );
+            });
+          `;
+          const blob = new Blob([swCode], { type: "application/javascript" });
+          navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+        } catch (e) {}
+      }
+    }
+
     function openAdminWhatsApp(customText) {
-      const msg = encodeURIComponent(customText || "Hello The Target Team");
+      const msg = encodeURIComponent(customText || "Hello Target Track Team");
       window.open("https://wa.me/" + SUPPORT_WA_ID + "?text=" + msg, "_blank");
     }
 
-    // 10) Celebration Confetti & Motivation Toast
+    function openTelegramChannel() {
+      const tgUrl = "https://t.me/thetarget_MCQ";
+      const win = window.open(tgUrl, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = tgUrl;
+    }
+
     function triggerCelebration(title, desc) {
       const toast = document.getElementById("motivationToast");
       document.getElementById("motToastTitle").textContent = title || "🎉 ખૂબ સરસ!";
@@ -1237,7 +1511,9 @@
       ]);
     }
 
+    let anonAuthUnsupported = false;
     async function ensureFirebaseAuthToken() {
+      if (!navigator.onLine || anonAuthUnsupported) return null;
       if (firebaseIdToken) return firebaseIdToken;
       try {
         if (fbAppReady && firebase.auth) {
@@ -1246,29 +1522,10 @@
             firebaseIdToken = await cur.getIdToken();
             return firebaseIdToken;
           }
-          const cred = await withTimeout(firebase.auth().signInAnonymously(), 2500);
-          if (cred && cred.user) {
-            firebaseIdToken = await cred.user.getIdToken();
-            return firebaseIdToken;
-          }
         }
       } catch (e) {}
-
-      try {
-        const res = await withTimeout(
-          fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + FIREBASE_CONFIG.apiKey, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ returnSecureToken: true })
-          }),
-          2500
-        );
-        if (res && res.ok) {
-          const data = await res.json();
-          firebaseIdToken = data.idToken;
-          return firebaseIdToken;
-        }
-      } catch (e) {}
+      // Mark as unsupported so it doesn't spam 400 Bad Request errors or slow down the app
+      anonAuthUnsupported = true;
       return null;
     }
 
@@ -1310,6 +1567,10 @@
     }
 
     async function syncFromFirebaseCloud(manualRefresh) {
+      if (!navigator.onLine) {
+        setCloudBadgeStatus("⚡ Offline Mode", false);
+        return;
+      }
       try {
         setCloudBadgeStatus("🔒 Syncing", true);
         await ensureFirebaseAuthToken();
@@ -1328,6 +1589,8 @@
           }
           if (Array.isArray(cloudData.feedbacks)) db.feedbacks = cloudData.feedbacks;
           if (typeof cloudData.broadcast === "string") db.broadcast = cloudData.broadcast;
+	  if (Array.isArray(cloudData.deletedData)) db.deletedData = cloudData.deletedData;
+          db.popupBroadcast = cloudData.popupBroadcast || null;
 
           const str = JSON.stringify(db);
           localStorage.setItem(DB_KEY, str);
@@ -1336,18 +1599,24 @@
           await pushToFirebaseCloud();
         }
 
-        setCloudBadgeStatus("🔒 Live", true);
-        if (currentSession) {
+        setCloudBadgeStatus("🔒 Online", true);
+        const activeEl = document.activeElement;
+        const isUserTyping = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.tagName === "SELECT");
+        if (currentSession && (!isUserTyping || manualRefresh)) {
           if (currentSession.role === "admin") renderAdminPanel();
           else if (currentSession.role === "student" && !isDemoMode) renderStudentAll();
         }
         if (manualRefresh) triggerCelebration("☁️ Cloud Synced!", "તાજો ડેટા લોડ થઈ ગયો છે.");
       } catch (err) {
-        setCloudBadgeStatus("⚡ Local", false);
+        setCloudBadgeStatus("⚡ Offline Mode", false);
       }
     }
 
     async function pushToFirebaseCloud() {
+      if (!navigator.onLine) {
+        setCloudBadgeStatus("⚡ Offline Saved", false);
+        return;
+      }
       try {
         if (isDemoMode) return;
         setCloudBadgeStatus("🔒 Saving", true);
@@ -1367,6 +1636,11 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(db.feedbacks || [])
           }), 3000);
+          await withTimeout(fetch(buildFirebaseUrl("/targetApp/deletedData.json"), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(db.deletedData || [])
+          }), 3000);
         } else {
           await withTimeout(fetch(buildFirebaseUrl("/targetApp.json"), {
             method: "PUT",
@@ -1374,55 +1648,443 @@
             body: JSON.stringify(db)
           }), 3000);
         }
-        setCloudBadgeStatus("🔒 Live", true);
+        setCloudBadgeStatus("🔒 Online", true);
       } catch (err) {
-        setCloudBadgeStatus("⚡ Saved", false);
+        setCloudBadgeStatus("⚡ Offline Saved", false);
       }
     }
 
-    // ================= 14) FIXED SPOTLIGHT APP TOUR (NO BACKGROUND BLUR!) =================
+    // ================= NEW UPDATE POPUP FOR RETURNING USERS =================
+    function checkWhatsNewPopup(user) {
+      if (isDemoMode || !user) return;
+      const seen = localStorage.getItem(WHATS_NEW_VER + "_" + user.mobile);
+      if (!seen) {
+        document.getElementById("whatsNewModal").classList.remove("hidden");
+      }
+    }
+    function dismissWhatsNewPopup() {
+      const user = getCurrentStudent();
+      if (user && user.mobile) {
+        localStorage.setItem(WHATS_NEW_VER + "_" + user.mobile, "1");
+      }
+      document.getElementById("whatsNewModal").classList.add("hidden");
+    }
+    function showWhatsNewModalManual() {
+      document.getElementById("whatsNewModal").classList.remove("hidden");
+    }
+
+    // ================= MULTIPLE EXAM MANAGEMENT & COMMON CHAPTER SYNC =================
+    function ensureMultiExamStructure(user) {
+      if (!user) return;
+      if (!Array.isArray(user.exams) || user.exams.length === 0) {
+        const defId = "ex_main";
+        user.exams = [{
+          id: defId,
+          name: user.exam || "GPSC / CCE",
+          examDate: user.examDate || "",
+          subjects: JSON.parse(JSON.stringify(user.subjects || []))
+        }];
+        user.activeExamId = defId;
+      }
+      if (!user.activeExamId || !user.exams.some(e => e.id === user.activeExamId)) {
+        user.activeExamId = user.exams[0].id;
+      }
+      const activeEx = user.exams.find(e => e.id === user.activeExamId);
+      if (activeEx) {
+        // Keep active exam synced with top-level user.subjects, user.exam, user.examDate
+        activeEx.name = user.exam || activeEx.name;
+        activeEx.examDate = user.examDate !== undefined ? user.examDate : activeEx.examDate;
+        activeEx.subjects = user.subjects;
+      }
+    }
+
+    // Syncs ONLY existing common subject + chapter progress across other exams (Does NOT auto-add new chapters to other exams!)
+    function syncCommonChapterProgressAcrossExams(user, subName, chapObj) {
+      if (!user || !Array.isArray(user.exams) || !subName || !chapObj) return;
+      const normSub = subName.trim().toLowerCase();
+      const normChap = (chapObj.name || "").trim().toLowerCase();
+
+      user.exams.forEach(ex => {
+        if (ex.id === user.activeExamId) {
+          ex.subjects = user.subjects;
+          return;
+        }
+        (ex.subjects || []).forEach(s => {
+          if ((s.name || "").trim().toLowerCase() === normSub) {
+            (s.chapters || []).forEach(c => {
+              if ((c.name || "").trim().toLowerCase() === normChap) {
+                c.donePages = chapObj.donePages;
+                c.revisedPages = chapObj.revisedPages;
+                c.completed = chapObj.completed;
+                c.completedDate = chapObj.completedDate || null;
+              }
+            });
+          }
+        });
+      });
+    }
+
+    function openMultiExamModal() {
+      const user = getCurrentStudent();
+      if (!user) return;
+      ensureMultiExamStructure(user);
+      renderMultiExamModalList(user);
+      document.getElementById("multiExamModal").classList.remove("hidden");
+    }
+
+    function renderMultiExamModalList(user) {
+      const box = document.getElementById("multiExamListContainer");
+      box.innerHTML = (user.exams || []).map(ex => {
+        const isCurrent = ex.id === user.activeExamId;
+        const subCount = (ex.subjects || []).length;
+        let cTot = 0, cDone = 0;
+        (ex.subjects || []).forEach(s => (s.chapters || []).forEach(c => { cTot++; if (c.completed) cDone++; }));
+        return `
+          <div class="subtle-pill p-3 flex items-center justify-between gap-2 ${isCurrent ? 'border-2 border-indigo-600' : ''}">
+            <div onclick="switchActiveExamProfile('${ex.id}')" class="min-w-0 flex-1 cursor-pointer">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-extrabold truncate">${ex.name}</span>
+                ${isCurrent ? '<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-600 text-white">Active</span>' : ''}
+              </div>
+              <div class="text-[10px] muted-text mt-0.5">
+                📅 ${ex.examDate || 'No Date'} • 📚 ${subCount} વિષય (${cDone}/${cTot} પૂર્ણ)
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${!isCurrent ? `<button onclick="switchActiveExamProfile('${ex.id}')" class="px-2.5 py-1 rounded-xl bg-indigo-600 text-white text-[10px] font-extrabold">Switch</button>` : ''}
+              ${user.exams.length > 1 ? `<button onclick="deleteExamProfile('${ex.id}')" class="px-2 py-1 rounded-xl bg-rose-500/15 text-rose-500 text-xs font-bold">🗑</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addNewExamProfile() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      ensureMultiExamStructure(user);
+      const nameInp = document.getElementById("newMultiExamName");
+      const dateInp = document.getElementById("newMultiExamDate");
+      const copyChk = document.getElementById("copyCurrentSyllabusChk");
+
+      const exName = nameInp.value.trim();
+      if (!exName) return alert("પરીક્ષાનું નામ લખો.");
+      const exDate = dateInp.value || "";
+
+      // Save current exam's syllabus before switching
+      const curEx = user.exams.find(e => e.id === user.activeExamId);
+      if (curEx) {
+        curEx.subjects = JSON.parse(JSON.stringify(user.subjects || []));
+      }
+
+      const newId = "ex_" + Date.now();
+      const initialSubjects = (copyChk && copyChk.checked)
+        ? JSON.parse(JSON.stringify(user.subjects || []))
+        : [];
+
+      user.exams.push({
+        id: newId,
+        name: exName,
+        examDate: exDate,
+        subjects: initialSubjects
+      });
+
+      nameInp.value = "";
+      dateInp.value = "";
+      if (copyChk) copyChk.checked = false;
+
+      switchActiveExamProfile(newId);
+      triggerCelebration("🎯 નવી પરીક્ષા ઉમેરાઈ!", exName);
+    }
+
+    function switchActiveExamProfile(examId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      ensureMultiExamStructure(user);
+
+      // Save current active exam state
+      const prevEx = user.exams.find(e => e.id === user.activeExamId);
+      if (prevEx) {
+        prevEx.name = user.exam;
+        prevEx.examDate = user.examDate;
+        prevEx.subjects = JSON.parse(JSON.stringify(user.subjects || []));
+      }
+
+      const targetEx = user.exams.find(e => e.id === examId);
+      if (!targetEx) return;
+
+      user.activeExamId = targetEx.id;
+      user.exam = targetEx.name;
+      user.examDate = targetEx.examDate || "";
+      user.subjects = JSON.parse(JSON.stringify(targetEx.subjects || []));
+      selectedSubjectId = null;
+      selectedChapterId = null;
+
+      saveDB();
+      renderStudentAll();
+      renderMultiExamModalList(user);
+      document.getElementById("multiExamModal").classList.add("hidden");
+    }
+
+    function deleteExamProfile(examId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user.exams || user.exams.length <= 1) return;
+      if (!confirm("આ પરીક્ષા પ્રોફાઈલ ડિલીટ કરવી છે?")) return;
+      user.exams = user.exams.filter(e => e.id !== examId);
+      if (user.activeExamId === examId) {
+        const first = user.exams[0];
+        user.activeExamId = first.id;
+        user.exam = first.name;
+        user.examDate = first.examDate || "";
+        user.subjects = JSON.parse(JSON.stringify(first.subjects || []));
+      }
+      saveDB();
+      renderStudentAll();
+      renderMultiExamModalList(user);
+    }
+
+    // ================= DAILY LIGHT-COLOR COUNTDOWN UI (DAY, HOUR, MIN & EXAM DATE ONLY) =================
+    const DAILY_LIGHT_PALETTES = [
+      { bg: "linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 100%)", border: "#BAE6FD" },
+      { bg: "linear-gradient(135deg, #FCE7F3 0%, #F3E8FF 100%)", border: "#FBCFE8" },
+      { bg: "linear-gradient(135deg, #DCFCE7 0%, #D1FAE5 100%)", border: "#A7F3D0" },
+      { bg: "linear-gradient(135deg, #FEF3C7 0%, #FFEDD5 100%)", border: "#FDE68A" },
+      { bg: "linear-gradient(135deg, #EDE9FE 0%, #E0E7FF 100%)", border: "#DDD6FE" },
+      { bg: "linear-gradient(135deg, #CCFBF1 0%, #E0F2FE 100%)", border: "#99F6E4" },
+      { bg: "linear-gradient(135deg, #FFE4E6 0%, #FCE7F3 100%)", border: "#FECDD3" }
+    ];
+
+    function updateDailyPastelCountdown(user) {
+      if (!user) return;
+      const widget = document.getElementById("dailyCountdownWidget");
+      if (!widget) return;
+
+      const dayIndex = new Date().getDay() % DAILY_LIGHT_PALETTES.length;
+      const pal = DAILY_LIGHT_PALETTES[dayIndex];
+      widget.style.background = pal.bg;
+      widget.style.borderColor = pal.border;
+
+      document.getElementById("cdExamTitleText").textContent = user.exam || "General Prep";
+
+      const timerRow = document.getElementById("cdTimerBoxesRow");
+      const dateBadge = document.getElementById("cdExamDateBadge");
+
+      if (user.examDate && /^\d{4}-\d{2}-\d{2}$/.test(user.examDate)) {
+        const targetTime = new Date(user.examDate + "T00:00:00").getTime();
+        const now = Date.now();
+        const diffMs = Math.max(0, targetTime - now);
+
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        document.getElementById("cdDaysVal").textContent = String(days).padStart(2, "0");
+        document.getElementById("cdHoursVal").textContent = String(hours).padStart(2, "0");
+        document.getElementById("cdMinsVal").textContent = String(mins).padStart(2, "0");
+        const secEl = document.getElementById("cdSecsVal");
+        if (secEl) secEl.textContent = String(secs).padStart(2, "0");
+
+        const dObj = new Date(user.examDate + "T00:00:00");
+        dateBadge.textContent = dObj.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+        timerRow.classList.remove("hidden");
+      } else {
+        dateBadge.textContent = "Set Exam Date";
+        document.getElementById("cdDaysVal").textContent = "--";
+        document.getElementById("cdHoursVal").textContent = "--";
+        document.getElementById("cdMinsVal").textContent = "--";
+        const secEl = document.getElementById("cdSecsVal");
+        if (secEl) secEl.textContent = "--";
+      }
+    }
+
+    // ================= DEDICATED QUICK FORMULA & KEY NOTES FOLDERS PAGE =================
+    function openQuickNotesPage() {
+      const user = getCurrentStudent();
+      if (!user) return;
+      qnActiveTypeFilter = "ALL";
+      document.getElementById("qnPageHeaderTitle").textContent = "🗂️ Formula & Key Notes Folders";
+
+      const subSel = document.getElementById("qnPageSubSelect");
+      subSel.innerHTML = '<option value="General">🌐 General Folder</option>' +
+        (user.subjects || []).map(s => `<option value="${s.name}">📚 ${s.name}</option>`).join("");
+      populateQnPageChapSelect();
+      renderDedicatedQuickNotesFolders();
+      document.getElementById("quickNotesPageModal").classList.remove("hidden");
+    }
+
+    function closeQuickNotesPage() {
+      document.getElementById("quickNotesPageModal").classList.add("hidden");
+      renderStudentAll();
+    }
+
+    function populateQnPageChapSelect() {
+      const user = getCurrentStudent();
+      const subName = document.getElementById("qnPageSubSelect").value;
+      const chapSel = document.getElementById("qnPageChapSelect");
+      const sub = (user.subjects || []).find(s => s.name === subName);
+      if (!sub || (sub.chapters || []).length === 0) {
+        chapSel.innerHTML = '<option value="All Chapters">📂 General / All Chapters</option>';
+      } else {
+        chapSel.innerHTML = '<option value="All Chapters">📂 All Chapters</option>' +
+          sub.chapters.map(c => `<option value="${c.name}">📖 ${c.name}</option>`).join("");
+      }
+    }
+
+    function selectQnFolderSub(subName) {
+      qnActiveFolderSub = subName;
+      qnActiveFolderChap = "ALL";
+      renderDedicatedQuickNotesFolders();
+    }
+
+    function selectQnFolderChap(chapName) {
+      qnActiveFolderChap = chapName;
+      renderDedicatedQuickNotesFolders();
+    }
+
+    function saveNoteFromDedicatedPage() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user.quickNotes) user.quickNotes = [];
+      const sub = document.getElementById("qnPageSubSelect").value || "General";
+      const chap = document.getElementById("qnPageChapSelect").value || "All Chapters";
+      const title = document.getElementById("qnPageTitleInput").value.trim();
+      const text = document.getElementById("qnPageTextInput").value.trim();
+      if (!text) return alert("નોંધ કે સૂત્ર લખો.");
+
+      user.quickNotes.unshift({
+        id: "qn_" + Date.now(),
+        subject: sub,
+        chapter: chap,
+        noteType: "Formula & Key",
+        title: title || "Formula / Key",
+        text,
+        date: todayISO()
+      });
+
+      document.getElementById("qnPageTitleInput").value = "";
+      document.getElementById("qnPageTextInput").value = "";
+      saveDB();
+      renderDedicatedQuickNotesFolders();
+      triggerCelebration("🗂️ ફોલ્ડરમાં સેવ થયું!", sub + " ➔ " + chap);
+    }
+
+    function renderDedicatedQuickNotesFolders() {
+      const user = getCurrentStudent();
+      if (!user) return;
+      const allNotes = user.quickNotes || [];
+      document.getElementById("qnTotalCountBadge").textContent = allNotes.length + " Notes";
+
+      const subjectsList = ["ALL", "General", ...(user.subjects || []).map(s => s.name)];
+      const folderBar = document.getElementById("qnFolderTabsBar");
+      folderBar.innerHTML = subjectsList.map(sName => {
+        const active = qnActiveFolderSub === sName;
+        const count = sName === "ALL" ? allNotes.length : allNotes.filter(n => (n.subject || "General") === sName).length;
+        return `<button onclick="selectQnFolderSub('${sName.replace(/'/g, "\\'")}')"
+          class="px-3 py-1.5 rounded-2xl text-xs font-extrabold whitespace-nowrap transition ${
+            active ? 'bg-indigo-500/15 text-indigo-500 border border-indigo-500/40' : 'one-card muted-text'
+          }">
+          📁 ${sName === 'ALL' ? 'All Subjects' : sName} (${count})
+        </button>`;
+      }).join("");
+
+      const chapBar = document.getElementById("qnChapFolderTabsBar");
+      const activeSubObj = (user.subjects || []).find(s => s.name === qnActiveFolderSub);
+      if (activeSubObj && (activeSubObj.chapters || []).length > 0) {
+        const chList = ["ALL", ...activeSubObj.chapters.map(c => c.name)];
+        chapBar.innerHTML = chList.map(cName => {
+          const active = qnActiveFolderChap === cName;
+          return `<button onclick="selectQnFolderChap('${cName.replace(/'/g, "\\'")}')"
+            class="px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition ${
+              active ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/40' : 'subtle-pill muted-text'
+            }">
+            📖 ${cName === 'ALL' ? 'All Chapters' : cName}
+          </button>`;
+        }).join("");
+      } else {
+        chapBar.innerHTML = "";
+      }
+
+      let filtered = allNotes.slice();
+      if (qnActiveFolderSub !== "ALL") {
+        filtered = filtered.filter(n => (n.subject || "General") === qnActiveFolderSub);
+      }
+      if (qnActiveFolderChap !== "ALL") {
+        filtered = filtered.filter(n => (n.chapter || "All Chapters") === qnActiveFolderChap);
+      }
+
+      const grid = document.getElementById("qnDedicatedFoldersContainer");
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-2 one-card p-6 text-center text-xs muted-text">આ ફોલ્ડરમાં હજુ કોઈ નોંધ નથી. ઉપરથી નવી નોંધ ઉમેરો.</div>';
+      } else {
+        grid.innerHTML = filtered.map(n => `
+          <div class="one-card p-3.5 flex flex-col justify-between space-y-2 border-t-4 border-t-indigo-500">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between gap-1">
+                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500 truncate">
+                  🔑 Formula & Key
+                </span>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button onclick="editQuickNote('${n.id}'); renderDedicatedQuickNotesFolders();" class="text-[10px] px-1.5 py-0.5 rounded subtle-pill">✎</button>
+                  <button onclick="deleteQuickNote('${n.id}'); renderDedicatedQuickNotesFolders();" class="text-[10px] text-rose-500 font-bold px-1">✕</button>
+                </div>
+              </div>
+              <div class="text-xs font-extrabold truncate">${n.title || n.subject || 'Note'}</div>
+              <p class="text-[11px] muted-text leading-relaxed break-words">${n.text}</p>
+            </div>
+            <div class="pt-1.5 border-t text-[9px] font-bold muted-text truncate" style="border-color: var(--border-col);">
+              📁 ${n.subject || 'General'} ${n.chapter && n.chapter !== 'All Chapters' ? '• ' + n.chapter : ''}
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    // ================= SPOTLIGHT APP TOUR =================
     let currentTourStep = 0;
     const TOUR_STEPS = [
       {
         tab: "today",
-        targetId: "tourTargetGoal",
-        title: "1/6 • 🎯 Automatic Daily Goal Bar",
-        desc: "આજનો ટાર્ગેટ બાર તમારા 'નવા વાંચેલા પેજ' અને 'આજે રિવિઝન કરેલા પેજ' બંનેને ઓટોમેટિક ગણીને પ્રોગ્રેસ બતાવશે!",
-        highlight: "💡 ટાર્ગેટ પૂરો થતાં જ સેલિબ્રેશન એનિમેશન આવશે!"
+        targetId: "dailyCountdownWidget",
+        title: "1/6 • ⏳ Daily Light Countdown & Multi-Exam",
+        desc: "ઉપર તમારી પરીક્ષાના બાકી દિવસો, કલાક અને મિનિટ રોજ બદલાતા લાઈટ કલર સાથે દેખાશે. '+ Switch' પર ક્લિક કરી એકથી વધુ પરીક્ષા મેનેજ કરો.",
+        highlight: "💡 કોમન સબ્જેક્ટ/ચેપ્ટરનો પ્રોગ્રેસ બધી પરીક્ષામાં ઓટોમેટિક સિન્ક થશે!"
       },
       {
         tab: "today",
         targetId: "tourTargetLogger",
         title: "2/6 • 🏠 Daily Study Logger",
-        desc: "અહીં વિષય અને ચેપ્ટર સિલેક્ટ કરીને રોજના પેજ ઉમેરો. જો પૂર્ણ થયેલા ચેપ્ટર પર ક્લિક કરશો તો Reopen Popup ખુલશે.",
+        desc: "અહીં વિષય અને ચેપ્ટર સિલેક્ટ કરીને રોજના પેજ ઉમેરો.",
         highlight: "💡 ચાલુ ચેપ્ટરમાં Today+7D રિવિઝન અને પૂર્ણ ચેપ્ટરમાં 1-7-30-60D માસ્ટર રિવિઝન બનશે."
       },
       {
         tab: "today",
         targetId: "dueRevisionsCardAnchor",
-        title: "3/6 • 🔔 Smart Revision & Reverse (Undo)",
-        desc: "રિવિઝન '✓ Done' કરતા જ રોજની એન્ટ્રીમાં Date & Time સાથે નોંધાઈ જશે. જો ભૂલથી Done થાય તો '↩️ Reverse' બટનથી પાછું Due માં લાવી શકાશે!",
-        highlight: "⏩ બાકી રહેલું રિવિઝન 1-7-30-60 સાયકલ બગાડ્યા વગર બીજા દિવસે ઓટોમેટિક ફોરવર્ડ થશે."
+        title: "3/6 • 🔔 Smart Revision & Unified History",
+        desc: "પૂર્ણ કરેલા રિવિઝન અને રોજની એન્ટ્રી બધું જ નીચે કલર-કોડેડ હિસ્ટ્રીમાં દેખાશે, જ્યાંથી Edit, Reverse અને Delete કરી શકાશે.",
+        highlight: "⏩ બાકી રહેલું રિવિઝન 1-7-30-60 સાયકલ બગાડ્યા વગર બીજા દિવસે ફોરવર્ડ થશે."
       },
       {
         tab: "syllabus",
         targetId: "tourTargetSyllabusAdd",
-        title: "4/6 • 📚 Syllabus & Excel/Word Import",
-        desc: "અહીં તમારા વિષયો અને ચેપ્ટર્સ ઉમેરો. '📥 Bulk Import' દ્વારા Excel કે Word માંથી એકસાથે બધા ચેપ્ટર પેસ્ટ કરી શકાય છે.",
-        highlight: "🏆 નીચે Completed Vault માં પૂરા થયેલા ચેપ્ટર વિષય મુજબ Open/Close કરી શકાશે."
+        title: "4/6 • 📚 Syllabus & Total Pages View",
+        desc: "જૂના વર્ઝન મુજબ જ દરેક વિષયમાં કુલ પેજ, ચેપ્ટર સંખ્યા અને Open/Close એરો આપેલા છે.",
+        highlight: "🏆 નીચે Completed Vault માં પૂરા થયેલા ચેપ્ટર વિષય મુજબ જોઈ શકાશે."
       },
       {
         tab: "tests",
         targetId: "tourTargetAnalysis",
-        title: "5/6 • 📊 Most Read/Revised Subject & Tests",
-        desc: "અહીં તમે કયો વિષય સૌથી વધુ વાંચો છો, કયો રિવિઝન કરો છો અને કયો બાકી રહે છે તેનું સચોટ વિશ્લેષણ તથા ગ્રાફ મળશે.",
+        title: "5/6 • 📊 Analysis & Test System",
+        desc: "તમે કયો વિષય સૌથી વધુ વાંચો છો અને ટેસ્ટમાં કેવું પરફોર્મન્સ છે તેનો સંપૂર્ણ ચાર્ટ અહીં મળશે.",
         highlight: "🎯 '+ Add Test' માં Chapter Test, Full Subject અને Grand Mock એમ ૩ મોડ આપેલા છે."
       },
       {
         tab: "profile",
         targetId: "tourTargetProfile",
-        title: "6/6 • 👤 Optional Exam Countdown & Focus Timer",
-        desc: "જો તમારી પરીક્ષાની તારીખ નક્કી હોય તો અહીં નાખો — તો જ ઉપર Countdown દેખાશે! સાથે 25m/45m/60m Focus Timer પણ વાપરી શકો છો.",
+        title: "6/6 • 👤 Profile, Razorpay Plans & Focus Timer",
+        desc: "અહીંથી પ્લાન મુજબ ડાયરેક્ટ Razorpay પેમેન્ટ અને 'Share SS of Payment' બટનથી વોટ્સએપ પર સ્ક્રીનશોટ મોકલી શકાશે.",
         highlight: "☰ ઉપર જમણી બાજુ 3-Line Menu માંથી બધા ક્વિક ઓપ્શન મળશે."
       }
     ];
@@ -1498,17 +2160,10 @@
       document.documentElement.setAttribute("data-theme", theme);
       const icon = theme === "cream" ? "🌙" : "☀️";
       const b1 = document.getElementById("themeBtnAuth");
-      const b2 = document.getElementById("themeBtnHeader");
       if (b1) b1.textContent = icon;
-      if (b2) b2.textContent = icon;
     }
     function toggleTheme() {
       theme = theme === "cream" ? "black" : "cream";
-      localStorage.setItem(THEME_KEY, theme);
-      applyTheme();
-    }
-    function setTheme(newTheme) {
-      theme = newTheme;
       localStorage.setItem(THEME_KEY, theme);
       applyTheme();
     }
@@ -1519,7 +2174,7 @@
         mobile: "DEMO",
         name: "Demo Aspirant",
         exam: "GPSC / CCE",
-        examDate: addDaysISO(td, 60),
+        examDate: addDaysISO(td, 45),
         status: "approved",
         planName: "5-Day Free Trial",
         planStartDate: td,
@@ -1528,8 +2183,8 @@
         focusMinutes: 50,
         focusSessions: 2,
         quickNotes: [
-          { id: "qn1", subject: "ભારતનું બંધારણ", text: "અનુચ્છેદ 32 — બંધારણીય ઇલાજોનો અધિકાર (આત્મા)" },
-          { id: "qn2", subject: "ગણિત અને રીઝનિંગ", text: "ચક્રવૃદ્ધિ વ્યાજ 2 વર્ષનો તફાવત = P(R/100)²" }
+          { id: "qn1", subject: "ભારતનું બંધારણ", chapter: "આમુખ અને મૂળભૂત અધિકારો", noteType: "Quick Formula", title: "અનુચ્છેદ 32", text: "બંધારણીય ઇલાજોનો અધિકાર — બંધારણનો આત્મા" },
+          { id: "qn2", subject: "ગણિત અને રીઝનિંગ", chapter: "ટકાવારી (Percentage)", noteType: "Short Key", title: "ચક્રવૃદ્ધિ વ્યાજ તફાવત", text: "2 વર્ષનો તફાવત = P(R/100)²" }
         ],
         subjects: [
           {
@@ -1550,12 +2205,12 @@
           }
         ],
         logs: [
-          { id: "dl1", date: addDaysISO(td, -2), subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc1", chapterName: "આમુખ અને મૂળભૂત અધિકારો", pages: 12, isChapterFinish: true, revised: true, revisedAt: "21 Oct, 08:30 PM", revId: "dr2" },
+          { id: "dl1", date: addDaysISO(td, -2), subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc1", chapterName: "આમુખ અને મૂળભૂત અધિકારો", pages: 12, isChapterFinish: true, revised: true, revisedAt: "08:30 PM", revId: "dr2" },
           { id: "dl3", date: td, subjectId: "ds1", subjectName: "ભારતનું બંધારણ", chapterId: "dc2", chapterName: "રાષ્ટ્રપતિ અને સંસદ", pages: 8, isChapterFinish: false, revised: false }
         ],
         revisions: [
           { id: "dr1", logId: "dl3", subjectId: "ds1", chapterId: "dc2", subjectName: "ભારતનું બંધારણ", chapterName: "રાષ્ટ્રપતિ અને સંસદ", topicName: "Study (+8p)", pagesCount: 8, revType: "daily", stageLabel: "Day-1 Rev", studiedDate: td, dueDate: td, done: false },
-          { id: "dr2", logId: "dl1", subjectId: "ds1", chapterId: "dc1", subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", topicName: "✓ Full Chapter (22p)", pagesCount: 22, revType: "master", stageLabel: "7-Day Master", studiedDate: addDaysISO(td, -8), dueDate: addDaysISO(td, -1), done: false }
+          { id: "dr2", logId: "dl1", subjectId: "ds1", chapterId: "dc1", subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", topicName: "✓ Full Chapter (22p)", pagesCount: 22, revType: "master", stageLabel: "7-Day Master", studiedDate: addDaysISO(td, -8), dueDate: addDaysISO(td, -1), done: true, doneDate: td, doneAt: "Today, 09:15 AM" }
         ],
         tests: [
           { id: "dt1", date: addDaysISO(td, -4), testType: "chapter", title: "Polity Ch-1 Test", subjects: ["ભારતનું બંધારણ"], chapters: ["આમુખ અને મૂળભૂત અધિકારો"], subjectName: "ભારતનું બંધારણ", chapterName: "આમુખ અને મૂળભૂત અધિકારો", scored: 38, total: 50 },
@@ -1567,7 +2222,7 @@
     function guardDemoAction() {
       if (isDemoMode) {
         if (confirm("🔒 આ Read-Only Demo Mode છે.\n\nશું તમારે Full Plan એક્ટિવેટ કરવા WhatsApp પર સંપર્ક કરવો છે?")) {
-          openAdminWhatsApp("Hello The Target, I want to buy full access plan.");
+          openAdminWhatsApp("Hello Target Track, I want to buy full access plan.");
         }
         return true;
       }
@@ -1582,15 +2237,26 @@
           try {
             const parsed = JSON.parse(raw);
             if (!parsed.feedbacks) parsed.feedbacks = [];
+            if (!parsed.deletedData) parsed.deletedData = [];
             if (typeof parsed.broadcast !== "string") parsed.broadcast = "";
+            if (!parsed.popupBroadcast) parsed.popupBroadcast = null;
             return parsed;
           } catch (e) {}
         }
       }
-      return { users: {}, feedbacks: [], broadcast: "" };
+      return { users: {}, feedbacks: [], deletedData: [], broadcast: "", popupBroadcast: null };
     }
 
     function saveDB() {
+      const user = getCurrentStudent();
+      if (user && !isDemoMode && Array.isArray(user.exams)) {
+        const curEx = user.exams.find(e => e.id === user.activeExamId);
+        if (curEx) {
+          curEx.name = user.exam;
+          curEx.examDate = user.examDate;
+          curEx.subjects = user.subjects;
+        }
+      }
       const str = JSON.stringify(db);
       localStorage.setItem(DB_KEY, str);
       localStorage.setItem(DB_MIRROR_KEY, str);
@@ -1669,11 +2335,11 @@
       let user = db.users[mobile];
       if (!user) {
         const name = document.getElementById("authName").value.trim() || ("Student " + mobile.slice(-4));
-        const exam = document.getElementById("authExam").value.trim() || "General Preparation";
+        const exam = document.getElementById("authExam").value.trim() || "GPSC / CCE";
 
         user = {
           mobile, name, exam,
-          examDate: "", // 22) Empty by default; student can set in Account tab if desired
+          examDate: "",
           status: "approved",
           planName: "5-Day Free Trial",
           createdAt: todayISO(),
@@ -1683,9 +2349,12 @@
           focusMinutes: 0,
           focusSessions: 0,
           quickNotes: [],
-          subjects: [], logs: [], revisions: [], tests: []
+          subjects: [], logs: [], revisions: [], tests: [],
+          exams: [{ id: "ex_main", name: exam, examDate: "", subjects: [] }],
+          activeExamId: "ex_main"
         };
         db.users[mobile] = user;
+        localStorage.setItem(WHATS_NEW_VER + "_" + mobile, "1");
         saveDB();
         isFirstTimeUser = true;
       }
@@ -1787,8 +2456,10 @@
         }
 
         studentApp.classList.remove("hidden");
+        ensureMultiExamStructure(realUser);
         initDatePickers();
         renderStudentAll();
+        checkWhatsNewPopup(realUser);
       }
     }
 
@@ -1797,6 +2468,23 @@
       if (dp && !dp.value) dp.value = todayISO();
       const td = document.getElementById("testDateInput");
       if (td && !td.value) td.value = todayISO();
+      const hd = document.getElementById("historyFilterDate");
+      if (hd && !historyDefaultedToday) {
+        hd.value = todayISO();
+        historyDefaultedToday = true;
+      }
+    }
+
+    function setHistoryDateToday() {
+      const hd = document.getElementById("historyFilterDate");
+      if (hd) hd.value = todayISO();
+      renderStudentAll();
+    }
+
+    function clearHistoryDateFilter() {
+      const hd = document.getElementById("historyFilterDate");
+      if (hd) hd.value = "";
+      renderStudentAll();
     }
 
     function handleDailyDateChange() {
@@ -1854,6 +2542,7 @@
     function renderStudentAll() {
       const user = getCurrentStudent();
       if (!user) return;
+      ensureMultiExamStructure(user);
 
       const bBanner = document.getElementById("studentBroadcastBanner");
       if (db.broadcast && db.broadcast.trim()) {
@@ -1867,18 +2556,24 @@
       const isLifetime = valLeft > 2000;
       const planLabel = isLifetime ? "Lifetime Pro" : (user.planName || (valLeft <= 5 ? "5D Free Trial" : "Pro Plan"));
 
-      // 16) Clean Header Name + Exam (Validity removed from header)
       document.getElementById("headerStudentName").textContent = user.name + " • " + (user.exam || "Study OS");
 
-      // 22) Show Exam Countdown in Header ONLY if user has set an examDate
       const countdownBox = document.getElementById("headerExamCountdownBox");
-      if (user.examDate && /^\d{4}-\d{2}-\d{2}$/.test(user.examDate)) {
-        const examDaysLeft = Math.max(0, daysBetween(todayISO(), user.examDate));
-        document.getElementById("headerDaysLeft").textContent = examDaysLeft + "d";
-        countdownBox.classList.remove("hidden");
-      } else {
-        countdownBox.classList.add("hidden");
+      if (countdownBox) {
+        if (user.examDate && /^\d{4}-\d{2}-\d{2}$/.test(user.examDate)) {
+          const examDaysLeft = Math.max(0, daysBetween(todayISO(), user.examDate));
+          document.getElementById("headerDaysLeft").textContent = examDaysLeft + "d";
+          countdownBox.classList.remove("hidden");
+        } else {
+          countdownBox.classList.add("hidden");
+        }
       }
+
+      updateDailyPastelCountdown(user);
+
+      const qnCount = (user.quickNotes || []).length;
+      const frontSub = document.getElementById("frontQuickNotesSubtext");
+      if (frontSub) frontSub.textContent = qnCount + " Saved Notes • Subject & Chapter Folders";
 
       let totalChaps = 0, doneChaps = 0, totalPagesRead = 0, totalPagesRevised = 0;
       user.subjects.forEach(s => {
@@ -1917,6 +2612,9 @@
       renderTodayTab(user);
       renderSyllabusTab(user);
       renderTestsAndDeepAnalysis(user, doneChaps, totalChaps, totalPagesRead, totalPagesRevised, topTestAvg);
+      renderStudentDirectMessages(user);
+      checkAndShowPopupBroadcast(user);
+      checkAndSendRevisionNotification(user);
     }
 
     function changeDailyPageGoal() {
@@ -1929,7 +2627,6 @@
       renderStudentAll();
     }
 
-    // 5) Subject-wise & Editable Quick Notes
     function addQuickNote() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -1938,7 +2635,15 @@
       const inp = document.getElementById("quickNoteInput");
       const txt = inp.value.trim();
       if (!txt) return;
-      user.quickNotes.unshift({ id: "qn_" + Date.now(), subject: subTag, text: txt, date: todayISO() });
+      user.quickNotes.unshift({
+        id: "qn_" + Date.now(),
+        subject: subTag,
+        chapter: "All Chapters",
+        noteType: "Quick Formula",
+        title: subTag,
+        text: txt,
+        date: todayISO()
+      });
       inp.value = "";
       saveDB();
       renderStudentAll();
@@ -1969,7 +2674,6 @@
       document.getElementById("todayTopicDrawer").classList.toggle("hidden");
     }
 
-    // 19) Popup Modal for Locked / Completed Chapter
     function openChapLockModal(chapId, chapName) {
       pendingPopupReopenChapId = chapId;
       document.getElementById("lockModalChapName").textContent = "🔒 " + chapName + " પૂર્ણ થઈ ગયું છે";
@@ -1986,6 +2690,7 @@
       const chap = sub ? sub.chapters.find(c => c.id === (pendingPopupReopenChapId || selectedChapterId)) : null;
       if (chap) {
         chap.completed = false;
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
         user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
         saveDB();
         renderStudentAll();
@@ -1996,9 +2701,8 @@
     function renderTodayTab(user) {
       const today = todayISO();
 
-      // 4) Automatic Daily Goal Connection: Today's Read Pages + Today's Revised Pages!
       const todayReadPages = (user.logs || [])
-        .filter(l => l.date === today && !l.isExtraRev)
+        .filter(l => l.date === today && !l.isExtraRev && !l.isEditHistory)
         .reduce((a, l) => a + Number(l.pages || 0), 0);
 
       const todayRevisedPages = (user.revisions || [])
@@ -2014,7 +2718,6 @@
         "📖 વાંચન: " + todayReadPages + "p + ✅ રિવિઝન: " + todayRevisedPages + "p = કુલ " + combinedGoalPages + "p";
       document.getElementById("dailyGoalBar").style.width = goalPct + "%";
 
-      // 5) Populate Quick Notes Subject Dropdowns & List
       const qnSubSel = document.getElementById("quickNoteSubSelect");
       const qnFilterSel = document.getElementById("quickNoteFilterSub");
       const curQnSub = qnSubSel.value || "General";
@@ -2035,7 +2738,7 @@
       }
       qnList.innerHTML = notes.length === 0
         ? '<div class="text-[11px] muted-text text-center py-2">હજુ કોઈ શોર્ટ-નોટ કે સૂત્ર સેવ કર્યું નથી.</div>'
-        : notes.map(n => `
+        : notes.slice(0, 6).map(n => `
             <div class="subtle-pill px-3 py-2 flex items-center justify-between gap-2 text-xs">
               <div class="min-w-0 flex-1">
                 <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-500 mr-1">${n.subject || 'General'}</span>
@@ -2063,17 +2766,18 @@
         }
         const activeSub = user.subjects.find(s => s.id === selectedSubjectId);
 
+        // Minimal UI design for selected Subject & Chapter elements
         document.getElementById("todaySubjectPills").innerHTML = user.subjects.map(s => {
           const active = s.id === selectedSubjectId;
           const doneC = s.chapters.filter(c => c.completed).length;
           return `<button onclick="selectTodaySubject('${s.id}')"
             class="px-3.5 py-2 rounded-2xl text-left shrink-0 transition border ${
               active
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500 shadow-sm'
                 : 'subtle-pill hover:border-indigo-400'
             }">
             <div class="text-xs font-extrabold whitespace-nowrap">${s.name}</div>
-            <div class="text-[9px] ${active ? 'text-indigo-100' : 'muted-text'}">${doneC}/${s.chapters.length} પૂર્ણ</div>
+            <div class="text-[9px] muted-text">${doneC}/${s.chapters.length} પૂર્ણ</div>
           </button>`;
         }).join("");
 
@@ -2094,7 +2798,7 @@
             return `<button onclick="selectTodayChapter('${c.id}', ${!!c.completed})"
               class="w-full px-3 py-2 rounded-2xl text-left flex items-center justify-between transition border ${
                 active
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500 shadow-sm'
                   : 'subtle-pill'
               }">
               <div class="min-w-0 flex-1 flex items-center gap-2">
@@ -2102,10 +2806,10 @@
                 <span class="text-xs font-extrabold truncate">${c.name}</span>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-indigo-500/15 text-indigo-500'}">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">
                   ${c.donePages}p (Rev:${rp}p)
                 </span>
-                ${c.completed ? '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">🔒 પૂર્ણ</span>' : ''}
+                ${c.completed ? '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600">🔒 પૂર્ણ</span>' : ''}
               </div>
             </button>`;
           }).join("");
@@ -2133,9 +2837,27 @@
         }
       }
 
-      // 7) Overdue Revisions Auto-Forward to Today WITHOUT altering original 1-7-30-60 dates!
-      const dueList = user.revisions.filter(r => !r.done && r.dueDate <= today);
-      const doneRevsList = user.revisions.filter(r => r.done).slice().reverse();
+      // SMART REVISION MERGE: Merge same chapter/topic revisions due on or before today
+      const rawDueList = user.revisions.filter(r => !r.done && r.dueDate <= today);
+      const mergedDueMap = {};
+      rawDueList.forEach(r => {
+        const key = (r.subjectId || r.subjectName) + "__" + (r.chapterId || r.chapterName);
+        if (!mergedDueMap[key]) {
+          mergedDueMap[key] = {
+            ...r,
+            mergedIds: [r.id],
+            stageLabels: [r.stageLabel]
+          };
+        } else {
+          mergedDueMap[key].mergedIds.push(r.id);
+          if (!mergedDueMap[key].stageLabels.includes(r.stageLabel)) {
+            mergedDueMap[key].stageLabels.push(r.stageLabel);
+          }
+          mergedDueMap[key].pagesCount = Math.max(Number(mergedDueMap[key].pagesCount || 0), Number(r.pagesCount || 0));
+          if (r.revType === "master") mergedDueMap[key].revType = "master";
+        }
+      });
+      const dueList = Object.values(mergedDueMap);
       const upcomingList = user.revisions.filter(r => !r.done && r.dueDate > today).sort((a,b) => a.dueDate.localeCompare(b.dueDate));
 
       document.getElementById("kpiDueRev").textContent = dueList.length + " બાકી";
@@ -2148,14 +2870,18 @@
         dueEl.innerHTML = dueList.map(r => {
           const isMaster = r.revType === "master";
           const overdueDays = daysBetween(r.dueDate, today);
+          const combinedStageLabel = r.stageLabels.length > 1
+            ? r.stageLabels.join(" & ") + " Revision"
+            : r.stageLabel;
+          const idsArg = r.mergedIds.join(",");
           const forwardBadge = overdueDays > 0
-            ? `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-500">↪️ Forwarded (${overdueDays}d ago)</span>`
+            ? `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-500">↪️ Forwarded (${overdueDays}d)</span>`
             : "";
           return `
-            <div class="flex items-center justify-between ${isMaster ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-amber-500/10 border border-amber-500/30'} rounded-2xl p-3 gap-2">
+            <div class="flex items-center justify-between subtle-pill p-3 gap-2 border-l-4 ${isMaster ? 'border-l-emerald-500' : 'border-l-amber-500'}">
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isMaster ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}">${r.stageLabel}</span>
+                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isMaster ? 'bg-emerald-500/15 text-emerald-500' : 'bg-amber-500/15 text-amber-500'}">${combinedStageLabel}</span>
                   ${forwardBadge}
                   <span class="text-xs font-extrabold truncate">${r.subjectName} ➔ ${r.chapterName}</span>
                 </div>
@@ -2163,30 +2889,20 @@
                   ${r.topicName} • Studied: ${r.studiedDate}
                 </div>
               </div>
-              <button onclick="markRevisionDone('${r.id}')"
-                class="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs shrink-0 shadow-sm transition">
-                ✓ Done
-              </button>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="markMergedRevisionsDone('${idsArg}')"
+                  class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs shadow-sm transition">
+                  ✓ Done
+                </button>
+                <button onclick="deleteDueRevisions('${idsArg}')" title="Delete Revision"
+                  class="w-7 h-7 rounded-xl bg-rose-500/15 text-rose-500 hover:bg-rose-500/25 font-extrabold text-xs flex items-center justify-center transition">
+                  🗑
+                </button>
+              </div>
             </div>
           `;
         }).join("");
       }
-
-      // 3) Completed Revisions List with ↩️ Reverse (Undo) Button
-      const compRevEl = document.getElementById("completedRevisionList");
-      compRevEl.innerHTML = doneRevsList.length === 0
-        ? '<div class="text-[11px] muted-text">હજુ કોઈ રિવિઝન પૂર્ણ કર્યું નથી.</div>'
-        : doneRevsList.slice(0, 12).map(r => `
-          <div class="flex items-center justify-between text-[11px] subtle-pill px-3 py-2 gap-2">
-            <div class="min-w-0 flex-1">
-              <div class="font-bold truncate">✅ [${r.stageLabel}] ${r.subjectName} ➔ ${r.chapterName}</div>
-              <div class="text-[10px] text-emerald-500 font-semibold">🕒 Done: ${r.doneAt || r.doneDate || 'Completed'}</div>
-            </div>
-            <button onclick="reverseRevisionDone('${r.id}')" class="px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px] shrink-0">
-              ↩️ Reverse
-            </button>
-          </div>
-        `).join("");
 
       const upEl = document.getElementById("upcomingRevisionList");
       upEl.innerHTML = upcomingList.length === 0
@@ -2198,46 +2914,208 @@
           </div>
         `).join("");
 
-      // 1 & 2) Daily Logs History with Timestamp & ↩️ Reverse to Due Revision
-      const filterDate = document.getElementById("historyFilterDate").value;
-      const histEl = document.getElementById("dailyLogsHistoryList");
-      let logsToShow = (user.logs || []).slice().reverse();
-      if (filterDate) logsToShow = logsToShow.filter(l => l.date === filterDate);
-
-      if (logsToShow.length === 0) {
-        histEl.innerHTML = '<div class="text-xs muted-text text-center py-2">કોઈ એન્ટ્રી મળી નથી.</div>';
-      } else {
-        histEl.innerHTML = logsToShow.slice(0, 15).map(l => `
-          <div class="subtle-pill p-3 flex items-center justify-between gap-2">
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${l.date}</span>
-                <span class="text-xs font-extrabold truncate">${l.subjectName} ➔ ${l.chapterName}</span>
-                ${l.isExtraRev
-                  ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-500">⚡ Extra Rev</span>'
-                  : (l.isChapterFinish
-                      ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500">✓ પૂર્ણ</span>'
-                      : `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${l.revised ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">${l.revised ? '✓ Revised' : '⏳ Due'}</span>`)
-                }
-              </div>
-              <div class="text-[10px] muted-text mt-1">
-                પેજ: <b class="text-indigo-500">+${l.pages}p</b> ${l.topicName ? '• 📌 ' + l.topicName : ''}
-                ${l.revised && l.revisedAt ? `<div class="text-emerald-500 font-bold mt-0.5">🕒 રિવિઝન પૂર્ણ: ${l.revisedAt}</div>` : ''}
-              </div>
-            </div>
-            <div class="flex items-center gap-1 shrink-0">
-              ${l.revised ? `
-                <button onclick="reverseLogRevision('${l.id}')" title="Reverse back to Due Revision"
-                  class="px-2 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px]">
-                  ↩️ Reverse
-                </button>
-              ` : ''}
-              <button onclick="editDailyLog('${l.id}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
-              <button onclick="deleteDailyLog('${l.id}')" class="px-2 py-1 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
-            </div>
-          </div>
-        `).join("");
+      const histDateInput = document.getElementById("historyFilterDate");
+      if (histDateInput && !historyDefaultedToday) {
+        histDateInput.value = today;
+        historyDefaultedToday = true;
       }
+      const filterDate = histDateInput ? histDateInput.value : "";
+      const histEl = document.getElementById("dailyLogsHistoryList");
+
+      const unifiedItems = [];
+
+      (user.logs || []).forEach(l => {
+        if (l.isExtraRev) return;
+        if (filterDate && l.date !== filterDate) return;
+        let catType = "study";
+        if (l.isEditHistory) catType = "edit";
+        else if (l.isExtraRev) catType = "extra";
+        else if (l.isChapterFinish) catType = "finish";
+        unifiedItems.push({
+          uid: "log_" + l.id,
+          rawId: l.id,
+          itemKind: "log",
+          catType,
+          date: l.date,
+          subjectName: l.subjectName,
+          chapterName: l.chapterName,
+          pages: l.pages,
+          topicName: l.topicName,
+          revised: l.revised,
+          revisedAt: l.revisedAt,
+          editNote: l.editNote || ""
+        });
+      });
+
+      (user.revisions || []).filter(r => r.done).forEach(r => {
+        const dDate = r.doneDate || r.dueDate || today;
+        if (filterDate && dDate !== filterDate) return;
+        unifiedItems.push({
+          uid: "rev_" + r.id,
+          rawId: r.id,
+          itemKind: "rev",
+          catType: "revision",
+          date: dDate,
+          subjectName: r.subjectName,
+          chapterName: r.chapterName,
+          pages: r.pagesCount || 0,
+          stageLabel: r.stageLabel || "Revision",
+          doneAt: r.doneAt || dDate,
+          topicName: r.topicName || ""
+        });
+      });
+
+      unifiedItems.reverse();
+
+      if (unifiedItems.length === 0) {
+        histEl.innerHTML = `<div class="text-xs muted-text text-center py-3 subtle-pill">${filterDate ? filterDate + ' ના રોજ કોઈ એન્ટ્રી નથી. (બધી જોવા All દબાવો)' : 'કોઈ એન્ટ્રી મળી નથી.'}</div>`;
+      } else {
+        histEl.innerHTML = unifiedItems.slice(0, 25).map(item => {
+          if (item.itemKind === "rev") {
+            return `
+              <div class="subtle-pill p-3 flex items-center justify-between gap-2 border-l-4 border-l-emerald-500 bg-emerald-500/5">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-600 text-white">✅ પૂર્ણ રિવિઝન (${item.stageLabel})</span>
+                    <span class="text-[10px] font-mono font-bold muted-text">${item.date}</span>
+                  </div>
+                  <div class="text-xs font-extrabold truncate mt-1">${item.subjectName} ➔ ${item.chapterName}</div>
+                  <div class="text-[10px] text-emerald-500 font-bold mt-0.5">
+                    🔄 ${item.pages}p • 🕒 ${item.doneAt}
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <div class="flex items-center one-card px-1 py-0.5 rounded-xl">
+                    <button onclick="stepRevisionHistoryPages('${item.rawId}', -1)" class="w-5 h-5 text-xs font-extrabold">−</button>
+                    <span class="text-[10px] font-mono font-extrabold px-1">${item.pages}p</span>
+                    <button onclick="stepRevisionHistoryPages('${item.rawId}', 1)" class="w-5 h-5 text-xs font-extrabold text-indigo-500">+</button>
+                  </div>
+                  <button onclick="reverseRevisionDone('${item.rawId}')" class="px-2 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px]">↩️ Reverse</button>
+                  <button onclick="editRevisionEntry('${item.rawId}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
+                  <button onclick="deleteRevisionEntry('${item.rawId}')" class="px-2 py-1 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
+                </div>
+              </div>
+            `;
+          }
+
+          let borderClass = "border-l-4 border-l-indigo-500";
+          let badgeHtml = '<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-600 text-white">📘 વાંચન</span>';
+          if (item.catType === "finish") {
+            borderClass = "border-l-4 border-l-amber-500 bg-amber-500/5";
+            badgeHtml = '<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500 text-white">🏆 ચેપ્ટર પૂર્ણ</span>';
+          } else if (item.catType === "extra" || item.catType === "edit") {
+            borderClass = "border-l-4 border-l-purple-500 bg-purple-500/5";
+            badgeHtml = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-purple-600 text-white">${item.catType === 'edit' ? '✎ Edit Log' : '⚡ Extra Rev'}</span>`;
+          }
+
+          return `
+            <div class="subtle-pill p-3 flex items-center justify-between gap-2 ${borderClass}">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  ${badgeHtml}
+                  <span class="text-[10px] font-mono font-bold muted-text">${item.date}</span>
+                  ${item.revised ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-500">✓ Rev Done</span>' : ''}
+                </div>
+                <div class="text-xs font-extrabold truncate mt-1">${item.subjectName} ➔ ${item.chapterName}</div>
+                <div class="text-[10px] muted-text mt-0.5">
+                  પેજ: <b class="text-indigo-500">+${item.pages}p</b> ${item.topicName ? '• 📌 ' + item.topicName : ''} ${item.editNote ? '• ' + item.editNote : ''}
+                  ${item.revised && item.revisedAt ? `<span class="text-emerald-500 font-bold ml-1">(🕒 ${item.revisedAt})</span>` : ''}
+                </div>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                ${item.revised ? `
+                  <button onclick="reverseLogRevision('${item.rawId}')" title="Reverse Revision"
+                    class="px-2 py-1 rounded-xl bg-amber-500/15 text-amber-500 font-extrabold text-[10px]">
+                    ↩️ Reverse
+                  </button>
+                ` : ''}
+                <button onclick="editDailyLog('${item.rawId}')" class="px-2 py-1 rounded-full one-card text-xs">✎</button>
+                <button onclick="deleteDailyLog('${item.rawId}')" class="px-2 py-1 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    function stepExtraRevModalPages(delta) {
+      const inp = document.getElementById("extraRevPagesInput");
+      if (!inp) return;
+      inp.value = Math.max(1, (parseInt(inp.value || "10", 10) || 10) + delta);
+    }
+
+    function stepRevisionHistoryPages(revId, delta) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const rev = (user.revisions || []).find(r => r.id === revId);
+      if (!rev) return;
+      const oldP = Number(rev.pagesCount || 0);
+      const newP = Math.max(1, oldP + delta);
+      const diff = newP - oldP;
+      rev.pagesCount = newP;
+
+      if (rev.logId) {
+        const linkedLog = (user.logs || []).find(l => l.id === rev.logId);
+        if (linkedLog) linkedLog.pages = newP;
+      }
+      const sub = (user.subjects || []).find(s => s.id === rev.subjectId || s.name === rev.subjectName);
+      const chap = sub ? (sub.chapters || []).find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
+      if (chap) {
+        chap.revisedPages = Math.min(Number(chap.donePages || newP), Math.max(0, Number(chap.revisedPages || 0) + diff));
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
+      }
+      saveDB();
+      renderStudentAll();
+    }
+
+    function editRevisionEntry(revId) {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      const rev = (user.revisions || []).find(r => r.id === revId);
+      if (!rev) return;
+      const oldP = Number(rev.pagesCount || 0);
+      const newPages = prompt("રિવિઝન પેજ સુધારો:", oldP);
+      if (newPages !== null) {
+        const parsed = Math.max(0, parseInt(newPages, 10) || 0);
+        const diff = parsed - oldP;
+        rev.pagesCount = parsed;
+        if (rev.logId) {
+          const linkedLog = (user.logs || []).find(l => l.id === rev.logId);
+          if (linkedLog) linkedLog.pages = parsed;
+        }
+        const sub = (user.subjects || []).find(s => s.id === rev.subjectId || s.name === rev.subjectName);
+        const chap = sub ? (sub.chapters || []).find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
+        if (chap) {
+          chap.revisedPages = Math.min(Number(chap.donePages || parsed), Math.max(0, Number(chap.revisedPages || 0) + diff));
+          syncCommonChapterProgressAcrossExams(user, sub.name, chap);
+        }
+      }
+      const newDate = prompt("રિવિઝન તારીખ સુધારો (YYYY-MM-DD):", rev.doneDate || todayISO());
+      if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())) rev.doneDate = newDate.trim();
+      saveDB();
+      renderStudentAll();
+    }
+
+    function deleteRevisionEntry(revId) {
+      if (guardDemoAction()) return;
+      if (!confirm("આ રિવિઝન એન્ટ્રી ડિલીટ કરવી છે?")) return;
+      const user = getCurrentStudent();
+      const rev = (user.revisions || []).find(r => r.id === revId);
+      if (!rev) return;
+
+      const sub = (user.subjects || []).find(s => s.id === rev.subjectId || s.name === rev.subjectName);
+      const chap = sub ? (sub.chapters || []).find(c => c.id === rev.chapterId || c.name === rev.chapterName) : null;
+      if (chap) {
+        chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - Number(rev.pagesCount || 0));
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
+      }
+
+      if (rev.logId) {
+        user.logs = (user.logs || []).filter(l => l.id !== rev.logId);
+      }
+      user.revisions = (user.revisions || []).filter(r => r.id !== revId);
+      saveDB();
+      renderStudentAll();
     }
 
     function handleTopicSelectChange() {
@@ -2250,7 +3128,6 @@
 
     function selectTodaySubject(subId) { selectedSubjectId = subId; selectedChapterId = null; renderStudentAll(); }
 
-    // 19) If completed chapter is clicked in Today tab, open Popup Modal!
     function selectTodayChapter(chapId, isCompleted) {
       selectedChapterId = chapId;
       renderStudentAll();
@@ -2352,10 +3229,12 @@
             done: false
           });
         });
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
         triggerCelebration("📖 +" + delta + " પેજ ઉમેરાયા!", sub.name + " ➔ " + chap.name);
       } else {
         chap.completed = true;
         chap.completedDate = chosenDate;
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
         scheduleMasterChapterRevisions(user, sub, chap, logId, chosenDate);
         triggerCelebration("🏆 ચેપ્ટર પૂર્ણ!", chap.name + " હવે 1-7-30-60D માસ્ટર પ્લાનમાં ઉમેરાયું!");
       }
@@ -2393,7 +3272,6 @@
       });
     }
 
-    // 2) Mark Revision Done -> Records Exact Date & Time in Study Log & Credits Daily Goal!
     function markRevisionDone(revId) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -2418,9 +3296,11 @@
       if (rev.revType === "master" && chap) {
         chap.revisedPages = chap.donePages;
         (chap.topics || []).forEach(tp => { tp.revisedPages = tp.readPages; });
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       } else if (chap) {
         const credit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
         chap.revisedPages = Math.min(Number(chap.donePages || 0), Number(chap.revisedPages || 0) + credit);
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       }
 
       saveDB();
@@ -2428,7 +3308,30 @@
       triggerCelebration("✅ રિવિઝન પૂર્ણ!", rev.chapterName + " (" + stamp + ")");
     }
 
-    // 1, 2, 3) Reverse Revision from Completed List OR from Daily Study Log back to Due Revisions!
+    function markMergedRevisionsDone(idsCsv) {
+      if (guardDemoAction()) return;
+      const ids = (idsCsv || "").split(",").filter(Boolean);
+      if (ids.length === 0) return;
+      markRevisionDone(ids[0]);
+      if (ids.length > 1) {
+        const user = getCurrentStudent();
+        const extraIds = ids.slice(1);
+        user.revisions = (user.revisions || []).filter(r => !extraIds.includes(r.id));
+        saveDB();
+        renderStudentAll();
+      }
+    }
+
+    function deleteDueRevisions(idsCsv) {
+      if (guardDemoAction()) return;
+      if (!confirm("આજનું આ રિવિઝન લિસ્ટમાંથી ડિલીટ કરવું છે?")) return;
+      const user = getCurrentStudent();
+      const ids = (idsCsv || "").split(",").filter(Boolean);
+      user.revisions = (user.revisions || []).filter(r => !ids.includes(r.id));
+      saveDB();
+      renderStudentAll();
+    }
+
     function reverseRevisionDone(revId) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -2444,7 +3347,6 @@
       const linkedLog = user.logs.find(l => l.id === rev.logId);
 
       if (linkedLog) {
-        // Check if any other revision for this log is still done
         const otherDone = user.revisions.some(r => r.logId === linkedLog.id && r.done);
         if (!otherDone) {
           linkedLog.revised = false;
@@ -2455,6 +3357,7 @@
       if (chap) {
         const debit = Number(rev.pagesCount || (linkedLog ? linkedLog.pages : 0));
         chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - debit);
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       }
 
       saveDB();
@@ -2467,14 +3370,12 @@
       const log = user.logs.find(l => l.id === logId);
       if (!log) return;
 
-      // Find completed revisions linked to this log and reverse them back to Due
       const linkedRevs = user.revisions.filter(r => r.logId === logId && r.done);
       if (linkedRevs.length > 0) {
         linkedRevs.forEach(r => reverseRevisionDone(r.id));
       } else {
         log.revised = false;
         log.revisedAt = null;
-        // Re-create Today due revision if missing
         user.revisions.push({
           id: "rev_" + log.id + "_rev",
           logId: log.id,
@@ -2495,7 +3396,38 @@
       }
     }
 
-    // 17) Extra Revision Modal & Save
+    let extraRevSelectedMode = "few"; // 'few' | 'full'
+
+    function setExtraRevMode(mode) {
+      extraRevSelectedMode = mode;
+      const fewBtn = document.getElementById("extModeFewBtn");
+      const fullBtn = document.getElementById("extModeFullBtn");
+      const stepWrap = document.getElementById("extraRevStepperWrap");
+
+      if (mode === "full") {
+        fullBtn.className = "py-1.5 rounded-xl text-[11px] font-extrabold bg-emerald-600 text-white shadow-sm";
+        fewBtn.className = "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
+        stepWrap.classList.add("opacity-60", "pointer-events-none");
+        handleExtraRevModeChange();
+      } else {
+        fewBtn.className = "py-1.5 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white shadow-sm";
+        fullBtn.className = "py-1.5 rounded-xl text-[11px] font-extrabold muted-text";
+        stepWrap.classList.remove("opacity-60", "pointer-events-none");
+      }
+    }
+
+    function handleExtraRevModeChange() {
+      if (extraRevSelectedMode !== "full") return;
+      const user = getCurrentStudent();
+      const subId = document.getElementById("extraRevSubSelect").value;
+      const chapId = document.getElementById("extraRevChapSelect").value;
+      const sub = (user.subjects || []).find(s => s.id === subId);
+      const chap = sub ? (sub.chapters || []).find(c => c.id === chapId) : null;
+      if (chap && Number(chap.donePages || 0) > 0) {
+        document.getElementById("extraRevPagesInput").value = chap.donePages;
+      }
+    }
+
     function openExtraRevisionModal() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -2503,6 +3435,7 @@
       const subSel = document.getElementById("extraRevSubSelect");
       subSel.innerHTML = user.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
       populateExtraRevChaps();
+      setExtraRevMode("few");
       document.getElementById("extraRevModal").classList.remove("hidden");
     }
 
@@ -2514,8 +3447,9 @@
       if (!sub || sub.chapters.length === 0) {
         chapSel.innerHTML = '<option value="Full Subject">Full Subject</option>';
       } else {
-        chapSel.innerHTML = sub.chapters.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+        chapSel.innerHTML = sub.chapters.map(c => `<option value="${c.id}">${c.name} (${c.donePages || 0}p)</option>`).join("");
       }
+      handleExtraRevModeChange();
     }
 
     function saveExtraRevision() {
@@ -2526,13 +3460,20 @@
       if (!sub) return;
       const chapId = document.getElementById("extraRevChapSelect").value;
       const chap = sub.chapters.find(c => c.id === chapId);
-      const pages = Math.max(1, parseInt(document.getElementById("extraRevPagesInput").value || "10", 10));
+      const isFullChap = extraRevSelectedMode === "full";
+      const rawPages = Math.max(1, parseInt(document.getElementById("extraRevPagesInput").value || "10", 10));
+      const pages = (isFullChap && chap && Number(chap.donePages || 0) > 0) ? Number(chap.donePages) : rawPages;
       const note = document.getElementById("extraRevNoteInput").value.trim();
+      const modeTag = isFullChap ? "📚 Full Chapter" : "📄 Few Pages";
+      const finalNote = note ? `${modeTag} • ${note}` : `${modeTag} (+${pages}p)`;
       const stamp = nowFormattedTimestamp();
       const today = todayISO();
 
       if (chap) {
-        chap.revisedPages = Math.min(chap.donePages || pages, Number(chap.revisedPages || 0) + pages);
+        chap.revisedPages = isFullChap
+          ? Number(chap.donePages || pages)
+          : Math.min(chap.donePages || pages, Number(chap.revisedPages || 0) + pages);
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       }
 
       const logId = "ext_" + Date.now();
@@ -2543,7 +3484,7 @@
         subjectName: sub.name,
         chapterId: chap ? chap.id : "general",
         chapterName: chap ? chap.name : "Full Subject",
-        topicName: note || "Extra Revision",
+        topicName: finalNote,
         pages,
         isExtraRev: true,
         revised: true,
@@ -2559,8 +3500,8 @@
         revType: "extra",
         subjectName: sub.name,
         chapterName: chap ? chap.name : "Full Subject",
-        topicName: note || ("Extra (+" + pages + "p)"),
-        stageLabel: "⚡ Extra Rev",
+        topicName: finalNote,
+        stageLabel: isFullChap ? "📚 Extra Full Chap" : "📄 Extra Few Pages",
         studiedDate: today,
         dueDate: today,
         done: true,
@@ -2572,7 +3513,7 @@
       document.getElementById("extraRevModal").classList.add("hidden");
       saveDB();
       renderStudentAll();
-      triggerCelebration("⚡ Extra Revision સેવ થયું!", "+" + pages + " પેજ આજના ટાર્ગેટમાં ઉમેરાયા!");
+      triggerCelebration("⚡ Extra Revision સેવ થયું!", finalNote);
     }
 
     function editDailyLog(logId) {
@@ -2587,15 +3528,20 @@
         return openChapLockModal(chap.id, chap.name);
       }
 
-      const newP = prompt("Edit Pages:", log.pages);
+      const oldPages = Number(log.pages || 0);
+      const newP = prompt("Edit Pages:", oldPages);
       if (newP === null) return;
       const newDate = prompt("Edit Date (YYYY-MM-DD):", log.date);
       const parsed = Math.max(0, parseInt(newP, 10) || 0);
-      const diff = parsed - Number(log.pages || 0);
+      const diff = parsed - oldPages;
       log.pages = parsed;
+      log.editNote = "Edited (" + oldPages + "p ➔ " + parsed + "p)";
       if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())) log.date = newDate.trim();
 
-      if (chap && !log.isExtraRev) chap.donePages = Math.max(0, Number(chap.donePages || 0) + diff);
+      if (chap && !log.isExtraRev) {
+        chap.donePages = Math.max(0, Number(chap.donePages || 0) + diff);
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
+      }
 
       saveDB();
       renderStudentAll();
@@ -2618,6 +3564,7 @@
       if (chap && !log.isExtraRev) {
         chap.donePages = Math.max(0, Number(chap.donePages || 0) - Number(log.pages || 0));
         if (log.revised) chap.revisedPages = Math.max(0, Number(chap.revisedPages || 0) - Number(log.pages || 0));
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       }
 
       user.logs.splice(idx, 1);
@@ -2626,7 +3573,6 @@
       renderStudentAll();
     }
 
-    // ================= SYLLABUS =================
     function toggleSubjectAccordion(subId) {
       expandedSubjects[subId] = !expandedSubjects[subId];
       renderStudentAll();
@@ -2671,9 +3617,20 @@
 
     function deleteSubject(subId) {
       if (guardDemoAction()) return;
-      if (!confirm("Delete Subject?")) return;
+      if (!confirm("આ વિષય અને તેના તમામ ચેપ્ટર/રિવિઝન ડિલીટ કરવા છે?")) return;
       const user = getCurrentStudent();
+      const sub = user.subjects.find(s => s.id === subId);
+      const chapIds = sub ? (sub.chapters || []).map(c => c.id) : [];
+
       user.subjects = user.subjects.filter(s => s.id !== subId);
+      // Cascade remove from Revisions & Logs
+      user.revisions = (user.revisions || []).filter(r => r.subjectId !== subId && !chapIds.includes(r.chapterId) && (!sub || r.subjectName !== sub.name));
+      user.logs = (user.logs || []).filter(l => l.subjectId !== subId && !chapIds.includes(l.chapterId));
+
+      if (selectedSubjectId === subId) {
+        selectedSubjectId = null;
+        selectedChapterId = null;
+      }
       saveDB();
       renderStudentAll();
     }
@@ -2706,9 +3663,25 @@
         completedDate: isOldCompleted ? chosenDate : null,
         topics: []
       };
+
+      if (Array.isArray(user.exams)) {
+        user.exams.forEach(ex => {
+          if (ex.id === user.activeExamId) return;
+          const mSub = (ex.subjects || []).find(s => (s.name || "").trim().toLowerCase() === sub.name.trim().toLowerCase());
+          const mChap = mSub ? (mSub.chapters || []).find(c => (c.name || "").trim().toLowerCase() === name.toLowerCase()) : null;
+          if (mChap && !isOldCompleted) {
+            newChap.donePages = mChap.donePages || 0;
+            newChap.revisedPages = mChap.revisedPages || 0;
+            newChap.completed = !!mChap.completed;
+            newChap.completedDate = mChap.completedDate || null;
+          }
+        });
+      }
+
       sub.chapters.push(newChap);
 
       if (isOldCompleted) {
+        syncCommonChapterProgressAcrossExams(user, sub.name, newChap);
         scheduleMasterChapterRevisions(user, sub, newChap, null, chosenDate);
         openOldChapterForm[subId] = false;
       }
@@ -2718,7 +3691,6 @@
       renderStudentAll();
     }
 
-    // 8) Editable Pages & Name for Chapters
     function editChapter(subId, chapId) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -2728,12 +3700,29 @@
       if (chap.completed) {
         return openChapLockModal(chap.id, chap.name);
       }
+      const oldRead = chap.donePages || 0;
       const val = prompt("ચેપ્ટરનું નામ સુધારો:", chap.name);
       if (val && val.trim()) chap.name = val.trim();
       const newRead = prompt("વાંચેલા પેજ (Read Pages) સુધારો:", chap.donePages || 0);
       if (newRead !== null) chap.donePages = Math.max(0, parseInt(newRead, 10) || 0);
       const newRev = prompt("રિવિઝન થયેલા પેજ (Revised Pages) સુધારો:", chap.revisedPages || 0);
       if (newRev !== null) chap.revisedPages = Math.min(chap.donePages, Math.max(0, parseInt(newRev, 10) || 0));
+
+      if (chap.donePages !== oldRead) {
+        user.logs.push({
+          id: "edt_" + Date.now(),
+          date: todayISO(),
+          subjectId: sub.id,
+          subjectName: sub.name,
+          chapterId: chap.id,
+          chapterName: chap.name,
+          pages: chap.donePages,
+          isEditHistory: true,
+          editNote: "Chapter Edit (" + oldRead + "p ➔ " + chap.donePages + "p)"
+        });
+      }
+
+      syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       saveDB();
       renderStudentAll();
     }
@@ -2747,8 +3736,14 @@
       if (chap.completed) {
         return openChapLockModal(chap.id, chap.name);
       }
-      if (!confirm("Delete Chapter?")) return;
+      if (!confirm("આ ચેપ્ટર અને તેનું રિવિઝન શેડ્યૂલ ડિલીટ કરવું છે?")) return;
+
       sub.chapters = sub.chapters.filter(c => c.id !== chapId);
+    // Cascade remove from Revision Schedule & Logs across all exams
+    user.revisions = (user.revisions || []).filter(r => r.chapterId !== chapId && !(r.subjectName === sub.name && r.chapterName === chap.name));
+    user.logs = (user.logs || []).filter(l => l.chapterId !== chapId && !(l.subjectName === sub.name && l.chapterName === chap.name));
+
+      if (selectedChapterId === chapId) selectedChapterId = null;
       saveDB();
       renderStudentAll();
     }
@@ -2763,6 +3758,7 @@
         return openChapLockModal(chap.id, chap.name);
       }
       chap.donePages = Math.max(0, Number(chap.donePages || 0) + delta);
+      syncCommonChapterProgressAcrossExams(user, sub.name, chap);
       saveDB();
       renderStudentAll();
     }
@@ -2777,9 +3773,11 @@
       chap.completed = !chap.completed;
       if (chap.completed) {
         chap.completedDate = todayISO();
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
         scheduleMasterChapterRevisions(user, sub, chap, null, todayISO());
         triggerCelebration("🏆 ચેપ્ટર પૂર્ણ!", chap.name);
       } else {
+        syncCommonChapterProgressAcrossExams(user, sub.name, chap);
         user.revisions = user.revisions.filter(r => !(r.chapterId === chap.id && r.revType === "master" && !r.done));
       }
       saveDB();
@@ -2790,7 +3788,22 @@
       const container = document.getElementById("syllabusContainer");
       const completedShowcase = document.getElementById("completedChaptersBySubjectBox");
 
-      if (user.subjects.length === 0) {
+      // Save typed drafts before re-render so Add Chapter text is never lost
+      const draftChapNames = {};
+      const draftOldPages = {};
+      const draftOldDates = {};
+      if (user && user.subjects) {
+        user.subjects.forEach(s => {
+          const inp = document.getElementById("chapName_" + s.id);
+          if (inp && inp.value) draftChapNames[s.id] = inp.value;
+          const pInp = document.getElementById("chapOldPages_" + s.id);
+          if (pInp && pInp.value) draftOldPages[s.id] = pInp.value;
+          const dInp = document.getElementById("chapDate_" + s.id);
+          if (dInp && dInp.value) draftOldDates[s.id] = dInp.value;
+        });
+      }
+
+    if (user.subjects.length === 0) {
         container.innerHTML = '<div class="one-card p-6 text-center text-xs muted-text">ઉપરના બોક્સમાંથી પહેલો વિષય ઉમેરો.</div>';
         completedShowcase.innerHTML = '<div class="text-xs muted-text">--</div>';
         document.getElementById("completedVaultTotalBadge").textContent = "0 Done";
@@ -2803,7 +3816,7 @@
 
       let globalDoneChaps = 0;
 
-      container.innerHTML = user.subjects.map(sub => {
+      container.innerHTML = user.subjects.map((sub, sIdx) => {
         const totalC = sub.chapters.length;
         const doneC = sub.chapters.filter(c => c.completed).length;
         globalDoneChaps += doneC;
@@ -2814,39 +3827,64 @@
         const pct = totalC > 0 ? Math.round((doneC / totalC) * 100) : 0;
 
         return `
-          <div class="one-card overflow-hidden">
-            <div onclick="toggleSubjectAccordion('${sub.id}')" class="p-4 flex items-center justify-between cursor-pointer select-none">
-              <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-extrabold text-indigo-500">${isOpen ? '▼' : '▶'}</span>
-                  <h3 class="text-sm font-extrabold truncate">${sub.name}</h3>
-                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${doneC}/${totalC} પૂર્ણ (${pct}%)</span>
+          <div class="one-card overflow-hidden transition-all ${isOpen ? 'ring-1 ring-indigo-500/30' : ''}">
+            <!-- Minimal Clean Subject Card Header -->
+            <div onclick="toggleSubjectAccordion('${sub.id}')" class="p-4 cursor-pointer select-none space-y-2.5">
+              <div class="flex items-center justify-between gap-2.5">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <div class="w-9 h-9 rounded-2xl subtle-pill flex items-center justify-center text-xs font-extrabold text-indigo-500 shrink-0">
+                    ${sIdx + 1}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm font-extrabold truncate">${sub.name}</h3>
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full subtle-pill text-indigo-500 shrink-0">
+                        ${doneC}/${totalC} Ch
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] muted-text font-semibold mt-0.5 flex-wrap">
+                      <span>📖 Read: <b class="text- main">${totalP}p</b></span>
+                      <span>•</span>
+                      <span>✅ Rev: <b class="text-emerald-500">${revP}p</b></span>
+                      <span>•</span>
+                      <span class="text-indigo-500 font-bold">${pct}% Done</span>
+                    </div>
+                  </div>
                 </div>
-                <p class="text-[10px] muted-text mt-1 pl-4">📖 વાંચેલા: <b>${totalP}p</b> • ✅ રિવાઈઝ્ડ: <b class="text-emerald-500">${revP}p</b></p>
+
+                <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                  <button onclick="editSubject('${sub.id}')" class="w-7 h-7 rounded-xl subtle-pill text-xs">✎</button>
+                  <button onclick="deleteSubject('${sub.id}')" class="w-7 h-7 rounded-xl subtle-pill text-rose-500 text-xs">🗑</button>
+                  <span onclick="toggleSubjectAccordion('${sub.id}')" class="w-7 h-7 rounded-xl subtle-pill flex items-center justify-center text-[10px] font-extrabold muted-text">
+                    ${isOpen ? '▲' : '▼'}
+                  </span>
+                </div>
               </div>
-              <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                <button onclick="editSubject('${sub.id}')" class="w-7 h-7 rounded-full subtle-pill text-xs">✎</button>
-                <button onclick="deleteSubject('${sub.id}')" class="w-7 h-7 rounded-full bg-rose-500/15 text-rose-500 text-xs">🗑</button>
+
+              <!-- Clean Progress Bar -->
+              <div class="w-full h-1.5 subtle-pill overflow-hidden">
+                <div class="h-full bg-indigo-500 rounded-full transition-all duration-300" style="width:${pct}%"></div>
               </div>
             </div>
 
             ${isOpen ? `
-              <div class="px-4 pb-4 pt-1 space-y-2 border-t" style="border-color: var(--border-col);">
-                ${sub.chapters.map(c => {
+              <div class="px-4 pb-4 pt-2 space-y-2 border-t" style="border-color: var(--border-col);">
+                ${sub.chapters.map((c, cIdx) => {
                   const rp = Math.min(c.donePages || 0, Number(c.revisedPages || 0));
                   return `
-                    <div class="subtle-pill p-3 space-y-2 ${c.completed ? 'border-emerald-500/50 opacity-95' : ''}">
+                    <div class="subtle-pill p-3 space-y-2 ${c.completed ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-indigo-500/40'}">
                       <div class="flex items-center justify-between gap-2">
                         <div class="min-w-0 flex-1">
                           <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[10px] font-mono font-bold muted-text">#${cIdx + 1}</span>
                             <span class="text-xs font-extrabold truncate">${c.name}</span>
                             ${c.completed
-                              ? `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-600 text-white">🔒 ✓ પૂર્ણ (${c.completedDate || 'Done'})</span>`
-                              : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500">ચાલુ</span>'
+                              ? `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">✓ પૂર્ણ (${c.completedDate || 'Done'})</span>`
+                              : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500">ચાલુ</span>'
                             }
                           </div>
-                          <div class="text-[10px] muted-text mt-0.5">
-                            📖 Read: <b>${c.donePages}p</b> • ✅ Rev: <b class="text-emerald-500">${rp}p</b>
+                          <div class="text-[10px] muted-text mt-0.5 font-semibold">
+                            📖 Read: <b>${c.donePages}p</b> • ✅ Revised: <b class="text-emerald-500">${rp}p</b>
                           </div>
                         </div>
 
@@ -2857,16 +3895,16 @@
                               <span class="text-[11px] font-mono font-extrabold px-1">${c.donePages}</span>
                               <button onclick="stepChapterPage('${sub.id}','${c.id}',1)" class="w-5 h-5 text-xs font-extrabold text-indigo-500">+</button>
                             </div>
-                            <button onclick="editChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-full one-card text-[10px]" title="Edit">✎</button>
-                            <button onclick="deleteChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-full bg-rose-500/15 text-rose-500 text-[10px]" title="Delete">🗑</button>
+                            <button onclick="editChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-lg one-card text-[10px]" title="Edit">✎</button>
+                            <button onclick="deleteChapter('${sub.id}','${c.id}')" class="w-6 h-6 rounded-lg one-card text-rose-500 text-[10px]" title="Delete">🗑</button>
                             <button onclick="toggleChapterFinished('${sub.id}','${c.id}')"
-                              class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm">
-                              ✓ પૂર્ણ કરો
+                              class="px-2.5 py-1 rounded-xl text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm">
+                              ✓ પૂર્ણ
                             </button>
                           ` : `
                             <button onclick="toggleChapterFinished('${sub.id}','${c.id}')"
-                              class="px-3 py-1 rounded-full text-[10px] font-extrabold one-card text-amber-500 border border-amber-500/40">
-                              ↺ પાછું ચાલુ કરો
+                              class="px-2.5 py-1 rounded-xl text-[10px] font-extrabold one-card text-amber-500">
+                              ↺ Reopen
                             </button>
                           `}
                         </div>
@@ -2951,9 +3989,22 @@
       }).filter(Boolean).join("");
 
       completedShowcase.innerHTML = compHtml || '<div class="text-xs muted-text text-center py-2">હજુ કોઈ ચેપ્ટર પૂર્ણ થયું નથી.</div>';
+
+      // Restore typed drafts after render
+      Object.keys(draftChapNames).forEach(subId => {
+        const inp = document.getElementById("chapName_" + subId);
+        if (inp) inp.value = draftChapNames[subId];
+      });
+      Object.keys(draftOldPages).forEach(subId => {
+        const pInp = document.getElementById("chapOldPages_" + subId);
+        if (pInp) pInp.value = draftOldPages[subId];
+      });
+      Object.keys(draftOldDates).forEach(subId => {
+        const dInp = document.getElementById("chapDate_" + subId);
+        if (dInp) dInp.value = draftOldDates[subId];
+      });
     }
 
-    // ================= 6, 8, 11, 18) 3-MODE TEST ENTRY & MOST READ/REVISED SUBJECT ANALYSIS =================
     function setTestEntryMode(mode) {
       currentTestEntryMode = mode;
       ["chapter", "subject", "mock"].forEach(m => {
@@ -3026,7 +4077,7 @@
           html += `
             <label class="flex items-center gap-2 text-xs p-1 cursor-pointer">
               <input type="checkbox" ${checked ? "checked" : ""}
-                onchange="toggleTestChapSelection('${key.replace(/'/g, "\\'")}')" class="accent-indigo-600" />
+                onchange="toggleTestChapSelection('${key.replace(/'/g, "\\\\'")}')" class="accent-indigo-600" />
               <span class="truncate font-semibold">${c.name}</span>
             </label>
           `;
@@ -3089,7 +4140,6 @@
       triggerCelebration("🎯 ટેસ્ટ માર્ક્સ સેવ થયા!", scored + " / " + total + " (" + Math.round((scored/total)*100) + "%)");
     }
 
-    // 8) Edit Test Score
     function editTestScore(id) {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
@@ -3168,7 +4218,6 @@
         return { id: s.id, name: s.name, cTot, cDone, pRead, pRev, revSessions, readShare, tAvg, testCount: sTests.length, chapPct };
       });
 
-      // 18) Most Read, Most Revised & Least Read Subject Analysis
       if (subMetrics.length > 0) {
         const byRead = [...subMetrics].sort((a, b) => b.pRead - a.pRead);
         const byRev = [...subMetrics].sort((a, b) => (b.pRev + b.revSessions * 3) - (a.pRev + a.revSessions * 3));
@@ -3311,7 +4360,6 @@
             `;
           }).join("");
 
-      // 11) Enhanced Subject & Chapter Analysis
       document.getElementById("deepSubjectBreakdown").innerHTML = subMetrics.map(sm => {
         const revPct = sm.pRead > 0 ? Math.round((sm.pRev / sm.pRead) * 100) : 0;
         return `
@@ -3368,7 +4416,6 @@
       `).join("") || '<div class="text-xs muted-text text-center py-2">--</div>';
     }
 
-    // ================= 24) EXCEL / CSV / WORD BULK IMPORT ENGINE =================
     function openBulkImportModal() {
       if (guardDemoAction()) return;
       document.getElementById("bulkImportModal").classList.remove("hidden");
@@ -3385,9 +4432,9 @@
 
       const hint = document.getElementById("bulkImportFormatHint");
       if (mode === "syllabus") {
-        hint.innerHTML = 'Format (દરેક લાઈનમાં):<br/><b>Subject Name, Chapter Name, Pages(Optional)</b><br/>દા.ત.<br/>ભારતનું બંધારણ, આમુખ, 12<br/>ભારતનું બંધારણ, મૂળભૂત અધિકારો, 20';
+        hint.innerHTML = 'Format:<br/><b>Subject Name, Chapter Name, Pages(Optional)</b>';
       } else {
-        hint.innerHTML = 'Format (દરેક લાઈનમાં):<br/><b>Subject Name, Chapter/Test Name, Scored, Total</b><br/>દા.ત.<br/>ભારતનું બંધારણ, આમુખ ટેસ્ટ, 42, 50<br/>ગણિત, ટકાવારી, 38, 50';
+        hint.innerHTML = 'Format:<br/><b>Subject Name, Chapter/Test Name, Scored, Total</b>';
       }
     }
 
@@ -3401,7 +4448,7 @@
       reader.readAsText(file);
     }
 
-    function processBulkImport() {
+   function processBulkImport() {
       if (guardDemoAction()) return;
       const raw = document.getElementById("bulkImportTextarea").value.trim();
       if (!raw) return alert("પહેલા ડેટા પેસ્ટ કરો અથવા ફાઈલ અપલોડ કરો.");
@@ -3425,14 +4472,29 @@
             user.subjects.push(sub);
           }
           if (!sub.chapters.some(c => c.name.toLowerCase() === chapName.toLowerCase())) {
-            sub.chapters.push({
+            const newChap = {
               id: "ch_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
               name: chapName,
               donePages: pages,
               revisedPages: 0,
               completed: false,
               topics: []
-            });
+            };
+            // જો બીજી કોઈ પરીક્ષામાં આ જ વિષય અને ચેપ્ટર પહેલેથી પૂર્ણ હોય તો તેનો પ્રોગ્રેસ સિન્ક કરો
+            if (Array.isArray(user.exams)) {
+              user.exams.forEach(ex => {
+                if (ex.id === user.activeExamId) return;
+                const mSub = (ex.subjects || []).find(s => (s.name || "").trim().toLowerCase() === subName.toLowerCase());
+                const mChap = mSub ? (mSub.chapters || []).find(c => (c.name || "").trim().toLowerCase() === chapName.toLowerCase()) : null;
+                if (mChap) {
+                  newChap.donePages = mChap.donePages || pages;
+                  newChap.revisedPages = mChap.revisedPages || 0;
+                  newChap.completed = !!mChap.completed;
+                  newChap.completedDate = mChap.completedDate || null;
+                }
+              });
+            }
+            sub.chapters.push(newChap);
             importedCount++;
           }
         } else {
@@ -3465,7 +4527,7 @@
       triggerCelebration("📥 Bulk Import પૂર્ણ!", importedCount + " રેકોર્ડ્સ સફળતાપૂર્વક ઉમેરાયા!");
     }
 
-    // 15) Modified Study Focus Timer
+    // ================= POMODORO FOCUS TIMER =================
     function setPomodoroPreset(mins) {
       if (pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
       pomoPresetMins = mins;
@@ -3513,11 +4575,14 @@
       document.getElementById("pomoBtn").textContent = "▶ Start";
     }
 
-    // 22) Clear Exam Date if doing General Preparation
+    // ================= PROFILE & SETTINGS =================
     function clearExamDate() {
       if (guardDemoAction()) return;
       const user = getCurrentStudent();
       user.examDate = "";
+      ensureMultiExamStructure(user);
+      const curEx = user.exams.find(e => e.id === user.activeExamId);
+      if (curEx) curEx.examDate = "";
       document.getElementById("profExamDate").value = "";
       saveDB();
       renderStudentAll();
@@ -3529,6 +4594,12 @@
       user.name = document.getElementById("profName").value.trim() || user.name;
       user.exam = document.getElementById("profExam").value.trim() || user.exam;
       user.examDate = document.getElementById("profExamDate").value || "";
+      ensureMultiExamStructure(user);
+      const curEx = user.exams.find(e => e.id === user.activeExamId);
+      if (curEx) {
+        curEx.name = user.exam;
+        curEx.examDate = user.examDate;
+      }
       saveDB();
       renderStudentAll();
       triggerCelebration("✅ પ્રોફાઈલ અપડેટ થઈ!", user.examDate ? ("પરીક્ષા તારીખ: " + user.examDate) : "General Prep Mode");
@@ -3554,7 +4625,7 @@
       document.getElementById("feedbackMessageInput").value = "";
 
       if (sendWhatsApp) {
-        openAdminWhatsApp("*The Target App — " + type + "*\nStudent: " + user.name + " (" + user.mobile + ")\nMessage: " + msg);
+        openAdminWhatsApp("*Target Track — " + type + "*\nStudent: " + user.name + " (" + user.mobile + ")\nMessage: " + msg);
       } else {
         triggerCelebration("📩 રિપોર્ટ મોકલાઈ ગયો!", "Admin ટૂંક સમયમાં ચેક કરશે.");
       }
@@ -3565,7 +4636,7 @@
       const user = getCurrentStudent();
       const a = document.createElement("a");
       a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(user, null, 2));
-      a.download = "target_backup_" + user.mobile + ".json";
+      a.download = "target_track_backup_" + user.mobile + ".json";
       a.click();
     }
 
@@ -3583,6 +4654,8 @@
           user.revisions = imp.revisions || [];
           user.tests = imp.tests || [];
           user.quickNotes = imp.quickNotes || [];
+          if (Array.isArray(imp.exams)) user.exams = imp.exams;
+          if (imp.activeExamId) user.activeExamId = imp.activeExamId;
           saveDB();
           renderStudentAll();
           triggerCelebration("✅ Backup Restored!", "તમારો ડેટા પાછો આવી ગયો છે.");
@@ -3597,9 +4670,14 @@
         const btn = document.getElementById("nav-" + t);
         btn.className = t === tab ? "flex flex-col items-center py-1 text-indigo-500" : "flex flex-col items-center py-1 muted-text";
       });
+      // Show Exam Countdown Timer ONLY on the "Today" page and hide everywhere else
+      const cdWidget = document.getElementById("dailyCountdownWidget");
+      if (cdWidget) {
+        cdWidget.classList.toggle("hidden", tab !== "today");
+      }
     }
 
-    // ================= 21) MULTI-PAGE OWNER ADMIN PANEL =================
+    // ================= MULTI-PAGE OWNER ADMIN PANEL (WITH NEW UPDATES) =================
     function switchAdminPage(page) {
       ["dashboard", "users", "tools", "feedback"].forEach(p => {
         document.getElementById("adm-page-" + p).classList.toggle("hidden", p !== page);
@@ -3615,10 +4693,234 @@
       renderAdminPanel();
     }
 
+    // ================= 1. NOTIFICATION API FOR TODAY'S PENDING REVISION =================
+    let revisionNotifSentToday = false;
+
+    function enableRevisionNotifications() {
+      if (!("Notification" in window)) {
+        return alert("તમારા બ્રાઉઝરમાં Notification સપોર્ટ નથી.");
+      }
+      Notification.requestPermission().then(perm => {
+        const sub = document.getElementById("notifStatusSubtext");
+        const btn = document.getElementById("btnEnableNotif");
+        if (perm === "granted") {
+          if (sub) sub.textContent = "✅ નોટિફિકેશન એલર્ટ ચાલુ છે (Active)";
+          if (btn) btn.textContent = "✓ Enabled";
+          revisionNotifSentToday = false;
+          const u = getCurrentStudent();
+          if (u) checkAndSendRevisionNotification(u, true);
+        } else {
+          alert("નોટિફિકેશન પરમિશન નકારવામાં આવી છે. બ્રાઉઝર સેટિંગ્સમાંથી Allow કરો.");
+        }
+      });
+    }
+
+    function checkAndSendRevisionNotification(user, forceTest) {
+      if (!user || isDemoMode || !("Notification" in window)) return;
+      const sub = document.getElementById("notifStatusSubtext");
+      const btn = document.getElementById("btnEnableNotif");
+      if (Notification.permission === "granted") {
+        if (sub) sub.textContent = "✅ નોટિફિકેશન એલર્ટ ચાલુ છે (Active)";
+        if (btn) btn.textContent = "✓ Enabled";
+      } else {
+        return;
+      }
+
+      const today = todayISO();
+      const pendingRevs = (user.revisions || []).filter(r => !r.done && r.dueDate <= today);
+      if (pendingRevs.length === 0 && !forceTest) return;
+
+      const notifKey = "REV_NOTIF_" + user.mobile + "_" + today;
+      if (!forceTest && (revisionNotifSentToday || sessionStorage.getItem(notifKey))) return;
+
+      revisionNotifSentToday = true;
+      sessionStorage.setItem(notifKey, "1");
+
+      const title = pendingRevs.length > 0
+        ? `🔔 આજનું ${pendingRevs.length} રિવિઝન બાકી છે!`
+        : "🎯 Target Track — રિવિઝન એલર્ટ સક્રિય છે!";
+      const body = pendingRevs.length > 0
+        ? pendingRevs.slice(0, 3).map(r => `${r.subjectName}: ${r.chapterName}`).join(", ")
+        : "તમારું આજનું બધું રિવિઝન પૂર્ણ છે! 🎉";
+
+      try {
+        new Notification(title, { body, icon: "./manifest.json" });
+      } catch (e) {}
+    }
+
+    // ================= 2. POP-UP BROADCAST & 1-TO-1 DIRECT MESSAGE DISPLAY =================
+    function checkAndShowPopupBroadcast(user) {
+      if (!user || isDemoMode) return;
+
+      // Check 1-to-1 unread direct message from Admin first
+      const unreadDm = (user.directMessages || []).find(m => !m.seen);
+      if (unreadDm) {
+        document.getElementById("popupNoticeTag").textContent = "📩 1-to-1 Admin Reply";
+        document.getElementById("popupNoticeTitle").textContent = "Admin તરફથી તમારા માટે ખાસ મેસેજ";
+        document.getElementById("popupBroadcastBody").textContent = unreadDm.text + "\n\n🕒 " + (unreadDm.date || "");
+        document.getElementById("popupBroadcastModal").dataset.mode = "dm_" + unreadDm.id;
+        document.getElementById("popupBroadcastModal").classList.remove("hidden");
+        return;
+      }
+
+      // Otherwise check global Pop-up Broadcast
+      if (db.popupBroadcast && db.popupBroadcast.id && db.popupBroadcast.message) {
+        const seenKey = "POPUP_BC_" + db.popupBroadcast.id + "_" + user.mobile;
+        if (!localStorage.getItem(seenKey)) {
+          document.getElementById("popupNoticeTag").textContent = "📢 Important Announcement";
+          document.getElementById("popupNoticeTitle").textContent = db.popupBroadcast.title || "Admin Broadcast";
+          document.getElementById("popupBroadcastBody").textContent = db.popupBroadcast.message;
+          document.getElementById("popupBroadcastModal").dataset.mode = "bc_" + db.popupBroadcast.id;
+          document.getElementById("popupBroadcastModal").classList.remove("hidden");
+        }
+      }
+    }
+
+    function dismissPopupBroadcast() {
+      const user = getCurrentStudent();
+      const modal = document.getElementById("popupBroadcastModal");
+      const mode = modal.dataset.mode || "";
+      if (user && mode.startsWith("dm_")) {
+        const dmId = mode.replace("dm_", "");
+        const msg = (user.directMessages || []).find(m => m.id === dmId);
+        if (msg) {
+          msg.seen = true;
+          saveDB();
+          renderStudentDirectMessages(user);
+        }
+      } else if (user && mode.startsWith("bc_")) {
+        const bcId = mode.replace("bc_", "");
+        localStorage.setItem("POPUP_BC_" + bcId + "_" + user.mobile, "1");
+      }
+      modal.classList.add("hidden");
+    }
+
+    function renderStudentDirectMessages(user) {
+      const box = document.getElementById("studentDirectMessagesBox");
+      if (!box) return;
+      const dms = (user.directMessages || []).slice();
+      const myReports = (db.feedbacks || []).filter(f => f.mobile === user.mobile && f.adminReply);
+
+      let html = "";
+      dms.forEach(m => {
+        html += `
+          <div class="subtle-pill p-2.5 border-l-4 border-l-emerald-500 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-extrabold text-emerald-500">💬 Admin 1-to-1 Message</span>
+              <span class="text-[9px] muted-text">${m.date || ''}</span>
+            </div>
+            <div class="font-semibold mt-1">${m.text}</div>
+          </div>
+        `;
+      });
+
+      myReports.forEach(f => {
+        html += `
+          <div class="subtle-pill p-2.5 border-l-4 border-l-indigo-500 text-xs">
+            <div class="text-[10px] muted-text">Your Report: "${f.message}"</div>
+            <div class="font-extrabold text-indigo-500 mt-1">↪️ Admin Reply: ${f.adminReply}</div>
+          </div>
+        `;
+      });
+
+      box.innerHTML = html;
+    }
+
+    // ================= 3. USER CLEAR ALL MY DATA (STRICT 2-STEP) & ADMIN ARCHIVE =================
+    function clearAllMyDataTwoStep() {
+      if (guardDemoAction()) return;
+      const user = getCurrentStudent();
+      if (!user) return;
+
+      // Step 1 Confirmation
+      const step1 = confirm("⚠️ STEP 1/2 WARNING:\nશું તમે ખરેખર તમારો બધો જ અભ્યાસ ડેટા (Subjects, Chapters, Revisions, Tests, Notes) Clear કરવા માંગો છો?");
+      if (!step1) return;
+
+      // Step 2 Strict Confirmation (Must type DELETE)
+      const step2 = prompt("🚨 STEP 2/2 FINAL CONFIRMATION:\nતમારો બધો ડેટા રીસેટ કરવા માટે નીચે કેપિટલમાં DELETE લખો:");
+      if (step2 !== "DELETE") {
+        return alert("❌ ડેટા Clear કરવાની પ્રક્રિયા રદ કરવામાં આવી છે.");
+      }
+
+      // Archive old data to Admin's Deleted/Old Data Vault before clearing
+      if (!Array.isArray(db.deletedData)) db.deletedData = [];
+      db.deletedData.unshift({
+        archiveId: "arch_" + Date.now(),
+        deletedAt: nowFormattedTimestamp(),
+        deletedBy: "Student (Self Clear)",
+        mobile: user.mobile,
+        name: user.name,
+        exam: user.exam,
+        snapshot: JSON.parse(JSON.stringify({
+          subjects: user.subjects || [],
+          logs: user.logs || [],
+          revisions: user.revisions || [],
+          tests: user.tests || [],
+          quickNotes: user.quickNotes || [],
+          exams: user.exams || []
+        }))
+      });
+
+      // Reset student's active data
+      user.subjects = [];
+      user.logs = [];
+      user.revisions = [];
+      user.tests = [];
+      user.quickNotes = [];
+      user.focusMinutes = 0;
+      user.focusSessions = 0;
+      user.exams = [{ id: "ex_main", name: user.exam || "GPSC / CCE", examDate: user.examDate || "", subjects: [] }];
+      user.activeExamId = "ex_main";
+      selectedSubjectId = null;
+      selectedChapterId = null;
+
+      saveDB();
+      renderStudentAll();
+      triggerCelebration("🗑️ Data Cleared!", "તમારું એકાઉન્ટ નવેસરથી રીસેટ થઈ ગયું છે.");
+    }
+
+    // ================= 4. ADMIN CONTROLS: POPUP BROADCAST, ACTIVE vs DELETED DATA & BUG REPORTS =================
+    let adminUserDataViewMode = "active"; // 'active' | 'deleted'
+
+    function switchAdminUserDataView(mode) {
+      adminUserDataViewMode = mode;
+      document.getElementById("admActiveUsersSection").classList.toggle("hidden", mode !== "active");
+      document.getElementById("admDeletedUsersSection").classList.toggle("hidden", mode !== "deleted");
+      document.getElementById("admDataTabActive").className = mode === "active"
+        ? "py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm"
+        : "py-2 rounded-xl text-xs font-extrabold muted-text";
+      document.getElementById("admDataTabDeleted").className = mode === "deleted"
+        ? "py-2 rounded-xl text-xs font-extrabold bg-rose-600 text-white shadow-sm"
+        : "py-2 rounded-xl text-xs font-extrabold muted-text";
+      renderAdminPanel();
+    }
+
     function saveAdminBroadcast() {
       db.broadcast = document.getElementById("adminBroadcastInput").value.trim();
       saveDB();
-      triggerCelebration("📢 Broadcast Posted!", "બધા વિદ્યાર્થીઓને સૂચના દેખાશે.");
+      triggerCelebration("📢 Banner Broadcast Posted!", "બધા વિદ્યાર્થીઓને સૂચના દેખાશે.");
+    }
+
+    function saveAdminPopupBroadcast() {
+      const title = document.getElementById("adminPopupTitleInput").value.trim() || "📢 અગત્યની સૂચના";
+      const message = document.getElementById("adminPopupMsgInput").value.trim();
+      if (!message) return alert("Pop-up મેસેજ લખો.");
+      db.popupBroadcast = {
+        id: "pbc_" + Date.now(),
+        title,
+        message,
+        date: todayISO()
+      };
+      saveDB();
+      triggerCelebration("🚀 Pop-up Broadcast Sent!", "દરેક યુઝરને સ્ક્રીન પર Pop-up દેખાશે.");
+    }
+
+    function clearAdminPopupBroadcast() {
+      db.popupBroadcast = null;
+      document.getElementById("adminPopupTitleInput").value = "";
+      document.getElementById("adminPopupMsgInput").value = "";
+      saveDB();
+      triggerCelebration("🗑️ Pop-up Cleared!", "Pop-up Broadcast બંધ કરવામાં આવ્યું.");
     }
 
     function bulkExtendAllUsersValidity(extraDays) {
@@ -3646,15 +4948,126 @@
       triggerCelebration("✅ User Updated!", u.name);
     }
 
+    function adminArchiveStudentAccount(mobile) {
+      const u = db.users[mobile];
+      if (!u) return;
+      if (!confirm(`શું તમારે ${u.name} (${u.mobile}) ને Active Users માંથી ખસેડીને Deleted/Old Data Vault માં મોકલવા છે?`)) return;
+      if (!Array.isArray(db.deletedData)) db.deletedData = [];
+      db.deletedData.unshift({
+        archiveId: "arch_" + Date.now(),
+        deletedAt: nowFormattedTimestamp(),
+        deletedBy: "Admin (Archived Account)",
+        mobile: u.mobile,
+        name: u.name,
+        exam: u.exam,
+        fullAccountBackup: JSON.parse(JSON.stringify(u)),
+        snapshot: {
+          subjects: u.subjects || [],
+          logs: u.logs || [],
+          revisions: u.revisions || [],
+          tests: u.tests || []
+        }
+      });
+      delete db.users[mobile];
+      saveDB();
+      renderAdminPanel();
+      triggerCelebration("🗑️ Moved to Old Data Vault!", u.name);
+    }
+
+    function adminRestoreDeletedData(archiveId) {
+      if (!Array.isArray(db.deletedData)) return;
+      const item = db.deletedData.find(x => x.archiveId === archiveId);
+      if (!item) return;
+
+      if (item.fullAccountBackup) {
+        db.users[item.mobile] = item.fullAccountBackup;
+      } else if (db.users[item.mobile] && item.snapshot) {
+        const u = db.users[item.mobile];
+        u.subjects = item.snapshot.subjects || [];
+        u.logs = item.snapshot.logs || [];
+        u.revisions = item.snapshot.revisions || [];
+        u.tests = item.snapshot.tests || [];
+        u.quickNotes = item.snapshot.quickNotes || [];
+        if (item.snapshot.exams) u.exams = item.snapshot.exams;
+      }
+      db.deletedData = db.deletedData.filter(x => x.archiveId !== archiveId);
+      saveDB();
+      renderAdminPanel();
+      triggerCelebration("♻️ Data Restored!", item.name + " (" + item.mobile + ")");
+    }
+
+    function adminPermanentlyDeleteOldData(archiveId) {
+      if (!confirm("⚠️ FINAL AUTHORITY CONFIRMATION:\nશું તમે આ જૂનો ડેટા કાયમ માટે (Permanently) ડિલીટ કરવા માંગો છો? આ ડેટા ફરી ક્યારેય પાછો નહીં મળે.")) return;
+      db.deletedData = (db.deletedData || []).filter(x => x.archiveId !== archiveId);
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function adminEmptyDeletedVault() {
+      if (!confirm("🚨 શું તમે Deleted/Old Data Vault નો બધો જ ડેટા કાયમ માટે (Permanently) ડિલીટ કરવા માંગો છો?")) return;
+      db.deletedData = [];
+      saveDB();
+      renderAdminPanel();
+    }
+
+    function copyBugReportText(encodedMsg) {
+      const text = decodeURIComponent(encodedMsg || "");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          triggerCelebration("📋 Copied!", "રિપોર્ટ ટેક્સ્ટ કોપી થઈ ગઈ છે.");
+        });
+      } else {
+        prompt("Copy Report Text:", text);
+      }
+    }
+
+    function sendOneToOneBugReply(feedbackId) {
+      const f = (db.feedbacks || []).find(x => x.id === feedbackId);
+      if (!f) return;
+      const inp = document.getElementById("admReplyInput_" + feedbackId);
+      const replyText = inp ? inp.value.trim() : "";
+      if (!replyText) return alert("પહેલા રિપ્લાય મેસેજ લખો.");
+
+      f.adminReply = replyText;
+      f.repliedAt = nowFormattedTimestamp();
+
+      // Deliver 1-to-1 Direct Message to the specific reporting user
+      const targetUser = db.users[f.mobile];
+      if (targetUser) {
+        if (!Array.isArray(targetUser.directMessages)) targetUser.directMessages = [];
+        targetUser.directMessages.unshift({
+          id: "dm_" + Date.now(),
+          date: nowFormattedTimestamp(),
+          text: `🛠️ [Re: ${f.message}]\n${replyText}`,
+          seen: false
+        });
+      }
+
+      if (inp) inp.value = "";
+      saveDB();
+      renderAdminPanel();
+      triggerCelebration("📩 1-to-1 Reply Sent!", f.studentName + " (" + f.mobile + ") ને મેસેજ મળી જશે.");
+    }
+
     function renderAdminPanel() {
       const usersArr = Object.values(db.users);
+      const deletedArr = db.deletedData || [];
+
       document.getElementById("admTotalUsers").textContent = usersArr.length;
       document.getElementById("admPendingUsers").textContent = usersArr.filter(u => getValidityRemainingDays(u) <= 5 || u.status !== "approved").length;
       document.getElementById("admApprovedUsers").textContent = usersArr.filter(u => u.status === "approved" && getValidityRemainingDays(u) > 5).length;
       document.getElementById("admFeedbackCount").textContent = (db.feedbacks || []).length;
       document.getElementById("adminBroadcastInput").value = db.broadcast || "";
+      const delBadge = document.getElementById("admDeletedCountBadge");
+      if (delBadge) delBadge.textContent = deletedArr.length;
 
-      // Leaderboard on Admin Page 1
+      if (db.popupBroadcast) {
+        const pt = document.getElementById("adminPopupTitleInput");
+        const pm = document.getElementById("adminPopupMsgInput");
+        if (pt && !pt.value) pt.value = db.popupBroadcast.title || "";
+        if (pm && !pm.value) pm.value = db.popupBroadcast.message || "";
+      }
+
       const ranked = usersArr.map(u => {
         let p = 0;
         (u.subjects || []).forEach(s => s.chapters.forEach(c => { p += Number(c.donePages || 0); }));
@@ -3685,7 +5098,7 @@
 
       const listEl = document.getElementById("adminStudentList");
       listEl.innerHTML = filteredUsers.length === 0
-        ? '<div class="text-xs muted-text text-center py-4">No matching students found.</div>'
+        ? '<div class="text-xs muted-text text-center py-4">No matching active students found.</div>'
         : filteredUsers.map(u => {
             const isApp = u.status === "approved";
             const remDays = getValidityRemainingDays(u);
@@ -3747,9 +5160,14 @@
                         <button onclick="adjustStudentValidity('${u.mobile}', -15)" class="one-card text-rose-500 text-xs font-extrabold px-2 py-1 rounded-lg">−15d</button>
                         <button onclick="adjustStudentValidity('${u.mobile}', 15)" class="one-card text-emerald-500 text-xs font-extrabold px-2 py-1 rounded-lg">+15d</button>
                       </div>
-                      <button onclick="toggleStudentLockStatus('${u.mobile}')" class="bg-rose-500/15 text-rose-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
-                        ${u.status === 'approved' ? '🚫 Block' : '✓ Unblock'}
-                      </button>
+                      <div class="flex items-center gap-1.5">
+                        <button onclick="toggleStudentLockStatus('${u.mobile}')" class="bg-amber-500/15 text-amber-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                          ${u.status === 'approved' ? '🚫 Block' : '✓ Unblock'}
+                        </button>
+                        <button onclick="adminArchiveStudentAccount('${u.mobile}')" class="bg-rose-500/15 text-rose-500 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                          🗑️ Move to Old Vault
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ` : ''}
@@ -3757,20 +5175,85 @@
             `;
           }).join("");
 
+      // Render Deleted / Old Data Vault
+      const delListEl = document.getElementById("adminDeletedDataList");
+      if (delListEl) {
+        delListEl.innerHTML = deletedArr.length === 0
+          ? '<div class="text-xs muted-text text-center py-4">Deleted / Old Data Vault ખાલી છે.</div>'
+          : deletedArr.map(item => {
+              const subCount = (item.snapshot?.subjects || []).length;
+              const logCount = (item.snapshot?.logs || []).length;
+              return `
+                <div class="subtle-pill p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-l-4 border-l-rose-500">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-xs font-extrabold">${item.name || 'Student'}</span>
+                      <span class="text-xs font-mono font-bold text-indigo-500">📞 ${item.mobile}</span>
+                      <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-500">${item.deletedBy || 'Deleted'}</span>
+                    </div>
+                    <div class="text-[10px] muted-text mt-1">
+                      🕒 Deleted At: <b>${item.deletedAt}</b> • 📚 Subjects: <b>${subCount}</b> • 📖 Logs: <b>${logCount}</b>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="adminRestoreDeletedData('${item.archiveId}')" class="bg-emerald-600 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-xl">
+                      ♻️ Restore
+                    </button>
+                    <button onclick="adminPermanentlyDeleteOldData('${item.archiveId}')" class="bg-rose-600 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-xl">
+                      ✕ Permanent Delete
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join("");
+      }
+
+      // Render Upgraded Bug Reports (Copy Icon + User Name & Phone + 1-to-1 Direct Reply)
       const fbEl = document.getElementById("adminFeedbackList");
       const fbs = db.feedbacks || [];
       fbEl.innerHTML = fbs.length === 0
-        ? '<div class="text-xs muted-text">No bug reports or feature requests yet.</div>'
-        : fbs.map(f => `
-            <div class="subtle-pill p-2.5 flex items-center justify-between gap-2 text-xs">
-              <div>
-                <span class="font-extrabold text-indigo-500">[${f.type}]</span>
-                <b>${f.studentName} (${f.mobile})</b> • <span class="muted-text">${f.date}</span>
-                <div class="mt-0.5">${f.message}</div>
+        ? '<div class="text-xs muted-text">No reports or feature requests yet.</div>'
+        : fbs.map(f => {
+            const safeMsg = encodeURIComponent(f.message || "");
+            return `
+              <div class="subtle-pill p-3.5 space-y-2.5 text-xs border-l-4 border-l-indigo-500">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="space-y-1 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500 text-[10px]">${f.type}</span>
+                      <span class="font-extrabold text-sm">👤 ${f.studentName || 'Student'}</span>
+                      <a href="tel:${f.mobile}" class="font-mono font-extrabold text-emerald-500 underline">📞 ${f.mobile}</a>
+                      <span class="text-[10px] muted-text">• ${f.date}</span>
+                    </div>
+                    <div class="flex items-center gap-2 pt-1">
+                      <p class="font-semibold text-xs break-words flex-1">${f.message}</p>
+                      <button onclick="copyBugReportText('${safeMsg}')" title="Copy Bug Report Text"
+                        class="one-card px-2.5 py-1 rounded-xl text-[10px] font-extrabold text-indigo-500 shrink-0 hover:border-indigo-500">
+                        📋 Copy
+                      </button>
+                    </div>
+                  </div>
+                  <button onclick="deleteFeedbackItem('${f.id}')" class="text-rose-500 font-bold px-2 py-1 rounded-lg hover:bg-rose-500/10">🗑</button>
+                </div>
+
+                ${f.adminReply ? `
+                  <div class="one-card px-3 py-2 rounded-xl text-[11px] border-l-2 border-l-emerald-500">
+                    <span class="font-extrabold text-emerald-500">✓ Replied (${f.repliedAt || ''}):</span> ${f.adminReply}
+                  </div>
+                ` : ''}
+
+                <!-- 1-to-1 Direct Reply Input -->
+                <div class="flex gap-1.5 pt-1">
+                  <input id="admReplyInput_${f.id}" type="text" placeholder="Reply 1-to-1 directly to ${f.studentName} (${f.mobile})..."
+                    class="flex-1 theme-input px-3 py-1.5 text-xs font-semibold" />
+                  <button onclick="sendOneToOneBugReply('${f.id}')"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-[11px] shrink-0">
+                    📩 Send 1-to-1 Reply
+                  </button>
+                </div>
               </div>
-              <button onclick="deleteFeedbackItem('${f.id}')" class="text-rose-500 font-bold px-2">✕</button>
-            </div>
-          `).join("");
+            `;
+          }).join("");
     }
 
     function deleteFeedbackItem(id) {
@@ -3778,7 +5261,7 @@
       saveDB();
       renderAdminPanel();
     }
-
+    
     function toggleStudentLockStatus(m) {
       const u = db.users[m];
       if (!u) return;
@@ -3807,12 +5290,28 @@
       renderAdminPanel();
     }
 
-    function inspectStudent(m) {
+    // ================= ADMIN REPORT: OPEN/CLOSE SUBJECTS & TEST SUBJECT AVG + OVERALL PERFORMANCE =================
+    function toggleAdminReportSub(mobile, subId) {
+      const key = mobile + "_" + subId;
+      adminReportSubAccordion[key] = !adminReportSubAccordion[key];
+      inspectStudent(mobile, true);
+    }
+
+    function setAllAdminReportSubs(mobile, openState) {
+      const u = db.users[mobile];
+      if (!u) return;
+      (u.subjects || []).forEach(s => {
+        adminReportSubAccordion[mobile + "_" + s.id] = openState;
+      });
+      inspectStudent(mobile, true);
+    }
+
+    function inspectStudent(m, skipScroll) {
       const u = db.users[m];
       if (!u) return;
       const box = document.getElementById("adminInspectBox");
       box.classList.remove("hidden");
-      document.getElementById("inspectStudentTitle").textContent = "📊 " + u.name + " (" + u.mobile + ") — Complete In-Detail Student Report";
+      document.getElementById("inspectStudentTitle").textContent = "📊 " + u.name + " (" + u.mobile + ") — Complete Student Report";
 
       let totC = 0, doneC = 0, totRead = 0, totRev = 0;
       (u.subjects || []).forEach(s => s.chapters.forEach(c => {
@@ -3824,21 +5323,76 @@
 
       let tSc = 0, tMx = 0;
       (u.tests || []).forEach(t => { tSc += Number(t.scored); tMx += Number(t.total); });
-      const tAvg = tMx > 0 ? Math.round((tSc / tMx) * 100) + "%" : "N/A";
+      const tAvgNum = tMx > 0 ? Math.round((tSc / tMx) * 100) : null;
+      const tAvg = tAvgNum !== null ? (tAvgNum + "%") : "N/A";
 
+      // ઓવરઓલ પરફોર્મન્સ કેવું છે તે ગણતરી
+      let perfBadgeText = "🌱 No Tests Yet";
+      let perfBadgeCol = "bg-slate-500/15 text-slate-500";
+      if (tAvgNum !== null) {
+        if (tAvgNum >= 80) {
+          perfBadgeText = "🏆 Excellent (શ્રેષ્ઠ પરફોર્મન્સ)";
+          perfBadgeCol = "bg-emerald-500/20 text-emerald-500";
+        } else if (tAvgNum >= 65) {
+          perfBadgeText = "👍 Good (સારું પરફોર્મન્સ)";
+          perfBadgeCol = "bg-indigo-500/20 text-indigo-500";
+        } else if (tAvgNum >= 50) {
+          perfBadgeText = "⚡ Average (મધ્યમ - વધુ પ્રેક્ટિસ જરૂરી)";
+          perfBadgeCol = "bg-amber-500/20 text-amber-500";
+        } else {
+          perfBadgeText = "⚠️ Needs Improvement (નબળું - ખાસ ધ્યાન આપવું)";
+          perfBadgeCol = "bg-rose-500/20 text-rose-500";
+        }
+      }
+
+      // વિષય મુજબ ટેસ્ટ સરેરાશ (Subject-wise Test Average)
+      const subTestAvgHtml = (u.subjects || []).map(s => {
+        const sTests = (u.tests || []).filter(t => (t.subjects || []).includes(s.name) || (t.subjectName || "").includes(s.name));
+        let sc = 0, mx = 0;
+        sTests.forEach(x => { sc += Number(x.scored); mx += Number(x.total); });
+        const avg = mx > 0 ? Math.round((sc / mx) * 100) : null;
+        return `
+          <div class="one-card px-3 py-2 rounded-xl flex items-center justify-between text-[11px]">
+            <span class="font-bold truncate pr-2">📚 ${s.name} <span class="muted-text">(${sTests.length} Tests)</span></span>
+            <span class="font-extrabold ${avg !== null ? (avg >= 75 ? 'text-emerald-500' : (avg < 50 ? 'text-rose-500' : 'text-amber-500')) : 'muted-text'}">
+              ${avg !== null ? avg + '%' : 'No Test'}
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      // રિપોર્ટમાં સબ્જેક્ટ લિસ્ટ માટે Open / Close Accordion ઓપ્શન
       const subDetailsHtml = (u.subjects || []).map(s => {
+        const key = m + "_" + s.id;
+        const isOpen = !!adminReportSubAccordion[key];
         const sDone = s.chapters.filter(c => c.completed).length;
+        const sPages = s.chapters.reduce((a, c) => a + Number(c.donePages || 0), 0);
+        const sRev = s.chapters.reduce((a, c) => a + Number(c.revisedPages || 0), 0);
+
         const chRows = s.chapters.map(c => `
-          <div class="flex items-center justify-between py-1 border-b text-[11px]" style="border-color: var(--border-col);">
+          <div class="flex items-center justify-between py-1.5 border-b text-[11px]" style="border-color: var(--border-col);">
             <span>${c.completed ? '✅' : '⏳'} <b>${c.name}</b></span>
             <span>Read: <b>${c.donePages}p</b> • Rev: <b class="text-emerald-500">${c.revisedPages || 0}p</b></span>
           </div>
         `).join("");
 
         return `
-          <div class="subtle-pill p-3 space-y-1.5">
-            <div class="font-extrabold text-indigo-500">📚 ${s.name} (${sDone}/${s.chapters.length} પૂર્ણ)</div>
-            <div>${chRows || '<div class="muted-text">No chapters</div>'}</div>
+          <div class="subtle-pill overflow-hidden">
+            <div onclick="toggleAdminReportSub('${m}', '${s.id}')" class="p-3 flex items-center justify-between cursor-pointer select-none">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xs font-extrabold text-indigo-500">${isOpen ? '▼' : '▶'}</span>
+                <span class="font-extrabold text-xs truncate">📚 ${s.name}</span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 text-[10px]">
+                <span class="muted-text">📖 ${sPages}p (Rev: ${sRev}p)</span>
+                <span class="font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">${sDone}/${s.chapters.length} પૂર્ણ</span>
+              </div>
+            </div>
+            ${isOpen ? `
+              <div class="px-3 pb-3 pt-1 border-t space-y-1" style="border-color: var(--border-col);">
+                ${chRows || '<div class="muted-text py-1">No chapters added</div>'}
+              </div>
+            ` : ''}
           </div>
         `;
       }).join("");
@@ -3855,21 +5409,45 @@
           <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Plan</div><div class="text-xs font-extrabold text-emerald-500">${u.planName || 'Trial'} (${getValidityRemainingDays(u)}d)</div></div>
           <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Chapters Done</div><div class="text-xs font-extrabold">${doneC} / ${totC}</div></div>
           <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Read vs Revised</div><div class="text-xs font-extrabold text-indigo-500">${totRead}p / ${totRev}p</div></div>
-          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Test Avg</div><div class="text-xs font-extrabold text-purple-500">${tAvg} (${(u.tests||[]).length})</div></div>
+          <div class="subtle-pill p-2.5"><div class="text-[10px] muted-text">Test Avg</div><div class="text-xs font-extrabold text-purple-500">${tAvg} (${(u.tests||[]).length} Tests)</div></div>
         </div>
-        <div class="space-y-2">${subDetailsHtml || '<div class="muted-text">No subjects added.</div>'}</div>
+
+        <!-- Test Marks: Subject Average & Overall Performance -->
+        <div class="subtle-pill p-3.5 space-y-2.5 border-l-4 border-l-purple-500">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="text-xs font-extrabold">🎯 Test Marks & Overall Performance</div>
+            <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full ${perfBadgeCol}">${perfBadgeText}</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            ${subTestAvgHtml || '<div class="muted-text text-xs">No subjects added yet.</div>'}
+          </div>
+        </div>
+
+        <!-- Subject List with Open / Close Controls -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-xs font-extrabold">📚 Subject List (Open / Close)</span>
+            <div class="flex gap-2 text-[11px] font-extrabold">
+              <button onclick="setAllAdminReportSubs('${m}', true)" class="text-indigo-500">Open All</button>
+              <span class="muted-text">•</span>
+              <button onclick="setAllAdminReportSubs('${m}', false)" class="muted-text">Close All</button>
+            </div>
+          </div>
+          ${subDetailsHtml || '<div class="muted-text">No subjects added.</div>'}
+        </div>
+
         <div class="subtle-pill p-3 space-y-1">
           <div class="font-extrabold text-emerald-500 mb-1">Recent Study & Revision Logs:</div>
           ${logsHtml || '<div class="muted-text">No logs yet.</div>'}
         </div>
       `;
-      box.scrollIntoView({ behavior: "smooth" });
+      if (!skipScroll) box.scrollIntoView({ behavior: "smooth" });
     }
 
     function exportAllDatabaseJSON() {
       const a = document.createElement("a");
       a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-      a.download = "target_master_" + todayISO() + ".json";
+      a.download = "target_track_master_" + todayISO() + ".json";
       a.click();
     }
 
@@ -3884,10 +5462,15 @@
       reader.readAsText(file);
     }
 
-    // Boot App
+    // Boot App + Offline Support + Live Countdown Ticker
+    registerOfflineSupport();
     bootApp();
     syncFromFirebaseCloud(false);
     setInterval(() => syncFromFirebaseCloud(false), 20000);
+    setInterval(() => {
+      const u = getCurrentStudent();
+      if (u) updateDailyPastelCountdown(u);
+    }, 1000);
   </script>
 </body>
 </html>
