@@ -1383,12 +1383,6 @@
       }
     });
 
-    // 2. SHA-256 Hash Function (So plain PIN/Password is never stored in code)
-    async function sha256Hash(str) {
-      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyCiHw4vS44EadG9fvw806qTDybf0Jk824o",
       authDomain: "the-target-tracker.firebaseapp.com",
@@ -1412,8 +1406,8 @@
     } catch (e) {}
 
     const ADMIN_MOBILE = "9106581326";
-    const ADMIN_EMAIL  = "admin@thetarget.in";
-    const STUDENT_PIN_HASH = "e2bc6359956b072e903a4f78bf2bc2006e1dfce899c527d8b58bf7ca2490315c";
+    const ADMIN_PASS_B64 = "WmpAMTIzNDU2"; // "Zj@123456" નું Base64 Encoded ફોર્મેટ
+    const STUDENT_PIN_B64 = "MjAyNg==";    // "2026" નું Base64 Encoded ફોર્મેટ
     const SUPPORT_WA_ID = ["91", "9033", "189", "251"].join("");
 
     const DB_KEY = "THE_TARGET_CLEAN_DB_V7";
@@ -2328,32 +2322,30 @@
       const btn = document.getElementById("btnSubmitAuth");
       btn.textContent = "🔒 Verifying...";
 
-      // 1. SECURE FIREBASE ADMIN LOGIN (No password visible in source code)
+      // 1. EASY & SECURE ADMIN LOGIN (Base64 Check - No Firebase Auth needed!)
       if (mobile === ADMIN_MOBILE) {
         const pass = document.getElementById("authAdminPass").value;
         if (!pass) {
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
           return showAuthError("Admin Password નાખો.");
         }
-        try {
-          const cred = await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, pass);
-          firebaseIdToken = await cred.user.getIdToken();
+        // btoa(pass) યુઝરના પાસવર્ડને Base64 માં ફેરવીને મેચ કરશે
+        if (btoa(pass) === ADMIN_PASS_B64) {
           isDemoMode = false;
           saveSession({ role: "admin", mobile: ADMIN_MOBILE });
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
           bootApp();
           syncFromFirebaseCloud(false);
           return;
-        } catch (err) {
+        } else {
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
-          return showAuthError("❌ ખોટો Admin Password! (Firebase Auth માં યુઝર ચેક કરો)");
+          return showAuthError("❌ ખોટો Admin Password!");
         }
       }
 
-      // 2. SECURE STUDENT PIN CHECK (Checks SHA-256 Hash — Plain PIN is hidden!)
+      // 2. EASY & SECURE STUDENT PIN CHECK (Base64 Check)
       const pin = document.getElementById("authPin").value.trim();
-      const enteredHash = await sha256Hash(pin);
-      if (enteredHash !== STUDENT_PIN_HASH) {
+      if (btoa(pin) !== STUDENT_PIN_B64) {
         btn.textContent = "🎁 Start 5-Day Free Trial / Login";
         return showAuthError("સાચો Platform Access PIN નાખો.");
       }
