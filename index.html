@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Target Track — Smart Study OS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- OFFICIAL FIREBASE SDK (DEFERRED FOR FAST LCP) -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- OFFICIAL FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Gujarati:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -1369,7 +1369,9 @@
     </div>
 
   </div>
-// 1. Block Right-Click & F12 DevTools Inspect
+<!-- ================= APPLICATION LOGIC ================= -->
+  <script>
+    // 1. Block Right-Click & F12 DevTools Inspect
     document.addEventListener("contextmenu", e => e.preventDefault());
     document.addEventListener("keydown", e => {
       if (
@@ -1386,8 +1388,7 @@
       const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
       return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
-  <!-- ================= APPLICATION LOGIC ================= -->
-  <script>
+
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyCiHw4vS44EadG9fvw806qTDybf0Jk824o",
       authDomain: "the-target-tracker.firebaseapp.com",
