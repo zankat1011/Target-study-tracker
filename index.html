@@ -1530,8 +1530,7 @@
       ]);
     }
 
-    let anonAuthUnsupported = false;
-   async function ensureFirebaseAuthToken() {
+    async function ensureFirebaseAuthToken() {
       if (!navigator.onLine) return null;
       if (firebaseIdToken) return firebaseIdToken;
       try {
@@ -1540,11 +1539,6 @@
           const cur = firebase.auth().currentUser;
           if (cur) {
             firebaseIdToken = await cur.getIdToken();
-            return firebaseIdToken;
-          }
-          const cred = await withTimeout(firebase.auth().signInAnonymously(), 3000);
-          if (cred && cred.user) {
-            firebaseIdToken = await cred.user.getIdToken();
             return firebaseIdToken;
           }
         }
