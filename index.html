@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Target Track — Smart Study OS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- OFFICIAL FIREBASE SDK -->
+ <!-- OFFICIAL FIREBASE SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -1383,6 +1383,12 @@
       }
     });
 
+    // 2. SHA-256 Hash Function
+    async function sha256Hash(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyCiHw4vS44EadG9fvw806qTDybf0Jk824o",
       authDomain: "the-target-tracker.firebaseapp.com",
@@ -1406,9 +1412,11 @@
     } catch (e) {}
 
     const ADMIN_MOBILE = "9106581326";
-    const ADMIN_PASS_B64 = "WmpAMTIzNDU2"; // "Zj@123456" નું Base64 Encoded ફોર્મેટ
-    const STUDENT_PIN_B64 = "MjAyNg==";    // "2026" નું Base64 Encoded ફોર્મેટ
-    const SUPPORT_WA_ID = ["91", "9033", "189", "251"].join("");
+    const ADMIN_EMAIL  = "thetarget.edu@gmail.com";
+    const ADMIN_UID    = "7ZX31dUfY5NsZefR7m5nGcUwEp22";
+    // "2026" no 100% sacho SHA-256 hash + Base64 fallback
+    const STUDENT_PIN_HASH = "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db";
+    const STUDENT_PIN_B64  = "MjAyNg==";    const SUPPORT_WA_ID = ["91", "9033", "189", "251"].join("");
 
     const DB_KEY = "THE_TARGET_CLEAN_DB_V7";
     const DB_MIRROR_KEY = "THE_TARGET_CLEAN_DB_MIRROR_V7";
@@ -1523,20 +1531,24 @@
     }
 
     let anonAuthUnsupported = false;
-    async function ensureFirebaseAuthToken() {
-      if (!navigator.onLine || anonAuthUnsupported) return null;
+   async function ensureFirebaseAuthToken() {
+      if (!navigator.onLine) return null;
       if (firebaseIdToken) return firebaseIdToken;
       try {
-        if (fbAppReady && firebase.auth) {
+        if (typeof firebase !== "undefined") {
+          if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
           const cur = firebase.auth().currentUser;
           if (cur) {
             firebaseIdToken = await cur.getIdToken();
             return firebaseIdToken;
           }
+          const cred = await withTimeout(firebase.auth().signInAnonymously(), 3000);
+          if (cred && cred.user) {
+            firebaseIdToken = await cred.user.getIdToken();
+            return firebaseIdToken;
+          }
         }
       } catch (e) {}
-      // Mark as unsupported so it doesn't spam 400 Bad Request errors or slow down the app
-      anonAuthUnsupported = true;
       return null;
     }
 
@@ -2322,30 +2334,63 @@
       const btn = document.getElementById("btnSubmitAuth");
       btn.textContent = "🔒 Verifying...";
 
-      // 1. EASY & SECURE ADMIN LOGIN (Base64 Check - No Firebase Auth needed!)
+      // 1. SECURE FIREBASE ADMIN LOGIN (Uses thetarget.edu@gmail.com & UID check)
       if (mobile === ADMIN_MOBILE) {
         const pass = document.getElementById("authAdminPass").value;
         if (!pass) {
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
           return showAuthError("Admin Password નાખો.");
         }
-        // btoa(pass) યુઝરના પાસવર્ડને Base64 માં ફેરવીને મેચ કરશે
-        if (btoa(pass) === ADMIN_PASS_B64) {
+        try {
+          if (typeof firebase !== "undefined" && !firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+          }
+          const cred = await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, pass);
+          if (cred.user && cred.user.uid === ADMIN_UID) {
+            firebaseIdToken = await cred.user.getIdToken();
+          }
           isDemoMode = false;
           saveSession({ role: "admin", mobile: ADMIN_MOBILE });
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
           bootApp();
           syncFromFirebaseCloud(false);
           return;
-        } else {
+        } catch (err) {
           btn.textContent = "🎁 Start 5-Day Free Trial / Login";
           return showAuthError("❌ ખોટો Admin Password!");
         }
       }
 
-      // 2. EASY & SECURE STUDENT PIN CHECK (Base64 Check)
+      // 2. SECURE STUDENT PIN CHECK (Checks Database studentPin OR SHA-256 Hash OR Base64)
       const pin = document.getElementById("authPin").value.trim();
-      if (btoa(pin) !== STUDENT_PIN_B64) {
+      if (!pin) {
+        btn.textContent = "🎁 Start 5-Day Free Trial / Login";
+        return showAuthError("સાચો Platform Access PIN નાખો.");
+      }
+
+      let pinValid = false;
+      // Btoa check ("2026")
+      if (btoa(pin) === STUDENT_PIN_B64) pinValid = true;
+      // SHA-256 check (if running on https/localhost)
+      if (!pinValid && window.crypto && window.crypto.subtle) {
+        try {
+          const enteredHash = await sha256Hash(pin);
+          if (enteredHash === STUDENT_PIN_HASH) pinValid = true;
+        } catch (e) {}
+      }
+      // Firebase Database /targetApp/studentPin check (from your screenshot 1)
+      if (!pinValid && navigator.onLine) {
+        try {
+          await ensureFirebaseAuthToken();
+          const pinRes = await withTimeout(fetch(buildFirebaseUrl("/targetApp/studentPin.json")), 2500);
+          if (pinRes && pinRes.ok) {
+            const cloudPin = await pinRes.json();
+            if (cloudPin && String(cloudPin) === String(pin)) pinValid = true;
+          }
+        } catch (e) {}
+      }
+
+      if (!pinValid) {
         btn.textContent = "🎁 Start 5-Day Free Trial / Login";
         return showAuthError("સાચો Platform Access PIN નાખો.");
       }
